@@ -1,4 +1,4 @@
-# Hướng dẫn tích hợp Firebase vào dự án Next.js
+# Hướng dẫn tích hợp Firebase vào dự án Next.js (TypeScript)
 
 ## 1. Tạo Project Firebase
 
@@ -52,30 +52,30 @@ Chạy lệnh sau trong thư mục dự án:
 npm install firebase
 ```
 
-## 5. Tạo file cấu hình Firebase trong dự án
+## 5. Tạo file cấu hình Firebase trong dự án (TypeScript)
 
-Tạo file `firebaseConfig.js` (hoặc `firebaseConfig.ts` nếu dùng TypeScript) trong thư mục gốc hoặc `/lib`:
-```js
-// lib/firebaseConfig.js
-import { initializeApp, getApps } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-import { getStorage } from "firebase/storage";
+Tạo file `firebaseConfig.ts` trong thư mục `/lib` hoặc gốc:
+```ts
+// lib/firebaseConfig.ts
+import { initializeApp, getApps, FirebaseApp } from "firebase/app";
+import { getAuth, Auth } from "firebase/auth";
+import { getFirestore, Firestore } from "firebase/firestore";
+import { getStorage, FirebaseStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN!,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID!,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET!,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID!,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID!,
 };
 
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
+const app: FirebaseApp = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-export const storage = getStorage(app);
+export const auth: Auth = getAuth(app);
+export const db: Firestore = getFirestore(app);
+export const storage: FirebaseStorage = getStorage(app);
 ```
 
 ## 6. Thêm biến môi trường
@@ -93,7 +93,7 @@ NEXT_PUBLIC_FIREBASE_APP_ID=...
 ## 7. Kiểm tra kết nối
 
 Thêm đoạn code test vào trang chủ hoặc một file bất kỳ:
-```js
+```ts
 import { db } from "../lib/firebaseConfig";
 // Thử đọc/ghi Firestore hoặc chỉ console.log(db)
 ```
@@ -107,4 +107,4 @@ import { db } from "../lib/firebaseConfig";
 - Không public file `.env.local` lên git.
 - Nếu sử dụng Firebase Storage, bắt buộc phải nâng cấp lên gói Blaze (Pay as you go), Spark (free) không hỗ trợ production storage.
 
-Nếu cần hướng dẫn chi tiết cho từng dịch vụ (Auth, Firestore, Storage) hoặc ví dụ code, hãy yêu cầu thêm!
+Nếu cần hướng dẫn chi tiết cho từng dịch vụ (Auth, Firestore, Storage) hoặc ví dụ code TypeScript, hãy yêu cầu thêm!

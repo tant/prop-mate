@@ -26,6 +26,12 @@ Truy cập http://localhost:3000
 - Next.js 15.4, React 19
 - Firebase (Firestore, Auth, Storage)
 - OpenStreetMap + Leaflet.js
+- TailwindCSS 4 (tích hợp sẵn với Next.js 15.4)
+
+## Lưu ý về TailwindCSS
+- Dự án sử dụng TailwindCSS 4, đã được tích hợp sẵn khi khởi tạo với Next.js 15.4.
+- **Không sử dụng cú pháp, cấu hình, hoặc plugin cũ của Tailwind 3.**
+- Tham khảo tài liệu TailwindCSS 4 để đảm bảo code luôn tương thích.
 
 ## License
 MIT
