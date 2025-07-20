@@ -5,7 +5,6 @@ import { collection, getDocs } from "firebase/firestore";
 import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
 import { ref, listAll } from "firebase/storage";
 import { useEffect } from "react";
-import styles from "./test-firebase.module.css";
 
 export default function TestFirebasePage() {
   useEffect(() => {
@@ -55,14 +54,14 @@ export default function TestFirebasePage() {
   }, []);
 
   return (
-    <main className={styles.testFirebaseMain}>
+    <main>
       <h1>Test Firebase Connection</h1>
       <ul>
         <li>✔️ Đăng nhập Firebase Auth bằng tài khoản test từ biến môi trường</li>
         <li>✔️ Đọc dữ liệu Firestore collection <b>test</b> (log kết quả ở console)</li>
         <li>✔️ Liệt kê file trong Firebase Storage root (log kết quả ở console)</li>
       </ul>
-      <p className={styles.consoleHint}>
+      <p>
         Kiểm tra <b>console log</b> để xem chi tiết kết quả từng bước.<br />
         <span>
           <b>Cách mở console:</b> Chrome/Edge: <code>Ctrl+Shift+J</code> (Windows/Linux), <code>Cmd+Option+J</code> (Mac).<br />
