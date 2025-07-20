@@ -1,11 +1,15 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { initializeApp, cert, getApps, applicationDefault } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 
-// Only initialize once
+// Ưu tiên dùng GOOGLE_APPLICATION_CREDENTIALS_JSON nếu có
+const credentials = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON
+  ? JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON)
+  : undefined;
+
 if (!getApps().length) {
   initializeApp({
-    credential: applicationDefault(),
+    credential: credentials ? cert(credentials) : applicationDefault(),
   });
 }
 

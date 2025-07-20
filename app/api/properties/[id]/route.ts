@@ -3,8 +3,9 @@ import { adminDb } from "@/lib/firebaseAdminDb";
 import { propertyFromDoc, Property } from "@/models/property";
 import { verifyFirebaseIdToken } from "@/lib/firebaseAdmin";
 
-// GET /api/properties/[id]
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+// @ts-expect-error Next.js App Router context has implicit any
+export async function GET(req: NextRequest, context) {
+  const { params } = context;
   const user = await verifyFirebaseIdToken(req);
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -25,8 +26,9 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   }
 }
 
-// PUT /api/properties/[id]
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+// @ts-expect-error Next.js App Router context has implicit any
+export async function PUT(req: NextRequest, context) {
+  const { params } = context;
   const user = await verifyFirebaseIdToken(req);
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -48,8 +50,9 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   }
 }
 
-// DELETE /api/properties/[id]
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+// @ts-expect-error Next.js App Router context has implicit any
+export async function DELETE(req: NextRequest, context) {
+  const { params } = context;
   const user = await verifyFirebaseIdToken(req);
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
