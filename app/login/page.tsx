@@ -20,12 +20,12 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [authChecking, setAuthChecking] = useState(true);
 
-  // Redirect to dashboard if already logged in
+  // Redirect to properties if already logged in
   useEffect(() => {
     const authInstance = getAuth();
     const unsubscribe = onAuthStateChanged(authInstance, (user) => {
       if (user) {
-        router.replace("/dashboard");
+        router.replace("/properties");
       } else {
         setAuthChecking(false);
       }
@@ -45,7 +45,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await signInWithEmailAndPassword(auth, values.email, values.password);
-      router.push("/");
+      router.push("/properties");
     } catch (err: any) {
       let msg = "Đăng nhập thất bại";
       if (err.code === "auth/user-not-found") msg = "Tài khoản không tồn tại";

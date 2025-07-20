@@ -1,7 +1,7 @@
 import React from 'react';
 import { SidebarTrigger } from '../ui/sidebar';
 import { Separator } from '../ui/separator';
-import { UserNav } from './user-nav';
+
 
 export default function Header() {
   return (
@@ -12,7 +12,7 @@ export default function Header() {
       </div>
 
       <div className='flex items-center gap-2 px-4'>
-        <UserNav />
+    
       </div>
     </header>
   );
