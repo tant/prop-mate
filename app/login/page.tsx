@@ -1,23 +1,42 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebaseConfig";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
+import { ClipLoader } from "react-spinners";
+
+const defaultEmail = process.env.NEXT_PUBLIC_FIREBASE_TEST_EMAIL || "";
+const defaultPassword = process.env.NEXT_PUBLIC_FIREBASE_TEST_PASSWORD || "";
 
 export default function LoginPage() {
   const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [authChecking, setAuthChecking] = useState(true);
+
+  // Redirect to dashboard if already logged in
+  useEffect(() => {
+    const authInstance = getAuth();
+    const unsubscribe = onAuthStateChanged(authInstance, (user) => {
+      if (user) {
+        router.replace("/dashboard");
+      } else {
+        setAuthChecking(false);
+      }
+    });
+    return () => unsubscribe();
+  }, [router]);
 
   const form = useForm({
     defaultValues: {
-      email: "",
-      password: "",
+      email: defaultEmail,
+      password: defaultPassword,
     },
   });
 
@@ -37,6 +56,14 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
+
+  if (authChecking) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <ClipLoader size={48} color="#2563eb" speedMultiplier={0.9} />
+      </div>
+    );
+  }
 
   return (
     <Card className="max-w-sm mx-auto mt-16 p-6">

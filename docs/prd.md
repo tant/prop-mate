@@ -235,6 +235,14 @@ The project will be structured into 5 main Epics, arranged in a logical developm
         - Successful login with a Firebase Console account redirects to the main page.
         - Failed login displays a user-friendly error (in Vietnamese).
         - Logged-in users can log out (button labeled "Đăng xuất").
+* **Story 1.3: Create Navigation Menu & Basic Pages**
+    * **Description:** Design and implement the main navigation menu (sidebar for desktop, bottom navigation for mobile) and create basic pages (Dashboard, Bất động sản, Khách hàng, Lịch hẹn) with placeholder content. All menu labels and navigation must be in Vietnamese.
+    * **AC:**
+        - The main navigation menu appears on all pages after login.
+        - Menu items: "Dashboard", "Bất động sản", "Khách hàng", "Lịch hẹn".
+        - Clicking each menu item navigates to the corresponding page with a title and placeholder content.
+        - All menu labels, page titles, and navigation are in Vietnamese.
+        - The navigation menu works well on both desktop and mobile.
 
 ### Epic 2: Property Management
 * **Story 2.1: Display Property List**
