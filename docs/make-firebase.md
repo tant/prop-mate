@@ -10,6 +10,14 @@
 
 - **Authentication:**  
   Vào "Build" → "Authentication" → "Get started" → Bật "Email/Password".
+  - **Tạo user test:**
+    - Vào tab **Users** trong Authentication, nhấn **Add user**, nhập email và password để tạo tài khoản test.
+    - Hoặc dùng code:
+      ```js
+      import { createUserWithEmailAndPassword } from "firebase/auth";
+      createUserWithEmailAndPassword(auth, "email@example.com", "yourpassword")
+        .then((userCredential) => console.log("User created:", userCredential.user.email));
+      ```
 
 - **Firestore Database:**  
   Vào "Build" → "Firestore Database" → "Create database" →
@@ -37,6 +45,43 @@
 - **Storage:**  
   Vào "Build" → "Storage" → "Get started" → Chọn vị trí mặc định.
   - **Lưu ý:** Nếu muốn sử dụng Firebase Storage, bạn cần nâng cấp project lên gói **Blaze (Pay as you go)**. Gói miễn phí (Spark) không hỗ trợ sử dụng Storage với các dự án production hoặc Next.js hosting.
+  - **Cập nhật rule cho Storage:**
+    - Vào tab **Rules** trong Storage.
+    - Dán rule mẫu sau để chỉ cho phép user đã đăng nhập mới được đọc/ghi dữ liệu:
+      ```plaintext
+      rules_version = '2';
+      service firebase.storage {
+        match /b/{bucket}/o {
+          match /{allPaths=**} {
+            allow read, write: if request.auth != null;
+          }
+        }
+      }
+      ```
+    - Nhấn **Publish** để áp dụng rule.
+    - Không dùng rule `allow read, write: if true;` trên môi trường production.
+  - **Thiết lập CORS cho Storage:**
+    - Cài Google Cloud SDK: https://cloud.google.com/sdk/docs/install
+    - Đăng nhập: `gcloud auth login`
+    - Tạo file `cors.json` với nội dung:
+      ```json
+      [
+        {
+          "origin": ["http://localhost:3000"],
+          "method": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+          "maxAgeSeconds": 3600,
+          "responseHeader": ["Content-Type", "Authorizationg"]
+        }
+      ]
+      ```
+    - Áp dụng CORS cho bucket:
+      ```sh
+      gsutil cors set cors.json gs://<your-bucket-name>
+      ```
+    - **Cách lấy tên bucket:**
+      - Vào Firebase Console → Storage → Get started.
+      - Xem link hướng dẫn, sẽ có dạng `gs://[id dự án].appspot.com` hoặc `gs://[id dự án].firebasestorage.app`.
+      - Sao chép đúng tên bucket này để dùng cho lệnh trên.
 
 ## 3. Lấy thông tin cấu hình Firebase
 
@@ -88,7 +133,13 @@ NEXT_PUBLIC_FIREBASE_PROJECT_ID=...
 NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=...
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=...
 NEXT_PUBLIC_FIREBASE_APP_ID=...
+NEXT_PUBLIC_FIREBASE_BUCKET_URL=gs://[id dự án].appspot.com
+NEXT_PUBLIC_FIREBASE_TEST_EMAIL=test@tantran.dev
+NEXT_PUBLIC_FIREBASE_TEST_PASSWORD=123456
 ```
+- Thay `[id dự án]` bằng id thực tế của project Firebase của bạn.
+- Biến `NEXT_PUBLIC_FIREBASE_BUCKET_URL` dùng để lưu link bucket, có thể sử dụng khi thao tác với Storage hoặc cấu hình CORS.
+- Thay bằng thông tin tài khoản test thực tế của bạn.
 
 ## 7. Kiểm tra kết nối
 
@@ -98,13 +149,20 @@ import { db } from "../lib/firebaseConfig";
 // Thử đọc/ghi Firestore hoặc chỉ console.log(db)
 ```
 
+- Nếu gặp lỗi **Missing or insufficient permissions** với Firestore:
+  - Đảm bảo đã đăng nhập đúng user (đã tạo ở bước trên).
+  - Kiểm tra lại rule Firestore, đảm bảo cho phép user đã đăng nhập truy cập.
+  - Đảm bảo collection bạn truy cập đã tồn tại.
+
+- Nếu gặp lỗi **CORS** với Storage:
+  - Đảm bảo đã thiết lập CORS như hướng dẫn ở trên.
+  - Kiểm tra rule Storage cho phép user đã đăng nhập truy cập.
+
 ## 8. Đẩy code và kiểm tra lại trên môi trường dev
 
 ---
 
 **Lưu ý:**
-- Khi chọn Production mode cho Firestore, mặc định rule sẽ chỉ cho phép truy cập khi đã xác thực (authenticated). Hãy kiểm tra và chỉnh sửa rule phù hợp với yêu cầu bảo mật của dự án.
+- Không dùng rule `allow read, write: if true;` trên production.
 - Không public file `.env.local` lên git.
-- Nếu sử dụng Firebase Storage, bắt buộc phải nâng cấp lên gói Blaze (Pay as you go), Spark (free) không hỗ trợ production storage.
-
-Nếu cần hướng dẫn chi tiết cho từng dịch vụ (Auth, Firestore, Storage) hoặc ví dụ code TypeScript, hãy yêu cầu thêm!
+- Nếu cần hướng dẫn chi tiết từng dịch vụ hoặc gặp lỗi, hãy gửi log để được hỗ trợ.

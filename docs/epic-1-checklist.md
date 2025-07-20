@@ -1,9 +1,9 @@
 # Checklist Epic 1: Foundation & Core Property Management
 
 ## Story 1.1: Project Setup & Firebase Integration
-- [ ] Khởi tạo dự án Next.js
-- [ ] Thiết lập cấu hình kết nối Firebase (Firestore, Auth, Storage)
-- [ ] Tạo trang chủ xác nhận dự án chạy thành công
+- [x] Khởi tạo dự án Next.js
+- [x] Thiết lập cấu hình kết nối Firebase (Firestore, Auth, Storage)
+- [x] Tạo trang chủ xác nhận dự án chạy thành công
 
 ## Story 1.2: Build Login/Logout Functionality
 - [ ] Tạo trang đăng nhập với trường email/password
