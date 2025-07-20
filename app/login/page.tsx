@@ -3,35 +3,30 @@ import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebaseConfig";
 import { useRouter } from "next/navigation";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { useForm } from "react-hook-form";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
-  const validate = () => {
-    if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-      setError("Email không hợp lệ");
-      return false;
-    }
-    if (!password) {
-      setError("Vui lòng nhập mật khẩu");
-      return false;
-    }
+  const form = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const handleSubmit = async (values: { email: string; password: string }) => {
     setError("");
-    return true;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validate()) return;
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      setError("");
-      router.push("/"); // Chuyển hướng về trang chủ sau khi đăng nhập thành công
+      await signInWithEmailAndPassword(auth, values.email, values.password);
+      router.push("/");
     } catch (err: any) {
       let msg = "Đăng nhập thất bại";
       if (err.code === "auth/user-not-found") msg = "Tài khoản không tồn tại";
@@ -44,38 +39,50 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: "60px auto", padding: 24, border: "1px solid #eee", borderRadius: 8, background: "#fff" }}>
-      <h2>Đăng nhập</h2>
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: 16 }}>
-          <label>Email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            style={{ width: "100%", padding: 8, marginTop: 4 }}
-            autoComplete="username"
-            placeholder="Nhập email"
-            title="Email"
+    <Card className="max-w-sm mx-auto mt-16 p-6">
+      <h2 className="text-2xl font-semibold mb-6 text-center">Đăng nhập</h2>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="email"
+            rules={{
+              required: "Vui lòng nhập email",
+              pattern: {
+                value: /^[^@\s]+@[^@\s]+\.[^@\s]+$/,
+                message: "Email không hợp lệ",
+              },
+            }}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input {...field} autoComplete="username" placeholder="Nhập email" title="Email" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </div>
-        <div style={{ marginBottom: 16 }}>
-          <label>Mật khẩu</label>
-          <input
-            type="password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            style={{ width: "100%", padding: 8, marginTop: 4 }}
-            autoComplete="current-password"
-            placeholder="Nhập mật khẩu"
-            title="Mật khẩu"
+          <FormField
+            control={form.control}
+            name="password"
+            rules={{ required: "Vui lòng nhập mật khẩu" }}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Mật khẩu</FormLabel>
+                <FormControl>
+                  <Input {...field} type="password" autoComplete="current-password" placeholder="Nhập mật khẩu" title="Mật khẩu" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </div>
-        {error && <div style={{ color: "red", marginBottom: 12 }}>{error}</div>}
-        <button type="submit" style={{ width: "100%", padding: 10 }} disabled={loading}>
-          {loading ? "Đang đăng nhập..." : "Đăng nhập"}
-        </button>
-      </form>
-    </div>
+          {error && <div className="text-red-600 text-sm mb-2">{error}</div>}
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? "Đang đăng nhập..." : "Đăng nhập"}
+          </Button>
+        </form>
+      </Form>
+    </Card>
   );
 }
