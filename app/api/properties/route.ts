@@ -23,7 +23,15 @@ export async function GET(req: NextRequest) {
     user = await verifyFirebaseIdToken(req);
     console.log("[API /properties] User after verifyFirebaseIdToken:", user);
   } catch (err) {
-    console.error("[API /properties] Error verifying token:", err);
+    console.error("[API /properties] Error verifying token:", err, {
+      errorType: typeof err,
+      errorString: String(err),
+      errorStack: err instanceof Error ? err.stack : undefined,
+      envProjectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+      envAdminProjectId: process.env.GOOGLE_CLOUD_PROJECT,
+      hasServiceAccount: !!process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON,
+      serviceAccountStart: process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON?.slice(0, 100),
+    });
   }
   if (!user) {
     console.warn("[API /properties] Unauthorized access attempt");
@@ -68,7 +76,15 @@ export async function POST(req: NextRequest) {
     user = await verifyFirebaseIdToken(req);
     console.log("[API /properties] User after verifyFirebaseIdToken:", user);
   } catch (err) {
-    console.error("[API /properties] Error verifying token:", err);
+    console.error("[API /properties] Error verifying token:", err, {
+      errorType: typeof err,
+      errorString: String(err),
+      errorStack: err instanceof Error ? err.stack : undefined,
+      envProjectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+      envAdminProjectId: process.env.GOOGLE_CLOUD_PROJECT,
+      hasServiceAccount: !!process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON,
+      serviceAccountStart: process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON?.slice(0, 100),
+    });
   }
   if (!user) {
     console.warn("[API /properties] Unauthorized access attempt");
