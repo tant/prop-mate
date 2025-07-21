@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { adminDb } from "@/lib/firebaseAdminDb";
+import { adminDb } from "@/lib/firebaseAdmin";
 import { propertyFromDoc, Property } from "@/models/property";
 import { verifyFirebaseIdToken } from "@/lib/firebaseAdmin";
 
 // @ts-expect-error Next.js App Router context has implicit any
 export async function GET(req: NextRequest, context) {
-  const { params } = context;
+  const params = await context.params;
   console.log("[API /properties/[id]] Incoming GET request", {
     url: req.url,
     headers: Object.fromEntries(req.headers.entries()),
@@ -44,7 +44,7 @@ export async function GET(req: NextRequest, context) {
 
 // @ts-expect-error Next.js App Router context has implicit any
 export async function PUT(req: NextRequest, context) {
-  const { params } = context;
+  const params = await context.params;
   console.log("[API /properties/[id]] Incoming PUT request", {
     url: req.url,
     headers: Object.fromEntries(req.headers.entries()),
@@ -82,7 +82,7 @@ export async function PUT(req: NextRequest, context) {
 
 // @ts-expect-error Next.js App Router context has implicit any
 export async function DELETE(req: NextRequest, context) {
-  const { params } = context;
+  const params = await context.params;
   console.log("[API /properties/[id]] Incoming DELETE request", {
     url: req.url,
     headers: Object.fromEntries(req.headers.entries()),
@@ -111,6 +111,44 @@ export async function DELETE(req: NextRequest, context) {
     return res;
   } catch (error) {
     console.error("[API /properties/[id]] DELETE error:", error, error instanceof Error ? error.stack : undefined);
+    const message = error instanceof Error ? error.message : "Internal Server Error";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
+// @ts-expect-error Next.js App Router context has implicit any
+export async function PATCH(req: NextRequest, context) {
+  const params = await context.params;
+  console.log("[API /properties/[id]] Incoming PATCH request", {
+    url: req.url,
+    headers: Object.fromEntries(req.headers.entries()),
+    method: req.method,
+    params,
+  });
+  let user = null;
+  try {
+    user = await verifyFirebaseIdToken(req);
+    console.log("[API /properties/[id]] User after verifyFirebaseIdToken:", user);
+  } catch (err) {
+    console.error("[API /properties/[id]] Error verifying token:", err);
+  }
+  if (!user) {
+    console.warn("[API /properties/[id]] Unauthorized access attempt");
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  try {
+    const ref = adminDb.collection("properties").doc(params.id);
+    const data = await req.json();
+    console.log("[API /properties/[id]] PATCH body:", data);
+    data.updatedAt = new Date();
+    await ref.update(data);
+    const res = NextResponse.json({ id: params.id, ...data });
+    res.headers.set("Access-Control-Allow-Origin", "*");
+    res.headers.set("Access-Control-Allow-Methods", "GET,PUT,PATCH,DELETE,OPTIONS");
+    res.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    return res;
+  } catch (error) {
+    console.error("[API /properties/[id]] PATCH error:", error, error instanceof Error ? error.stack : undefined);
     const message = error instanceof Error ? error.message : "Internal Server Error";
     return NextResponse.json({ error: message }, { status: 500 });
   }

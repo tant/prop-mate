@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { adminDb } from "@/lib/firebaseAdminDb";
+import { adminDb } from "@/lib/firebaseAdmin";
 import { propertyFromDoc, propertyToFirestore, Property } from "@/models/property";
 import { verifyFirebaseIdToken } from "@/lib/firebaseAdmin";
 
