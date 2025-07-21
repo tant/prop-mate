@@ -83,7 +83,7 @@ export default function MapPage() {
             </div>
           </div>
         ) : (
-          <span className="text-gray-500 text-lg block text-center">Thông tin sẽ hiện ở đây</span>
+          <span className="text-gray-500 text-lg block text-center">Hãy chọn một bất động sản để xem thông tin</span>
         )}
       </div>
       <ConfirmDeleteDialog

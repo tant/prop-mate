@@ -84,7 +84,7 @@ export default function PropertiesPage() {
       )}
       {error && <div className="text-red-600">Lỗi tải dữ liệu!</div>}
       {data && Array.isArray(data) && data.length === 0 && (
-        <div className="text-gray-500">Chưa có bất động sản nào.</div>
+        <div className="text-gray-500">Hãy nhập bất động sản vào để quản lý</div>
       )}
       {data && Array.isArray(data) && data.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
