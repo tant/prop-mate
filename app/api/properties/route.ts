@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
     res.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
     return res;
   } catch (error) {
-    console.error("[API /properties] GET error:", error, error?.stack);
+    console.error("[API /properties] GET error:", error, error instanceof Error ? error.stack : undefined);
     const message = error instanceof Error ? error.message : "Internal Server Error";
     const res = NextResponse.json({ error: message }, { status: 500 });
     res.headers.set("Access-Control-Allow-Origin", "*");
@@ -91,7 +91,7 @@ export async function POST(req: NextRequest) {
     res.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
     return res;
   } catch (error) {
-    console.error("[API /properties] POST error:", error, error?.stack);
+    console.error("[API /properties] POST error:", error, error instanceof Error ? error.stack : undefined);
     const message = error instanceof Error ? error.message : "Internal Server Error";
     const res = NextResponse.json({ error: message }, { status: 500 });
     res.headers.set("Access-Control-Allow-Origin", "*");
