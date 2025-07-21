@@ -47,7 +47,7 @@ export function PropertyFormDialog({
       setForm({
         memorableName: initial.memorableName || "",
         address: initial.address || "",
-        price: initial.price?.toString() || "",
+        price: initial.price ? (initial.price / 1_000_000).toString() : "",
         area: initial.area?.toString() || "",
         bedrooms: initial.bedrooms?.toString() || "",
         bathrooms: initial.bathrooms?.toString() || "",
@@ -121,7 +121,7 @@ export function PropertyFormDialog({
     e.preventDefault();
     onSubmit({
       ...form,
-      price: Number(form.price),
+      price: Number(form.price) * 1_000_000,
       area: Number(form.area),
       bedrooms: Number(form.bedrooms),
       bathrooms: Number(form.bathrooms),
@@ -170,11 +170,23 @@ export function PropertyFormDialog({
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24"><path stroke="#2563eb" strokeWidth="2" d="M12 21c4.97 0 9-4.03 9-9s-4.03-9-9-9-9 4.03-9 9 4.03 9 9 9Zm0 0v-4m0-8v4m0 0h4m-4 0H8"/></svg>
             </Button>
           </div>
-          <Input name="price" placeholder="Giá (VNĐ)" value={form.price} onChange={handleChange} type="number" required />
-          <Input name="area" placeholder="Diện tích (m²)" value={form.area} onChange={handleChange} type="number" required />
+          <div className="flex items-center gap-2">
+            <Input name="price" placeholder="Giá" value={form.price} onChange={handleChange} type="number" required />
+            <span className="text-gray-500 whitespace-nowrap">triệu đồng</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Input name="area" placeholder="Diện tích" value={form.area} onChange={handleChange} type="number" required />
+            <span className="text-gray-500 whitespace-nowrap">m²</span>
+          </div>
           <div className="flex gap-2">
-            <Input name="bedrooms" placeholder="Phòng ngủ" value={form.bedrooms} onChange={handleChange} type="number" required />
-            <Input name="bathrooms" placeholder="WC" value={form.bathrooms} onChange={handleChange} type="number" required />
+            <div className="flex items-center gap-2 w-full">
+              <Input name="bedrooms" placeholder="Phòng ngủ" value={form.bedrooms} onChange={handleChange} type="number" required />
+              <span className="text-gray-500 whitespace-nowrap">phòng ngủ</span>
+            </div>
+            <div className="flex items-center gap-2 w-full">
+              <Input name="bathrooms" placeholder="WC" value={form.bathrooms} onChange={handleChange} type="number" required />
+              <span className="text-gray-500 whitespace-nowrap">nhà tắm</span>
+            </div>
           </div>
           <Input name="legalStatus" placeholder="Tình trạng pháp lý" value={form.legalStatus} onChange={handleChange} />
           <div>
@@ -183,7 +195,8 @@ export function PropertyFormDialog({
               <LocationPickerMap
                 lat={form.gps?.lat}
                 lng={form.gps?.lng}
-                onChange={(lat, lng) => setForm(f => ({ ...f, gps: { lat, lng } }))}
+                onChange={(lat, lng) => setForm(f => ({ ...f, gps: { lat, lng } }))
+                }
               />
             </div>
             {form.gps && (

@@ -36,7 +36,9 @@ export function PropertyDetailDialog({ property, open, onClose, onEdit, onDelete
               <Badge variant="outline">{property.bathrooms} WC</Badge>
             </div>
             <div className="text-blue-700 font-bold text-xl mb-2">
-              {property.price?.toLocaleString()} đ
+              {property.price !== undefined && property.price !== null ?
+                `${(property.price / 1_000_000).toLocaleString('vi-VN', { maximumFractionDigits: 2 })} triệu`
+                : '—'}
             </div>
             {property.notes && (
               <div className="text-gray-700 mb-2">Ghi chú: {property.notes}</div>

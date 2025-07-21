@@ -31,15 +31,17 @@ export function PropertyCard({ property, onView, onEdit, onDelete }: PropertyCar
       <div className="font-bold text-lg truncate">{property.memorableName}</div>
       <div className="text-gray-600 text-sm truncate">{property.address}</div>
       <div className="flex items-center gap-2 text-blue-700 font-semibold">
-        {property.price?.toLocaleString()} đ
+        {property.price !== undefined && property.price !== null ?
+          `${(property.price / 1_000_000).toLocaleString('vi-VN', { maximumFractionDigits: 2 })} triệu`
+          : '—'}
         <Badge variant="outline" className="ml-2">
           {property.legalStatus}
         </Badge>
       </div>
       <div className="flex gap-4 text-xs text-gray-500">
         <span>Diện tích: {property.area} m²</span>
-        <span>PN: {property.bedrooms}</span>
-        <span>WC: {property.bathrooms}</span>
+        <span>PN: {property.bedrooms} phòng ngủ</span>
+        <span>WC: {property.bathrooms} nhà tắm</span>
       </div>
       <div className="flex gap-2 mt-2">
         <Button size="sm" variant="outline" onClick={onView}>
