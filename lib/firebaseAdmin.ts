@@ -2,10 +2,16 @@ import { NextRequest } from "next/server";
 import { initializeApp, cert, getApps, applicationDefault } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 
-// Ưu tiên dùng GOOGLE_APPLICATION_CREDENTIALS_JSON nếu có
-const credentials = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON
-  ? JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON)
-  : undefined;
+// Chỉ dùng FIREBASE_SERVICE_ACCOUNT_BASE64 để lấy credentials
+let credentials: any = undefined;
+if (process.env.FIREBASE_SERVICE_ACCOUNT_BASE64) {
+  try {
+    const jsonStr = Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT_BASE64, "base64").toString("utf-8");
+    credentials = JSON.parse(jsonStr);
+  } catch (e) {
+    console.error("[firebaseAdmin] Lỗi giải mã FIREBASE_SERVICE_ACCOUNT_BASE64:", e);
+  }
+}
 
 if (!getApps().length) {
   initializeApp({
@@ -23,6 +29,11 @@ export async function verifyFirebaseIdToken(req: NextRequest) {
     const decoded = await getAuth().verifyIdToken(idToken);
     return decoded;
   } catch (e) {
+    console.error("[verifyFirebaseIdToken] Error verifying token:", e, {
+      errorType: typeof e,
+      errorString: String(e),
+      errorStack: e instanceof Error ? e.stack : undefined,
+    });
     return null;
   }
 }
