@@ -22,6 +22,14 @@ export const navItems: NavItem[] = [
     items: []
   },
   {
+    title: 'Bản đồ',
+    url: '/map',
+    icon: 'map',
+    isActive: false,
+    shortcut: ['b', 'm'],
+    items: []
+  },
+  {
     title: 'Bất động sản',
     url: '/properties',
     icon: 'home',

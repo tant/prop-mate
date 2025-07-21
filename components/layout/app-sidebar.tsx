@@ -29,14 +29,16 @@ import {
   IconHome,
   IconUsers,
   IconCalendar,
-  IconLayoutDashboard
+  IconLayoutDashboard,
+  IconMap
 } from "@tabler/icons-react";
 
 const iconMap: Record<string, React.ReactNode> = {
   dashboard: <IconLayoutDashboard className="w-5 h-5" />,
   home: <IconHome className="w-5 h-5" />,
   users: <IconUsers className="w-5 h-5" />,
-  calendar: <IconCalendar className="w-5 h-5" />
+  calendar: <IconCalendar className="w-5 h-5" />,
+  map: <IconMap className="w-5 h-5" />
 };
 
 export default function AppSidebar() {
@@ -61,19 +63,40 @@ export default function AppSidebar() {
           <SidebarMenu>
             {navItems.map((item: any) => {
               const Icon = iconMap[item.icon] || null;
+              const hasChildren = item.items && item.items.length > 0;
               return (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    tooltip={item.title}
-                    isActive={pathname === item.url}
-                  >
-                    <Link href={item.url}>
-                      {Icon}
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                <React.Fragment key={item.title}>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      asChild
+                      tooltip={item.title}
+                      isActive={pathname === item.url}
+                    >
+                      <Link href={item.url}>
+                        {Icon}
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  {hasChildren && item.items.map((child: any) => {
+                    const ChildIcon = iconMap[child.icon] || null;
+                    return (
+                      <SidebarMenuItem key={child.title}>
+                        <SidebarMenuButton
+                          asChild
+                          tooltip={child.title}
+                          isActive={pathname === child.url}
+                          className="pl-8"
+                        >
+                          <Link href={child.url}>
+                            {ChildIcon}
+                            <span>{child.title}</span>
+                          </Link>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    );
+                  })}
+                </React.Fragment>
               );
             })}
           </SidebarMenu>
