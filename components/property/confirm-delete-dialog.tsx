@@ -9,7 +9,7 @@ export function ConfirmDeleteDialog({ open, onCancel, onConfirm, loading }: {
 }) {
   return (
     <Dialog open={open} onOpenChange={v => !v && onCancel()}>
-      <DialogContent showCloseButton>
+      <DialogContent showCloseButton className="z-[9999]">
         <DialogHeader>
           <DialogTitle>Bạn chắc chắn muốn xóa?</DialogTitle>
           <DialogDescription>Hành động này không thể hoàn tác.</DialogDescription>

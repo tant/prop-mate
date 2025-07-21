@@ -12,4 +12,5 @@ export interface Property {
   imageUrls: string[];
   notes?: string;
   createdAt?: { seconds: number } | string | Date;
+  gps?: { lat: number; lng: number };
 }

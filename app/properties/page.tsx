@@ -64,8 +64,8 @@ export default function PropertiesPage() {
   }
 
   return (
-    <div className="flex flex-col flex-1 p-6 gap-4">
-      <div className="flex items-center justify-between mb-4">
+    <div className="flex flex-col flex-1 p-6 gap-4 z-0">
+      <div className="flex items-center justify-between mb-4 z-0">
         <h1 className="text-3xl font-bold">Quản lý Bất động sản</h1>
         <Button
           onClick={() => router.push("/properties/add")}

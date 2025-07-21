@@ -6,16 +6,9 @@ import { verifyFirebaseIdToken } from "@/lib/firebaseAdmin";
 // @ts-expect-error Next.js App Router context has implicit any
 export async function GET(req: NextRequest, context) {
   const params = await context.params;
-  console.log("[API /properties/[id]] Incoming GET request", {
-    url: req.url,
-    headers: Object.fromEntries(req.headers.entries()),
-    method: req.method,
-    params,
-  });
   let user = null;
   try {
     user = await verifyFirebaseIdToken(req);
-    console.log("[API /properties/[id]] User after verifyFirebaseIdToken:", user);
   } catch (err) {
     console.error("[API /properties/[id]] Error verifying token:", err);
   }
@@ -45,16 +38,9 @@ export async function GET(req: NextRequest, context) {
 // @ts-expect-error Next.js App Router context has implicit any
 export async function PUT(req: NextRequest, context) {
   const params = await context.params;
-  console.log("[API /properties/[id]] Incoming PUT request", {
-    url: req.url,
-    headers: Object.fromEntries(req.headers.entries()),
-    method: req.method,
-    params,
-  });
   let user = null;
   try {
     user = await verifyFirebaseIdToken(req);
-    console.log("[API /properties/[id]] User after verifyFirebaseIdToken:", user);
   } catch (err) {
     console.error("[API /properties/[id]] Error verifying token:", err);
   }
@@ -65,7 +51,6 @@ export async function PUT(req: NextRequest, context) {
   try {
     const ref = adminDb.collection("properties").doc(params.id);
     const data = await req.json();
-    console.log("[API /properties/[id]] PUT body:", data);
     data.updatedAt = new Date();
     await ref.update(data);
     const res = NextResponse.json({ id: params.id, ...data });
@@ -83,16 +68,9 @@ export async function PUT(req: NextRequest, context) {
 // @ts-expect-error Next.js App Router context has implicit any
 export async function DELETE(req: NextRequest, context) {
   const params = await context.params;
-  console.log("[API /properties/[id]] Incoming DELETE request", {
-    url: req.url,
-    headers: Object.fromEntries(req.headers.entries()),
-    method: req.method,
-    params,
-  });
   let user = null;
   try {
     user = await verifyFirebaseIdToken(req);
-    console.log("[API /properties/[id]] User after verifyFirebaseIdToken:", user);
   } catch (err) {
     console.error("[API /properties/[id]] Error verifying token:", err);
   }
@@ -103,7 +81,6 @@ export async function DELETE(req: NextRequest, context) {
   try {
     const ref = adminDb.collection("properties").doc(params.id);
     await ref.delete();
-    console.log("[API /properties/[id]] Deleted property:", params.id);
     const res = NextResponse.json({ success: true });
     res.headers.set("Access-Control-Allow-Origin", "*");
     res.headers.set("Access-Control-Allow-Methods", "GET,PUT,DELETE,OPTIONS");
@@ -119,16 +96,9 @@ export async function DELETE(req: NextRequest, context) {
 // @ts-expect-error Next.js App Router context has implicit any
 export async function PATCH(req: NextRequest, context) {
   const params = await context.params;
-  console.log("[API /properties/[id]] Incoming PATCH request", {
-    url: req.url,
-    headers: Object.fromEntries(req.headers.entries()),
-    method: req.method,
-    params,
-  });
   let user = null;
   try {
     user = await verifyFirebaseIdToken(req);
-    console.log("[API /properties/[id]] User after verifyFirebaseIdToken:", user);
   } catch (err) {
     console.error("[API /properties/[id]] Error verifying token:", err);
   }
@@ -139,7 +109,6 @@ export async function PATCH(req: NextRequest, context) {
   try {
     const ref = adminDb.collection("properties").doc(params.id);
     const data = await req.json();
-    console.log("[API /properties/[id]] PATCH body:", data);
     data.updatedAt = new Date();
     await ref.update(data);
     const res = NextResponse.json({ id: params.id, ...data });
