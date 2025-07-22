@@ -32,6 +32,7 @@ export default function PropertiesPage() {
   const [selected, setSelected] = useState<Property | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [search, setSearch] = useState("");
   const router = useRouter();
 
   const handleDelete = async () => {
@@ -55,6 +56,19 @@ export default function PropertiesPage() {
     }
   };
 
+  // Lọc bất động sản theo tên hoặc địa chỉ
+  const filteredData =
+    data && Array.isArray(data)
+      ? data.filter((p: Property) => {
+          const q = search.trim().toLowerCase();
+          if (!q) return true;
+          return (
+            (p.memorableName && p.memorableName.toLowerCase().includes(q)) ||
+            (p.address && p.address.toLowerCase().includes(q))
+          );
+        })
+      : [];
+
   if (checking) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -74,6 +88,15 @@ export default function PropertiesPage() {
           + Thêm mới
         </Button>
       </div>
+      <div className="mb-4 max-w-md">
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Tìm kiếm theo tên hoặc địa chỉ..."
+          className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
 
       {isLoading && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -83,12 +106,12 @@ export default function PropertiesPage() {
         </div>
       )}
       {error && <div className="text-red-600">Lỗi tải dữ liệu!</div>}
-      {data && Array.isArray(data) && data.length === 0 && (
-        <div className="text-gray-500">Hãy nhập bất động sản vào để quản lý</div>
+      {(!isLoading && data && Array.isArray(data) && filteredData.length === 0) && (
+        <div className="text-gray-500">Không tìm thấy bất động sản phù hợp</div>
       )}
-      {data && Array.isArray(data) && data.length > 0 && (
+      {(!isLoading && filteredData.length > 0) && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {data.map((p: Property) => (
+          {filteredData.map((p: Property) => (
             <PropertyCard
               key={p.id}
               property={p}
@@ -104,8 +127,12 @@ export default function PropertiesPage() {
         open={!!selected}
         property={selected}
         onClose={() => setSelected(null)}
-        onEdit={selected ? () => router.push(`/properties/${selected.id}/edit`) : undefined}
-        onDelete={selected ? () => setDeleteId(selected.id) : undefined}
+        onEdit={
+          selected ? () => router.push(`/properties/${selected.id}/edit`) : undefined
+        }
+        onDelete={
+          selected ? () => setDeleteId(selected.id) : undefined
+        }
       />
       {/* Modal xác nhận xóa */}
       <ConfirmDeleteDialog
