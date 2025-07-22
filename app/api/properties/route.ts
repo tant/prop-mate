@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { adminDb } from "@/lib/firebaseAdmin";
+import { adminDb, verifyFirebaseIdToken } from "@/lib/firebaseAdmin";
 import { propertyFromDoc, propertyToFirestore, Property } from "@/models/property";
-import { verifyFirebaseIdToken } from "@/lib/firebaseAdmin";
 
-// Helper: CORS
+// Helper: Set CORS headers
 function setCORS(res: NextResponse) {
   res.headers.set("Access-Control-Allow-Origin", "*");
   res.headers.set("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
@@ -11,71 +10,44 @@ function setCORS(res: NextResponse) {
   return res;
 }
 
-// GET /api/properties - list all properties (with pagination)
+// GET /api/properties - List all properties (with pagination)
 export async function GET(req: NextRequest) {
   let user = null;
   try {
     user = await verifyFirebaseIdToken(req);
   } catch (err) {
-    console.error("[API /properties] Error verifying token:", err, {
-      errorType: typeof err,
-      errorString: String(err),
-      errorStack: err instanceof Error ? err.stack : undefined,
-      envProjectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-      envAdminProjectId: process.env.GOOGLE_CLOUD_PROJECT,
-      hasServiceAccount: !!process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON,
-      serviceAccountStart: process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON?.slice(0, 100),
-    });
+    console.error("[API /properties] Error verifying token:", err);
   }
   if (!user) {
-    console.warn("[API /properties] Unauthorized access attempt");
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return setCORS(NextResponse.json({ error: "Unauthorized" }, { status: 401 }));
   }
   try {
     const { searchParams } = new URL(req.url);
     const limitParam = searchParams.get("limit");
     const startAfterParam = searchParams.get("startAfter");
-    let q = adminDb.collection("properties").orderBy("createdAt", "desc");
-    if (limitParam) q = q.limit(Number(limitParam));
-    // Pagination: startAfter expects a value of createdAt (timestamp)
-    if (startAfterParam) q = q.startAfter(Number(startAfterParam));
-    const snapshot = await q.get();
+    let query = adminDb.collection("properties").orderBy("createdAt", "desc");
+    if (limitParam) query = query.limit(Number(limitParam));
+    if (startAfterParam) query = query.startAfter(Number(startAfterParam));
+    const snapshot = await query.get();
     const properties = snapshot.docs.map((doc) => propertyFromDoc({ id: doc.id, ...doc.data() }));
-    const res = NextResponse.json(properties);
-    res.headers.set("Access-Control-Allow-Origin", "*");
-    res.headers.set("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
-    res.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    return res;
+    return setCORS(NextResponse.json(properties));
   } catch (error) {
-    console.error("[API /properties] GET error:", error, error instanceof Error ? error.stack : undefined);
+    console.error("[API /properties] GET error:", error);
     const message = error instanceof Error ? error.message : "Internal Server Error";
-    const res = NextResponse.json({ error: message }, { status: 500 });
-    res.headers.set("Access-Control-Allow-Origin", "*");
-    res.headers.set("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
-    res.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    return res;
+    return setCORS(NextResponse.json({ error: message }, { status: 500 }));
   }
 }
 
-// POST /api/properties - create new property
+// POST /api/properties - Create new property
 export async function POST(req: NextRequest) {
   let user = null;
   try {
     user = await verifyFirebaseIdToken(req);
   } catch (err) {
-    console.error("[API /properties] Error verifying token:", err, {
-      errorType: typeof err,
-      errorString: String(err),
-      errorStack: err instanceof Error ? err.stack : undefined,
-      envProjectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-      envAdminProjectId: process.env.GOOGLE_CLOUD_PROJECT,
-      hasServiceAccount: !!process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON,
-      serviceAccountStart: process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON?.slice(0, 100),
-    });
+    console.error("[API /properties] Error verifying token:", err);
   }
   if (!user) {
-    console.warn("[API /properties] Unauthorized access attempt");
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return setCORS(NextResponse.json({ error: "Unauthorized" }, { status: 401 }));
   }
   try {
     const data = await req.json();
@@ -85,24 +57,16 @@ export async function POST(req: NextRequest) {
       createdAt: now,
       updatedAt: now,
     };
-    const docRef = await adminDb.collection("properties").add(property);
-    const res = NextResponse.json({ id: docRef.id, ...property });
-    res.headers.set("Access-Control-Allow-Origin", "*");
-    res.headers.set("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
-    res.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    return res;
+    const docRef = await adminDb.collection("properties").add(propertyToFirestore ? propertyToFirestore(property) : property);
+    return setCORS(NextResponse.json({ id: docRef.id, ...property }));
   } catch (error) {
-    console.error("[API /properties] POST error:", error, error instanceof Error ? error.stack : undefined);
+    console.error("[API /properties] POST error:", error);
     const message = error instanceof Error ? error.message : "Internal Server Error";
-    const res = NextResponse.json({ error: message }, { status: 500 });
-    res.headers.set("Access-Control-Allow-Origin", "*");
-    res.headers.set("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
-    res.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    return res;
+    return setCORS(NextResponse.json({ error: message }, { status: 500 }));
   }
 }
 
-// OPTIONS preflight
+// OPTIONS /api/properties - Preflight
 export async function OPTIONS() {
   return setCORS(new NextResponse(null, { status: 204 }));
 }

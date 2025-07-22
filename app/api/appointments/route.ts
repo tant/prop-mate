@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { adminDb, verifyFirebaseIdToken } from "@/lib/firebaseAdmin";
 import { appointmentFromDoc, appointmentToFirestore, Appointment } from "@/models/appointment";
 
+// Helper: Set CORS headers
 function setCORS(res: NextResponse) {
   res.headers.set("Access-Control-Allow-Origin", "*");
   res.headers.set("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
@@ -9,7 +10,7 @@ function setCORS(res: NextResponse) {
   return res;
 }
 
-// GET /api/appointments - list all appointments
+// GET /api/appointments - List all appointments
 export async function GET(req: NextRequest) {
   let user = null;
   try {
@@ -18,28 +19,26 @@ export async function GET(req: NextRequest) {
     console.error("[API /appointments] Error verifying token:", err);
   }
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return setCORS(NextResponse.json({ error: "Unauthorized" }, { status: 401 }));
   }
   try {
     const { searchParams } = new URL(req.url);
     const limitParam = searchParams.get("limit");
     const startAfterParam = searchParams.get("startAfter");
-    let q = adminDb.collection("appointments").orderBy("time", "desc");
-    if (limitParam) q = q.limit(Number(limitParam));
-    if (startAfterParam) q = q.startAfter(Number(startAfterParam));
-    const snapshot = await q.get();
+    let query = adminDb.collection("appointments").orderBy("time", "desc");
+    if (limitParam) query = query.limit(Number(limitParam));
+    if (startAfterParam) query = query.startAfter(Number(startAfterParam));
+    const snapshot = await query.get();
     const appointments = snapshot.docs.map((doc) => appointmentFromDoc({ id: doc.id, ...doc.data() }));
-    const res = NextResponse.json(appointments);
-    return setCORS(res);
+    return setCORS(NextResponse.json(appointments));
   } catch (error) {
     console.error("[API /appointments] GET error:", error);
     const message = error instanceof Error ? error.message : "Internal Server Error";
-    const res = NextResponse.json({ error: message }, { status: 500 });
-    return setCORS(res);
+    return setCORS(NextResponse.json({ error: message }, { status: 500 }));
   }
 }
 
-// POST /api/appointments - create new appointment
+// POST /api/appointments - Create new appointment
 export async function POST(req: NextRequest) {
   let user = null;
   try {
@@ -48,7 +47,7 @@ export async function POST(req: NextRequest) {
     console.error("[API /appointments] Error verifying token:", err);
   }
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return setCORS(NextResponse.json({ error: "Unauthorized" }, { status: 401 }));
   }
   try {
     const data = await req.json();
@@ -60,17 +59,15 @@ export async function POST(req: NextRequest) {
       updatedAt: now,
     };
     const docRef = await adminDb.collection("appointments").add(appointmentToFirestore(appointment));
-    const res = NextResponse.json({ id: docRef.id, ...appointment });
-    return setCORS(res);
+    return setCORS(NextResponse.json({ id: docRef.id, ...appointment }));
   } catch (error) {
     console.error("[API /appointments] POST error:", error);
     const message = error instanceof Error ? error.message : "Internal Server Error";
-    const res = NextResponse.json({ error: message }, { status: 500 });
-    return setCORS(res);
+    return setCORS(NextResponse.json({ error: message }, { status: 500 }));
   }
 }
 
-// OPTIONS preflight
+// OPTIONS /api/appointments - Preflight
 export async function OPTIONS() {
   return setCORS(new NextResponse(null, { status: 204 }));
 }

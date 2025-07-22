@@ -1,5 +1,6 @@
-import { Timestamp, DocumentData } from "firebase/firestore";
+import { Timestamp } from "firebase/firestore";
 
+// Bất động sản
 export interface Property {
   id: string;
   memorableName: string; // Tên gợi nhớ
@@ -18,8 +19,8 @@ export interface Property {
   updatedAt: Timestamp;
 }
 
-// Helper: convert Firestore doc to Property
-export function propertyFromDoc(doc: DocumentData): Property {
+// Chuyển Firestore doc sang Property
+export function propertyFromDoc(doc: any): Property {
   return {
     id: doc.id,
     memorableName: doc.memorableName,
@@ -39,7 +40,7 @@ export function propertyFromDoc(doc: DocumentData): Property {
   };
 }
 
-// Helper: convert Property to Firestore data (for set/update)
+// Chuyển Property sang Firestore data
 export function propertyToFirestore(property: Omit<Property, "id">) {
   return {
     ...property,
