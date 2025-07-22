@@ -1,42 +1,23 @@
 "use client";
-import { useState, useEffect } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { useState } from "react";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebaseConfig";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
-import { ClipLoader } from "react-spinners";
 
-const defaultEmail = process.env.NEXT_PUBLIC_FIREBASE_TEST_EMAIL || "";
-const defaultPassword = process.env.NEXT_PUBLIC_FIREBASE_TEST_PASSWORD || "";
-
-export default function LoginPage() {
+export default function RegisterPage() {
   const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [authChecking, setAuthChecking] = useState(true);
-
-  // Redirect to properties if already logged in
-  useEffect(() => {
-    const authInstance = getAuth();
-    const unsubscribe = onAuthStateChanged(authInstance, (user) => {
-      if (user) {
-        router.replace("/properties");
-      } else {
-        setAuthChecking(false);
-      }
-    });
-    return () => unsubscribe();
-  }, [router]);
 
   const form = useForm({
     defaultValues: {
-      email: defaultEmail,
-      password: defaultPassword,
+      email: "",
+      password: "",
     },
   });
 
@@ -44,30 +25,22 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, values.email, values.password);
+      await createUserWithEmailAndPassword(auth, values.email, values.password);
       router.push("/properties");
     } catch (err: any) {
-      let msg = "Đăng nhập thất bại";
-      if (err.code === "auth/user-not-found") msg = "Tài khoản không tồn tại";
-      else if (err.code === "auth/wrong-password") msg = "Sai mật khẩu";
+      let msg = "Đăng ký thất bại";
+      if (err.code === "auth/email-already-in-use") msg = "Email đã được sử dụng";
       else if (err.code === "auth/invalid-email") msg = "Email không hợp lệ";
+      else if (err.code === "auth/weak-password") msg = "Mật khẩu quá yếu (tối thiểu 6 ký tự)";
       setError(msg);
     } finally {
       setLoading(false);
     }
   };
 
-  if (authChecking) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <ClipLoader size={48} color="#2563eb" speedMultiplier={0.9} />
-      </div>
-    );
-  }
-
   return (
     <Card className="max-w-sm mx-auto mt-16 p-6">
-      <h2 className="text-2xl font-semibold mb-6 text-center">Đăng nhập</h2>
+      <h2 className="text-2xl font-semibold mb-6 text-center">Đăng ký</h2>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <FormField
@@ -93,12 +66,12 @@ export default function LoginPage() {
           <FormField
             control={form.control}
             name="password"
-            rules={{ required: "Vui lòng nhập mật khẩu" }}
+            rules={{ required: "Vui lòng nhập mật khẩu", minLength: { value: 6, message: "Mật khẩu tối thiểu 6 ký tự" } }}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Mật khẩu</FormLabel>
                 <FormControl>
-                  <Input {...field} type="password" autoComplete="current-password" placeholder="Nhập mật khẩu" title="Mật khẩu" />
+                  <Input {...field} type="password" autoComplete="new-password" placeholder="Nhập mật khẩu" title="Mật khẩu" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -106,13 +79,13 @@ export default function LoginPage() {
           />
           {error && <div className="text-red-600 text-sm mb-2">{error}</div>}
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Đang đăng nhập..." : "Đăng nhập"}
+            {loading ? "Đang đăng ký..." : "Đăng ký"}
           </Button>
         </form>
       </Form>
       <div className="text-center mt-4 text-sm">
-        Chưa có tài khoản?{' '}
-        <a href="/register" className="text-blue-600 hover:underline">Đăng ký</a>
+        Đã có tài khoản?{' '}
+        <a href="/login" className="text-blue-600 hover:underline">Đăng nhập</a>
       </div>
     </Card>
   );
