@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect, useRef } from "react";
 import LocationPickerMap from "@/components/property/location-picker-map";
+import imageCompression from "browser-image-compression";
 
 
 const MAX_IMAGE_SIZE_MB = 2;
@@ -82,31 +83,24 @@ export function PropertyFormDialog({
   const handleFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
-    // Kiểm tra từng file
-    for (let i = 0; i < files.length; i++) {
-      if (files[i].size > MAX_IMAGE_SIZE_MB * 1024 * 1024) {
-        alert(`Ảnh "${files[i].name}" vượt quá ${MAX_IMAGE_SIZE_MB}MB!`);
-        fileInputRef.current && (fileInputRef.current.value = "");
-        return;
-      }
-    }
-    // Tính tổng size đã upload (ảnh cũ)
-    const uploadedTotal = form.imageUrls.reduce((sum, img) => sum + (img.size || 0), 0);
-    // Tính tổng size file mới
-    const newTotal = Array.from(files).reduce((sum, f) => sum + f.size, 0);
-    if (uploadedTotal + newTotal > MAX_TOTAL_SIZE_MB * 1024 * 1024) {
-      alert(`Tổng dung lượng ảnh vượt quá ${MAX_TOTAL_SIZE_MB}MB!`);
-      fileInputRef.current && (fileInputRef.current.value = "");
-      return;
-    }
     setUploading(true);
     try {
       const imgs: ImageWithSize[] = [];
       for (let i = 0; i < files.length; i++) {
-        const url = URL.createObjectURL(files[i]);
-        imgs.push({ url, size: files[i].size });
+        // Nén ảnh
+        const compressedFile = await imageCompression(files[i], {
+          maxSizeMB: 0.3, // ~300kb
+          maxWidthOrHeight: 760,
+          useWebWorker: true,
+          fileType: "image/jpeg",
+          initialQuality: 0.8,
+        });
+        const url = URL.createObjectURL(compressedFile);
+        imgs.push({ url, size: compressedFile.size });
       }
       setForm(f => ({ ...f, imageUrls: [...f.imageUrls, ...imgs] }));
+    } catch (err) {
+      alert("Lỗi khi nén ảnh: " + (err instanceof Error ? err.message : err));
     } finally {
       setUploading(false);
       fileInputRef.current && (fileInputRef.current.value = "");
