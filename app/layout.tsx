@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "vi_VN",
     siteName: "PropMate",
-    title: "PropMate - Trợ lý môi giới bất động sản",,
+    title: "PropMate - Trợ lý môi giới bất động sản",
     description:
       "Ứng dụng web giúp môi giới bất động sản quản lý khách hàng, BĐS, lịch hẹn, công việc hiệu quả, mọi lúc mọi nơi, ngay cả khi offline.",
     images: [

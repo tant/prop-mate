@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { getClientById, updateClient, deleteClient } from "@/lib/clientService";
 import { verifyFirebaseIdToken } from "@/lib/firebaseAdmin";
 
-// @ts-expect-error Next.js App Router context has implicit any
-export async function GET(req: NextRequest, context) {
-  const params = await context.params;
+// GET /api/clients/[id]
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function GET(req: NextRequest, context: any) {
+  const { id } = context.params;
   let user = null;
   try {
     user = await verifyFirebaseIdToken(req);
@@ -16,7 +17,7 @@ export async function GET(req: NextRequest, context) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   try {
-    const client = await getClientById(params.id);
+    const client = await getClientById(id);
     if (!client) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json(client);
   } catch (error) {
@@ -26,9 +27,10 @@ export async function GET(req: NextRequest, context) {
   }
 }
 
-// @ts-expect-error Next.js App Router context has implicit any
-export async function PUT(req: NextRequest, context) {
-  const params = await context.params;
+// PUT /api/clients/[id]
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function PUT(req: NextRequest, context: any) {
+  const { id } = context.params;
   let user = null;
   try {
     user = await verifyFirebaseIdToken(req);
@@ -41,7 +43,7 @@ export async function PUT(req: NextRequest, context) {
   }
   try {
     const data = await req.json();
-    const client = await updateClient(params.id, data);
+    const client = await updateClient(id, data);
     if (!client) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json(client);
   } catch (error) {
@@ -51,9 +53,10 @@ export async function PUT(req: NextRequest, context) {
   }
 }
 
-// @ts-expect-error Next.js App Router context has implicit any
-export async function DELETE(req: NextRequest, context) {
-  const params = await context.params;
+// DELETE /api/clients/[id]
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function DELETE(req: NextRequest, context: any) {
+  const { id } = context.params;
   let user = null;
   try {
     user = await verifyFirebaseIdToken(req);
@@ -65,7 +68,7 @@ export async function DELETE(req: NextRequest, context) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   try {
-    await deleteClient(params.id);
+    await deleteClient(id);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("[API /clients/[id]] DELETE error:", error);
