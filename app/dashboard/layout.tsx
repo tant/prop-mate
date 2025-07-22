@@ -1,4 +1,3 @@
-
 import AppSidebar from '@/components/layout/app-sidebar';
 import Header from '@/components/layout/header';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
@@ -6,8 +5,16 @@ import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 
 export const metadata: Metadata = {
-  title: 'Next Shadcn Dashboard Starter',
-  description: 'Basic dashboard with Next.js and Shadcn'
+  title: 'Dashboard - PropMate',
+  description: 'Tổng quan hoạt động, hiệu suất, công việc môi giới bất động sản trên PropMate.',
+  keywords: 'dashboard, tổng quan, báo cáo, hiệu suất, môi giới, proptech, Việt Nam',
+  openGraph: {
+    type: 'website',
+    locale: 'vi_VN',
+    siteName: 'PropMate',
+    title: 'Dashboard - PropMate',
+    description: 'Tổng quan hoạt động, hiệu suất, công việc môi giới bất động sản trên PropMate.',
+  },
 };
 
 export default async function DashboardLayout({
