@@ -1,15 +1,32 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, ChangeEvent, FormEvent } from "react";
 import LocationPickerMap from "@/components/property/location-picker-map";
 import imageCompression from "browser-image-compression";
 
-
-const MAX_IMAGE_SIZE_MB = 2;
-const MAX_TOTAL_SIZE_MB = 15;
-// Lưu thêm size cho từng ảnh đã upload (dạng: {url, size})
 type ImageWithSize = { url: string; size: number };
+
+type PropertyFormDialogProps = {
+  open: boolean;
+  onClose: () => void;
+  onSubmit: (data: any) => void;
+  initial?: any;
+  loading?: boolean;
+};
+
+const defaultForm = {
+  memorableName: "",
+  address: "",
+  price: "",
+  area: "",
+  bedrooms: "",
+  bathrooms: "",
+  legalStatus: "",
+  imageUrls: [] as ImageWithSize[],
+  notes: "",
+  gps: undefined as { lat: number; lng: number } | undefined,
+};
 
 export function PropertyFormDialog({
   open,
@@ -17,32 +34,12 @@ export function PropertyFormDialog({
   onSubmit,
   initial,
   loading,
-}: {
-  open: boolean;
-  onClose: () => void;
-  onSubmit: (data: any) => void;
-  initial?: any;
-  loading?: boolean;
-}) {
-  // Sửa lại state imageUrls thành mảng object {url, size}
-  const [form, setForm] = useState({
-    memorableName: "",
-    address: "",
-    price: "",
-    area: "",
-    bedrooms: "",
-    bathrooms: "",
-    legalStatus: "",
-    imageUrls: [] as ImageWithSize[],
-    notes: "",
-    gps: undefined as { lat: number; lng: number } | undefined,
-  });
-
+}: PropertyFormDialogProps) {
+  const [form, setForm] = useState({ ...defaultForm });
   const [uploading, setUploading] = useState(false);
   const [geocoding, setGeocoding] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Khi load initial, nếu là mảng string thì gán size = 0 (không kiểm soát được size cũ)
   useEffect(() => {
     if (initial) {
       setForm({
@@ -60,27 +57,16 @@ export function PropertyFormDialog({
         gps: initial.gps || undefined,
       });
     } else {
-      setForm({
-        memorableName: "",
-        address: "",
-        price: "",
-        area: "",
-        bedrooms: "",
-        bathrooms: "",
-        legalStatus: "",
-        imageUrls: [],
-        notes: "",
-        gps: undefined,
-      });
+      setForm({ ...defaultForm });
     }
   }, [initial, open]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm(f => ({ ...f, [name]: value }));
   };
 
-  const handleFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFiles = async (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
     setUploading(true);
@@ -111,7 +97,7 @@ export function PropertyFormDialog({
     setForm(f => ({ ...f, imageUrls: f.imageUrls.filter((_, i) => i !== idx) }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     onSubmit({
       ...form,
@@ -189,8 +175,7 @@ export function PropertyFormDialog({
               <LocationPickerMap
                 lat={form.gps?.lat}
                 lng={form.gps?.lng}
-                onChange={(lat, lng) => setForm(f => ({ ...f, gps: { lat, lng } }))
-                }
+                onChange={(lat, lng) => setForm(f => ({ ...f, gps: { lat, lng } }))}
               />
             </div>
             {form.gps && (
