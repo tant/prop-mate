@@ -1,5 +1,7 @@
 import Image from "next/image";
 import { Icons } from "@/components/icons";
+import StoryButton from "@/components/ui/story-button";
+import { IconCloudOff } from "@tabler/icons-react";
 
 export default function Home() {
   return (
@@ -20,6 +22,7 @@ export default function Home() {
           >
             Vào App
           </a>
+          <StoryButton />
           <div className="text-sm text-gray-500 mt-2">
             Sử dụng thử 1 tháng miễn phí. Không cần thẻ tín dụng.
           </div>
@@ -77,10 +80,10 @@ export default function Home() {
           <div className="space-y-12">
             {/* Feature 1 */}
             <div className="flex flex-col md:flex-row items-center gap-8">
-              <div className="flex-1">
-                <Image src="/next.svg" alt="Quản lý giỏ hàng" width={320} height={200} className="rounded-lg" />
+              <div className="flex-1 flex justify-center">
+                <Image src="/page-home/products.png" alt="Quản lý giỏ hàng" width={320} height={200} className="rounded-lg" />
               </div>
-              <div className="flex-1">
+              <div className="flex-1 flex flex-col justify-center items-start">
                 <h3 className="text-xl font-bold mb-2">Quản lý giỏ hàng bất động sản chuyên nghiệp</h3>
                 <p className="text-gray-700 mb-2">
                   Tạo và quản lý hồ sơ bất động sản chi tiết chỉ trong vài phút. Đính kèm hình ảnh, ghi chú vị trí, trạng thái (còn hàng, đã bán). Tìm kiếm và lọc thông tin sản phẩm tức thì.
@@ -89,10 +92,10 @@ export default function Home() {
             </div>
             {/* Feature 2 */}
             <div className="flex flex-col md:flex-row-reverse items-center gap-8">
-              <div className="flex-1">
-                <Image src="/vercel.svg" alt="CRM" width={320} height={200} className="rounded-lg" />
+              <div className="flex-1 flex justify-center">
+                <Image src="/page-home/crm.png" alt="CRM" width={320} height={200} className="rounded-lg" />
               </div>
-              <div className="flex-1">
+              <div className="flex-1 flex flex-col justify-center items-start">
                 <h3 className="text-xl font-bold mb-2">Xây dựng & chăm sóc khách hàng (CRM)</h3>
                 <p className="text-gray-700 mb-2">
                   Lưu trữ thông tin khách hàng tập trung, theo dõi lịch sử tư vấn và nhu cầu của từng người. Không bao giờ bỏ quên một khách hàng tiềm năng nào.
@@ -101,10 +104,10 @@ export default function Home() {
             </div>
             {/* Feature 3 */}
             <div className="flex flex-col md:flex-row items-center gap-8">
-              <div className="flex-1">
-                <Image src="/appointments.svg" alt="Lịch hẹn" width={320} height={200} className="rounded-lg" />
+              <div className="flex-1 flex justify-center">
+                <Image src="/page-home/appointment.png" alt="Lịch hẹn" width={320} height={200} className="rounded-lg" />
               </div>
-              <div className="flex-1">
+              <div className="flex-1 flex flex-col justify-center items-start">
                 <h3 className="text-xl font-bold mb-2">Sắp xếp lịch hẹn thông minh</h3>
                 <p className="text-gray-700 mb-2">
                   Tạo lịch hẹn xem nhà chỉ với vài cú nhấp, liên kết trực tiếp khách hàng với bất động sản tương ứng. Nhận thông báo nhắc nhở để không bỏ lỡ cuộc gặp quan trọng.
@@ -113,10 +116,10 @@ export default function Home() {
             </div>
             {/* Feature 4 */}
             <div className="flex flex-col items-center text-center bg-blue-100 rounded-lg p-8">
-              <Image src="/globe.svg" alt="Offline" width={64} height={64} />
-              <h3 className="text-xl font-bold mt-4 mb-2">Làm việc không gián đoạn với Chế độ Offline</h3>
+              <IconCloudOff size={64} stroke={2} className="text-blue-500 mb-2" />
+              <h3 className="text-xl font-bold mt-4 mb-2">Làm việc không gián đoạn dù không có internet</h3>
               <p className="text-gray-700 max-w-2xl mx-auto">
-                <span className="font-semibold">Điểm khác biệt lớn nhất:</span> Xem, thêm, và chỉnh sửa dữ liệu ngay cả khi mất kết nối. Ứng dụng sẽ tự động đồng bộ mọi thứ ngay khi có mạng trở lại. Hoàn hảo cho các chuyến đi xem đất nền hoặc vào tầng hầm các dự án.
+                <span className="font-semibold">Điểm khác biệt lớn nhất:</span> Xem, thêm, và chỉnh sửa dữ liệu ngay cả khi mất kết nối. <br/> Ứng dụng sẽ tự động đồng bộ mọi thứ ngay khi có mạng trở lại. Hoàn hảo cho các chuyến đi xem đất nền hoặc vào tầng hầm các dự án.
               </p>
             </div>
           </div>
@@ -148,7 +151,7 @@ export default function Home() {
             </details>
             <details className="bg-white rounded shadow p-4">
               <summary className="font-semibold cursor-pointer">Việc nhập dữ liệu từ Excel vào có dễ dàng không?</summary>
-              <div className="mt-2 text-gray-600">Chúng tôi sẽ bổ sung các tính năng import trong thời gian ngắn nhất.</div>
+              <div className="mt-2 text-gray-600">Chúng tôi sẽ bổ sung các tính năng import trong thời gian sớm nhất.</div>
             </details>
           </div>
         </div>
@@ -199,3 +202,14 @@ export default function Home() {
     </main>
   );
 }
+
+/* Thêm animation CSS vào file global nếu chưa có */
+/*
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fadeIn 1s;
+}
+*/
