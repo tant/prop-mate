@@ -1,47 +1,67 @@
-# Project Brief: Real Estate Agent Management App
+# Bản tóm tắt dự án: Ứng dụng quản lý bất động sản cho môi giới
 
-### 1. Executive Summary
-This is a mobile-first responsive web application designed for real estate agents to efficiently manage their property listings, client information, and work schedule directly from their mobile phones, while also ensuring a good experience on desktop. It solves the inefficiency of manual, fragmented information management by centralizing all critical data (properties, clients, appointments) in a single place, accessible seamlessly across devices, even when offline. The target market is independent real estate agents and those in small teams in Vietnam.
+## 1. Tóm tắt dự án
+Đây là một ứng dụng web đáp ứng ưu tiên cho thiết bị di động (mobile-first), được thiết kế như một công cụ bán hàng chiến lược cho các nhà môi giới bất động sản tại Việt Nam. Thay vì chỉ quản lý thông tin, ứng dụng tập trung vào việc giúp chốt giao dịch nhanh hơn bằng cách cung cấp quyền truy cập tức thì vào dữ liệu bất động sản và khách hàng, ngay cả khi ngoại tuyến. Bằng cách tập trung mọi thứ vào một nơi, ứng dụng không chỉ giúp tiết kiệm thời gian mà còn nâng cao tính chuyên nghiệp và khả năng phản hồi của nhà môi giới với khách hàng.
 
-### 2. Problem Statement
-Real estate agents are frequently on the move and require immediate access to information. However, their current management methods (notebooks, Excel, Zalo, scattered notes) are fragmented and inefficient. This leads to time-consuming information retrieval, difficulty in matching properties with potential clients, and a reduction in professionalism when they cannot provide fast and accurate information to clients.
+## 2. Phát biểu vấn đề
+Nhà môi giới bất động sản tại Việt Nam đối mặt với nhiều thách thức trong quy trình làm việc hàng ngày, đặc biệt khi công cụ chính của họ là điện thoại di động:
 
-### 3. Proposed Solution
-We propose building a responsive web app with offline-first capabilities. The solution will be built on the Next.js platform and the Firebase ecosystem to accelerate development. The solution focuses on simplicity and efficiency, comprising the following core functional modules:
-* Property Management
-* Client Management
-* Appointment Scheduling
-* Deal Tracking
+- Dữ liệu phân mảnh, thiếu hiệu quả: Việc quản lý thông tin thủ công qua sổ tay, Excel, Zalo... khiến dữ liệu bị rời rạc, khó tra cứu tức thì.
+- Rủi ro bị đánh cắp thông tin ("chôm hàng"): Công sức khảo sát và thu thập thông tin rất dễ bị các môi giới khác sao chép khi đăng tải công khai.
+- Hạn chế về marketing và tiếp cận: Việc đăng tin lên các nền tảng lớn không hiệu quả và dễ bị đánh cắp dữ liệu, khiến môi giới bị giới hạn trong mạng lưới quan hệ có sẵn.
+- Khó khăn trong việc theo dõi khách hàng: Khi có nhiều tương tác, việc ghi nhớ chính xác các chi tiết về nhu cầu và phản hồi của khách hàng trở nên rất phức tạp.
+- Thiếu công cụ đo lường hiệu quả: Người môi giới không thể phân tích được hiệu quả kinh doanh của chính mình.
 
-### 4. Target Users
-* **Segment:** Independent real estate agents or those working in small teams in Vietnam.
-* **Behavior:** Dynamic, constantly moving, and primarily working on their mobile devices.
-* **"Pain Points":** Wasted time on manual information management, fragmented data, and difficulty retrieving information instantly.
+## 3. Giải pháp đề xuất
+Chúng tôi đề xuất xây dựng một ứng dụng web với chiến lược thiết kế mobile-first, đồng thời đảm bảo mang lại trải nghiệm người dùng tốt nhất và được tối ưu hóa riêng cho cả hai nền tảng di động và máy tính để bàn ngay từ phiên bản đầu tiên. Về mặt kỹ thuật, đây sẽ là một ứng dụng web đáp ứng với khả năng hoạt động ngoại tuyến và được phát triển trên nền tảng Next.js và hệ sinh thái Firebase.
 
-### 5. Goals & Success Metrics
-* **Goals:** To provide a stable, easy-to-use tool that helps real estate agents manage their daily work more efficiently and professionally.
-* **KPIs:** To be defined after the product launch, based on feedback and real user data.
+## 4. Người dùng mục tiêu
+- Phân khúc: Nhà môi giới bất động sản độc lập hoặc làm việc trong các đội nhóm nhỏ tại Việt Nam.
+- Hành vi: Năng động, thường xuyên di chuyển và làm việc chủ yếu trên điện thoại di động.
+- Bối cảnh Việt Nam: Tất cả các chức năng, giao diện và mô hình dữ liệu phải được thiết kế phù hợp với thị trường Việt Nam (đơn vị tiền tệ VNĐ, định dạng địa chỉ, thuật ngữ chuyên ngành, đơn vị đo lường m²).
 
-### 6. MVP (Minimum Viable Product) Scope
-* **Core Features:** Property Management, Client Management, Appointment Scheduling, Offline Mode, Map Visualization.
-* **Out of Scope:** Advanced reporting, advanced map features (e.g., search by drawing area, data layers), automatic property suggestions, detailed contract and financial management.
+## 5. Mục tiêu và chỉ số thành công
+**Mục tiêu:**
+- Nâng cao sự chuyên nghiệp và khả năng phản hồi của nhà môi giới.
+- Giảm thiểu thời gian quản lý hành chính để tập trung vào các hoạt động tạo ra doanh thu.
+- Tạo ra một công cụ làm việc cốt lõi, không thể thiếu trong quy trình hàng ngày của người dùng.
 
-### 7. Post-MVP Vision
-The long-term development roadmap will be built based on real user feedback after the initial version is launched.
+**KPIs:** Sẽ được xác định sau khi sản phẩm ra mắt.
 
-### 8. Technical Considerations
-* **Platform & Framework:** The frontend and backend will be developed uniformly on the **Next.js 15.4** and **React 19** platform.
-* **Backend Ecosystem:** The **Firebase** suite of services will be used for backend needs, including Firestore (Database), Authentication, and Cloud Storage (Image Storage).
-* **Maps:** Use **OpenStreetMap** as the data source and the **Leaflet.js** library for map rendering.
-* **General Architecture:**
-    * The product is a **Responsive Web App**, with a mobile-first priority.
-    * The application must have **offline mode** capability.
-    * The system is designed for a **single user**, and real-time data synchronization is not a hard requirement.
+## 6. Phạm vi MVP (Sản phẩm khả dụng tối thiểu)
+**Tính năng cốt lõi:**
+- (Cập nhật) Hệ thống đăng ký và quản lý tài khoản (đa người dùng).
+- Quản lý bất động sản.
+- Quản lý khách hàng.
+- Quản lý lịch hẹn.
+- Chế độ ngoại tuyến.
+- Trực quan hóa trên bản đồ.
 
-### 9. Constraints & Assumptions
-* **Constraints:** Flexible budget and timeline; initial phase serves only a single user; does not handle complex legal contracts.
-* **Assumptions:** The target user is familiar with smartphones; a centralized, simple solution will improve their work efficiency.
+**Ngoài phạm vi:** Báo cáo nâng cao, các tính năng bản đồ nâng cao, quản lý chi tiết hợp đồng và dòng tiền.
 
-### 10. Risks & Open Questions
-* **Risks:** Adoption risk (users changing habits); technical risk (offline complexity); scalability risk (difficulty expanding for teams in the future).
-* **Open Questions:** What is the most intuitive and user-friendly interface for a busy real estate agent?
+## 7. Tầm nhìn sau MVP
+Lộ trình phát triển dài hạn sẽ tập trung vào việc chuyển đổi ứng dụng thành một nền tảng SaaS đa người dùng, hỗ trợ bán hàng, marketing và phân tích thông minh, bao gồm các tính năng như trang thông tin bất động sản công khai, website cá nhân cho môi giới, và tích hợp trợ lý AI.
+
+## 8. Các cân nhắc về kỹ thuật
+- Nền tảng: Next.js 15.4 và React 19.
+- Hệ sinh thái backend: Bộ dịch vụ của Firebase.
+- Bản đồ: OpenStreetMap và Leaflet.js.
+- Kiến trúc chung: Ứng dụng web đáp ứng, mobile-first, hoạt động ngoại tuyến, và (Cập nhật) có kiến trúc đa người dùng (multi-tenant) ngay từ MVP.
+
+## 9. Ràng buộc và giả định
+**Ràng buộc:**
+- Ngân sách và thời gian linh hoạt.
+- Không xử lý hợp đồng pháp lý phức tạp.
+
+**Giả định:**
+- Người dùng quen thuộc với smartphone.
+- Một giải pháp tập trung sẽ cải thiện hiệu suất công việc.
+
+## 10. Rủi ro và câu hỏi mở
+**Rủi ro:**
+- Người dùng khó thay đổi thói quen.
+- (Cập nhật) Độ phức tạp kỹ thuật của việc xây dựng một hệ thống đa người dùng và có chế độ ngoại tuyến ngay từ MVP.
+
+**Câu hỏi mở:**
+- Giao diện như thế nào là trực quan nhất cho người môi giới bận rộn?
+
