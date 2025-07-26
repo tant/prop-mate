@@ -3,6 +3,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Property } from "@/models/property-interface";
 import dynamic from "next/dynamic";
+import { useState } from "react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
 
 const PropertyMiniMap = dynamic(() => import("./property-mini-map"), { ssr: false });
 
@@ -14,20 +18,47 @@ export interface PropertyCardProps {
 }
 
 export function PropertyCard({ property, onView, onEdit, onDelete }: PropertyCardProps) {
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalImg, setModalImg] = useState<string | null>(null);
+  const images = property.imageUrls?.length ? property.imageUrls : ["/no-image.png"];
+
+  const handleImgClick = (img: string) => {
+    setModalImg(img);
+    setModalOpen(true);
+  };
+
   return (
     <Card className="p-4 flex flex-col gap-2 shadow hover:shadow-lg transition">
       <div className="flex gap-2 h-32 w-full mb-2">
         <div className="w-1/2 h-full">
-          <img
-            src={property.imageUrls?.[0] || "/window.svg"}
-            alt={property.memorableName}
-            className="h-full w-full object-cover rounded"
-          />
+          <Swiper
+            spaceBetween={8}
+            slidesPerView={1}
+            style={{ height: "100%", width: "100%" }}
+          >
+            {images.map((img, idx) => (
+              <SwiperSlide key={idx}>
+                <img
+                  src={img}
+                  alt={property.memorableName}
+                  className="h-full w-full object-contain rounded bg-gray-100 cursor-pointer"
+                  onClick={() => handleImgClick(img)}pm
+                />
+              </SwiperSlide>
+            ))}
+          </Swiper>
         </div>
         <div className="w-1/2 h-full">
           <PropertyMiniMap lat={property.gps?.lat} lng={property.gps?.lng} />
         </div>
       </div>
+      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+        <DialogContent className="flex items-center justify-center">
+          {modalImg && (
+            <img src={modalImg} alt="Xem ảnh" className="max-h-[80vh] max-w-full object-contain rounded" />
+          )}
+        </DialogContent>
+      </Dialog>
       <div className="font-bold text-lg truncate">{property.memorableName}</div>
       <div className="text-gray-600 text-sm truncate">{property.address}</div>
       <div className="flex items-center gap-2 text-blue-700 font-semibold">

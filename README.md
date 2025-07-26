@@ -41,4 +41,4 @@ Truy cập: http://localhost:3000
 - Tham khảo tài liệu chính thức TailwindCSS 4 để đảm bảo code luôn tương thích
 
 ## 📄 License
-MIT © 2025 PropMate Team
+MIT © 2025 Tan

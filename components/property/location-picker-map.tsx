@@ -17,6 +17,10 @@ type Props = {
 };
 
 export default function LocationPickerMap({ lat, lng, onChange }: Props) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   function LocationMarker() {
     useMapEvents({
       click(e) {

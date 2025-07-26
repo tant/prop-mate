@@ -56,7 +56,7 @@ export default function EditPropertyPage() {
   if (fetching) return <div className="flex justify-center items-center min-h-screen">Đang tải...</div>;
 
   return (
-    <div className="flex flex-col min-h-screen items-center justify-center p-4">
+    <div className="flex flex-col min-h-screen p-4 overflow-auto items-center">
       <div className="w-full max-w-lg">
         <PropertyFormDialog
           open={true}

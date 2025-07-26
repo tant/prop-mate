@@ -12,7 +12,8 @@ function setCORS(res: NextResponse) {
 
 // GET /api/properties/[id] - Get property by id
 export async function GET(req: NextRequest, context: any) {
-  const { id } = context.params;
+  const params = await context.params;
+  const { id } = params;
   let user = null;
   try {
     user = await verifyFirebaseIdToken(req);
@@ -38,7 +39,8 @@ export async function GET(req: NextRequest, context: any) {
 
 // PUT /api/properties/[id] - Update property
 export async function PUT(req: NextRequest, context: any) {
-  const { id } = context.params;
+  const params = await context.params;
+  const { id } = params;
   let user = null;
   try {
     user = await verifyFirebaseIdToken(req);
@@ -63,7 +65,8 @@ export async function PUT(req: NextRequest, context: any) {
 
 // PATCH /api/properties/[id] - Patch property
 export async function PATCH(req: NextRequest, context: any) {
-  const { id } = context.params;
+  const params = await context.params;
+  const { id } = params;
   let user = null;
   try {
     user = await verifyFirebaseIdToken(req);
@@ -88,7 +91,8 @@ export async function PATCH(req: NextRequest, context: any) {
 
 // DELETE /api/properties/[id] - Delete property
 export async function DELETE(req: NextRequest, context: any) {
-  const { id } = context.params;
+  const params = await context.params;
+  const { id } = params;
   let user = null;
   try {
     user = await verifyFirebaseIdToken(req);

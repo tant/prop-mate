@@ -4,6 +4,8 @@ import { Input } from "@/components/ui/input";
 import { useState, useEffect, useRef, ChangeEvent, FormEvent } from "react";
 import LocationPickerMap from "@/components/property/location-picker-map";
 import imageCompression from "browser-image-compression";
+import { storage } from "@/lib/firebaseConfig";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 type ImageWithSize = { url: string; size: number };
 
@@ -66,6 +68,15 @@ export function PropertyFormDialog({
     setForm(f => ({ ...f, [name]: value }));
   };
 
+  const uploadImageToFirebase = async (file: File) => {
+    const storageRef = ref(storage, `properties/${Date.now()}_${file.name}`);
+    console.log("[Upload] Bắt đầu upload:", file.name);
+    const snapshot = await uploadBytes(storageRef, file);
+    const url = await getDownloadURL(snapshot.ref);
+    console.log("[Upload] Thành công:", url);
+    return url;
+  };
+
   const handleFiles = async (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
@@ -81,12 +92,14 @@ export function PropertyFormDialog({
           fileType: "image/jpeg",
           initialQuality: 0.8,
         });
-        const url = URL.createObjectURL(compressedFile);
+        // Upload lên Firebase Storage
+        const url = await uploadImageToFirebase(compressedFile);
         imgs.push({ url, size: compressedFile.size });
       }
       setForm(f => ({ ...f, imageUrls: [...f.imageUrls, ...imgs] }));
     } catch (err) {
-      alert("Lỗi khi nén ảnh: " + (err instanceof Error ? err.message : err));
+      console.error("[Upload] Lỗi khi upload ảnh:", err);
+      alert("Lỗi khi upload ảnh: " + (err instanceof Error ? err.message : err));
     } finally {
       setUploading(false);
       fileInputRef.current && (fileInputRef.current.value = "");
@@ -137,7 +150,7 @@ export function PropertyFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={v => !v && onClose()}>
-      <DialogContent showCloseButton>
+      <DialogContent showCloseButton className="overflow-auto max-h-[80vh]">
         <DialogHeader>
           <DialogTitle>{initial ? "Chỉnh sửa BĐS" : "Thêm mới BĐS"}</DialogTitle>
           <DialogDescription />

@@ -14,6 +14,10 @@ if (typeof window !== "undefined" && L && L.Icon.Default) {
 type Props = { lat?: number; lng?: number };
 
 export default function PropertyMiniMap({ lat, lng }: Props) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   if (typeof lat !== "number" || typeof lng !== "number") {
     return (
       <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded text-xs text-gray-400">
