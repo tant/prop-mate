@@ -42,7 +42,7 @@ export function PropertyCard({ property, onView, onEdit, onDelete }: PropertyCar
                   src={img}
                   alt={property.memorableName}
                   className="h-full w-full object-contain rounded bg-gray-100 cursor-pointer"
-                  onClick={() => handleImgClick(img)}pm
+                  onClick={() => handleImgClick(img)}
                 />
               </SwiperSlide>
             ))}
