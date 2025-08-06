@@ -6,6 +6,7 @@ import { cookies } from "next/headers";
 import { adminAuth } from "@/lib/firebase/admin";
 import { UserProvider } from "@/contexts/UserProvider";
 import { userService } from "@/server/user.server";
+import { TRPCReactProvider } from "@/lib/TRPCReactProvider";
 
 
 export const metadata: Metadata = {
@@ -63,7 +64,9 @@ export default async function RootLayout({
   // KHÔNG render <html> và <body> ở layout con
   return (
     <UserProvider user={user}>
-      <ReactQueryProvider>{children}</ReactQueryProvider>
+      <TRPCReactProvider>
+        <ReactQueryProvider>{children}</ReactQueryProvider>
+      </TRPCReactProvider>
     </UserProvider>
   );
 }
