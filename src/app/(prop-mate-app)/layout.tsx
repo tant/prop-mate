@@ -5,6 +5,7 @@ import { ReactQueryProvider } from "@/lib/queryClient";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { adminAuth } from "@/lib/firebase/admin";
+import { UserContext } from "@/contexts/UserContext";
 
 const inter = Inter({
   subsets: ["latin", "vietnamese"],
@@ -63,7 +64,9 @@ export default async function RootLayout({
   return (
     <html lang="vi">
       <body className={`${inter.variable} font-inter antialiased`}>
-        <ReactQueryProvider>{children}</ReactQueryProvider>
+        <UserContext.Provider value={user}>
+          <ReactQueryProvider>{children}</ReactQueryProvider>
+        </UserContext.Provider>
       </body>
     </html>
   );
