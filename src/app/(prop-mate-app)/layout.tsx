@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { adminAuth } from "@/lib/firebase/admin";
 import { UserContext } from "@/contexts/UserContext";
+import { userService } from "@/server/user.server";
 
 const inter = Inter({
   subsets: ["latin", "vietnamese"],
@@ -51,7 +52,8 @@ export default async function RootLayout({
   let user = null;
   if (idToken) {
     try {
-      user = await adminAuth.verifyIdToken(idToken);
+      const decoded = await adminAuth.verifyIdToken(idToken);
+      user = await userService.getUserById(decoded.uid);
     } catch {
       user = null;
     }

@@ -49,7 +49,8 @@ propmate/
 │   │   └── utils.ts
 │   ├── server/              # Business logic layer, service backend
 │   ├── services/            # Hàm gọi API, thao tác dữ liệu phía client
-│   └── types/               # Định nghĩa type/interface chung
+│   ├── types/               # Định nghĩa type/interface chung
+│   ├── contexts/            # Chứa các React Context toàn cục (UserContext, ThemeContext, ...)
 ├── docs/                    # Tài liệu dự án (nếu có)
 ├── package.json
 ├── README.md
@@ -105,6 +106,28 @@ pnpm lint
 pnpm reset:db
 ```
 > Lưu ý: Cần cấu hình biến môi trường và service account cho Firebase Admin SDK.
+
+---
+
+## Quản lý trạng thái đăng nhập (UserContext)
+
+- Thư mục `src/contexts/` chứa các React Context dùng toàn app, ví dụ: `UserContext`.
+- `UserContext` giúp toàn bộ tree component truy cập thông tin user đã đăng nhập một cách an toàn, type-safe.
+- Ở layout server component, sau khi xác thực user thành công, user sẽ được truyền vào `UserContext.Provider`.
+- Các component con chỉ cần gọi `const user = useUser()` để lấy thông tin user, không cần truyền prop thủ công.
+- Nếu chưa đăng nhập, layout sẽ tự động redirect về `/login`, đảm bảo mọi nơi trong app chỉ nhận user hợp lệ.
+- Đây là best practice cho Next.js/React app hiện đại, giúp codebase dễ mở rộng, bảo trì và test.
+
+Ví dụ sử dụng:
+```tsx
+import { useUser } from "@/contexts/UserContext"
+
+function Profile() {
+  const user = useUser()
+  if (!user) return null // hoặc redirect/login UI
+  return <div>Xin chào, {user.firstName}!</div>
+}
+```
 
 ---
 
