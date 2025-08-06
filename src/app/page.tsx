@@ -10,7 +10,7 @@ export default function Home() {
       <section className="flex flex-col md:flex-row items-center justify-between px-6 py-16 max-w-6xl mx-auto">
         <div className="flex-1 mb-10 md:mb-0 md:mr-12">
           <h1 className="text-4xl md:text-5xl font-bold text-blue-700 mb-4">
-            App Quản Lý Bất Động Sản Dành Cho Môi Giới
+            App quản lý bất động sản dành cho môi giới
           </h1>
           <p className="text-lg md:text-xl text-gray-700 mb-6">
             Tập trung toàn bộ giỏ hàng, khách hàng và lịch hẹn vào một nơi duy nhất.<br />
@@ -75,7 +75,7 @@ export default function Home() {
       <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-semibold text-center text-blue-800 mb-12">
-            PropMate - Trợ Lý Ảo "Tất Cả Trong Một" Của Bạn
+            PropMate - trợ lý ảo &quot;tất cả trong một&quot; của bạn
           </h2>
           <div className="space-y-12">
             {/* Feature 1 */}
@@ -195,7 +195,7 @@ export default function Home() {
             </ul>
           </div>
           <div className="col-span-2 flex items-end justify-end md:justify-end">
-            <span className="text-xs text-gray-400">© 2025 PropMate - Phát triển bởi WitData.</span>
+            <span className="text-xs text-gray-400">© 2025 PropMate - phát triển bởi WitData.</span>
           </div>
         </div>
       </footer>
