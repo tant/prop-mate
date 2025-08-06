@@ -1,7 +1,8 @@
-import { useEffect } from "react"
 import { auth } from "@/lib/firebase/client"
-import { onAuthStateChanged, User } from "firebase/auth"
-import { useQuery, UseQueryResult } from "@tanstack/react-query"
+import { onAuthStateChanged } from "firebase/auth"
+import type { User } from "firebase/auth"
+import { useQuery } from "@tanstack/react-query"
+import type { UseQueryResult } from "@tanstack/react-query"
 
 export function useAuthUser(): UseQueryResult<User | null, Error> {
   return useQuery({
