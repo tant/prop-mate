@@ -65,13 +65,10 @@ export default async function RootLayout({
     redirect("/login");
   }
 
+  // KHÔNG render <html> và <body> ở layout con
   return (
-    <html lang="vi">
-      <body className={`${inter.variable} font-inter antialiased`}>
-        <UserProvider user={user}>
-          <ReactQueryProvider>{children}</ReactQueryProvider>
-        </UserProvider>
-      </body>
-    </html>
+    <UserProvider user={user}>
+      <ReactQueryProvider>{children}</ReactQueryProvider>
+    </UserProvider>
   );
 }

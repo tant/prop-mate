@@ -1,7 +1,8 @@
 'use client'
+import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { motion } from "motion/react"
-import BottomNav from "@/components/layout/bottom-nav";
+import BottomNav from "@/components/page-story/bottom-nav";
 const story = [
 	{
 		type: "hero",
