@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { auth } from "@/lib/firebase/client"
 import { signInWithEmailAndPassword } from "firebase/auth"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 
 function getErrorMessage(err: unknown): string {
   // Firebase AuthError type: { code: string, message: string }
@@ -50,6 +51,7 @@ export function LoginForm({
   )
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -65,9 +67,7 @@ export function LoginForm({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token: idToken }),
       });
-      setTimeout(() => {
-        window.location.assign("/dashboard");
-      }, 100);
+      router.push("/dashboard");
     } catch (err) {
       console.debug("[LOGIN FAIL]", err)
       setError(getErrorMessage(err))
