@@ -5,7 +5,7 @@ import { ReactQueryProvider } from "@/lib/queryClient";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { adminAuth } from "@/lib/firebase/admin";
-import { UserContext } from "@/contexts/UserContext";
+import { UserProvider } from "@/contexts/UserProvider";
 import { userService } from "@/server/user.server";
 
 const inter = Inter({
@@ -53,7 +53,9 @@ export default async function RootLayout({
   if (idToken) {
     try {
       const decoded = await adminAuth.verifyIdToken(idToken);
-      user = await userService.getUserById(decoded.uid);
+      const rawUser = await userService.getUserById(decoded.uid);
+      // Ensure user is serializable (handles Firestore Timestamp, Date, etc.)
+      user = rawUser ? JSON.parse(JSON.stringify(rawUser)) : null;
     } catch {
       user = null;
     }
@@ -66,9 +68,9 @@ export default async function RootLayout({
   return (
     <html lang="vi">
       <body className={`${inter.variable} font-inter antialiased`}>
-        <UserContext.Provider value={user}>
+        <UserProvider user={user}>
           <ReactQueryProvider>{children}</ReactQueryProvider>
-        </UserContext.Provider>
+        </UserProvider>
       </body>
     </html>
   );
