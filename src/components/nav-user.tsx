@@ -9,6 +9,7 @@ import {
   IconSparkles,
 } from "@tabler/icons-react"
 import type { User } from "@/types/user"
+import { useRouter } from "next/navigation"
 
 import {
   Avatar,
@@ -33,6 +34,7 @@ import {
 
 export function NavUser({ user }: { user: User | null }) {
   const { isMobile } = useSidebar()
+  const router = useRouter()
 
   if (!user) return null
 
@@ -103,9 +105,9 @@ export function NavUser({ user }: { user: User | null }) {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => { router.push("/account") }}>
                 <IconBadgeCc />
-                Account
+                Tài khoản
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <IconCreditCard />
