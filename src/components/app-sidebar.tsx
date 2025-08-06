@@ -1,6 +1,6 @@
 "use client"
 
-import * as React from "react"
+import type * as React from "react"
 import { navMain, projects } from "@/constants"
 import { Home } from "lucide-react"
 
