@@ -40,6 +40,7 @@ propmate/
 │   │   ├── nav-user.tsx
 │   │   ├── team-switcher.tsx
 │   │   └── ui/              # Các UI component nhỏ (button, card, ...)
+│   ├── constants/            # Định nghĩa các hằng số dùng chung toàn dự án
 │   ├── queries/             # Custom hook data fetching/mutation (TanStack Query)
 │   ├── hooks/               # Custom hook UI, event, responsive, logic không liên quan đến data
 │   ├── lib/                 # Tiện ích, config, firebase, genkit, ...
