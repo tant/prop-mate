@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "../globals.css";
 import { ReactQueryProvider } from "@/lib/queryClient";
+import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
+import { adminAuth } from "@/lib/firebase/admin";
 
 const inter = Inter({
   subsets: ["latin", "vietnamese"],
@@ -35,11 +38,28 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Lấy cookie chứa Firebase ID token (ví dụ: "token" hoặc tên bạn lưu)
+  const cookieStore = await cookies();
+  const idToken = cookieStore.get("token")?.value;
+
+  let user = null;
+  if (idToken) {
+    try {
+      user = await adminAuth.verifyIdToken(idToken);
+    } catch {
+      user = null;
+    }
+  }
+
+  if (!user) {
+    redirect("/login");
+  }
+
   return (
     <html lang="vi">
       <body className={`${inter.variable} font-inter antialiased`}>

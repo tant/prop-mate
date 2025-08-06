@@ -1,3 +1,6 @@
+"use client"
+
+import { useRouter } from "next/navigation"
 import { AppSidebar } from "@/components/app-sidebar"
 import { Separator } from "@/components/ui/separator"
 import {
@@ -5,8 +8,27 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import { useAuthUser } from "@/hooks/use-auth-user"
 
 export default function Page() {
+  const router = useRouter()
+  const { data: user, isLoading } = useAuthUser()
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <span className="text-muted-foreground text-sm">Đang kiểm tra đăng nhập...</span>
+      </div>
+    )
+  }
+
+  if (!user) {
+    if (typeof window !== "undefined") {
+      router.replace("/login")
+    }
+    return null
+  }
+
   return (
     <SidebarProvider>
       <AppSidebar />
