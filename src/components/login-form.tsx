@@ -9,7 +9,6 @@ import { Label } from "@/components/ui/label"
 import { auth } from "@/lib/firebase/client"
 import { signInWithEmailAndPassword } from "firebase/auth"
 import Image from "next/image"
-import { useRouter } from "next/navigation"
 
 function getErrorMessage(err: unknown): string {
   // Firebase AuthError type: { code: string, message: string }
@@ -39,7 +38,6 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const router = useRouter()
   const [email, setEmail] = useState(
     typeof process.env.NEXT_PUBLIC_FIREBASE_TEST_EMAIL === "string"
       ? process.env.NEXT_PUBLIC_FIREBASE_TEST_EMAIL

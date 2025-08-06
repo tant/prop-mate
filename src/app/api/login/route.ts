@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server"
+import type { NextRequest } from "next/server"
+import { NextResponse } from "next/server"
 import { adminAuth } from "@/lib/firebase/admin"
 
 export async function POST(req: NextRequest) {
@@ -19,7 +20,7 @@ export async function POST(req: NextRequest) {
       maxAge: 60 * 60 * 24 * 7, // 7 ngày
     })
     return res
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: "Invalid token" }, { status: 401 })
   }
 }
