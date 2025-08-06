@@ -2,7 +2,7 @@
 
 import type * as React from "react"
 import { navMain, projects } from "@/constants"
-import { Home } from "lucide-react"
+import { IconHome } from "@tabler/icons-react";
 
 import { NavMain } from "@/components/nav-main"
 import { NavProjects } from "@/components/nav-projects"
@@ -31,7 +31,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
               <a href="/dashboard">
-                <Home className="!size-5" />
+                <IconHome className="!size-5" />
                 <span className="text-base font-semibold">PropMate</span>
               </a>
             </SidebarMenuButton>

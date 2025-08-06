@@ -1,19 +1,19 @@
 import {
-  Gauge,
-  Building2,
-  Map as LucideMap,
-  Landmark,
-  FolderKanban,
-  Boxes,
-} from "lucide-react"
+  IconGauge,
+  IconBuilding,
+  IconMap,
+  IconBuildingMonument,
+  IconLayoutKanban,
+  IconBox,
+} from "@tabler/icons-react"
 
 const iconMap = {
-  Gauge,
-  Building2,
-  Map: LucideMap,
-  Landmark,
-  FolderKanban,
-  Boxes,
+  Gauge: IconGauge,
+  Building2: IconBuilding,
+  Map: IconMap,
+  Landmark: IconBuildingMonument,
+  FolderKanban: IconLayoutKanban,
+  Boxes: IconBox,
 } as const
 
 const navMainRaw = [

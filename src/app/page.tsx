@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { FileText, Calendar, AlertTriangle, CloudOff } from "lucide-react";
+import { IconFileText, IconCalendar, IconAlertTriangle, IconCloudOff } from "@tabler/icons-react";
 
 import StoryButton from "@/components/page-home/story-button";
 
@@ -47,21 +47,21 @@ export default function Home() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="flex flex-col items-center text-center">
-              <FileText className="w-12 h-12 text-blue-500" />
+              <IconFileText className="w-12 h-12 text-blue-500" />
               <h3 className="font-bold mt-4 mb-2">Dữ liệu phân mảnh?</h3>
               <p className="text-gray-600 text-sm">
                 Lưu thông tin khách hàng trên Zalo, giỏ hàng trên Excel, lịch hẹn trong sổ tay?
               </p>
             </div>
             <div className="flex flex-col items-center text-center">
-              <Calendar className="w-12 h-12 text-blue-500" />
+              <IconCalendar className="w-12 h-12 text-blue-500" />
               <h3 className="font-bold mt-4 mb-2">Mất thời gian?</h3>
               <p className="text-gray-600 text-sm">
                 Phải tìm kiếm, đối chiếu thông tin từ nhiều nguồn khác nhau khi khách hàng cần gấp?
               </p>
             </div>
             <div className="flex flex-col items-center text-center">
-              <AlertTriangle className="w-12 h-12 text-blue-500" />
+              <IconAlertTriangle className="w-12 h-12 text-blue-500" />
               <h3 className="font-bold mt-4 mb-2">Công việc gián đoạn?</h3>
               <p className="text-gray-600 text-sm">
                 Không thể truy cập dữ liệu quan trọng khi ở khu vực sóng yếu hoặc không có Internet?
@@ -116,7 +116,7 @@ export default function Home() {
             </div>
             {/* Feature 4 */}
             <div className="flex flex-col items-center text-center bg-blue-100 rounded-lg p-8">
-              <CloudOff size={64} strokeWidth={2} className="text-blue-500 mb-2" />
+              <IconCloudOff size={64} strokeWidth={2} className="text-blue-500 mb-2" />
               <h3 className="text-xl font-bold mt-4 mb-2">Làm việc không gián đoạn dù không có internet</h3>
               <p className="text-gray-700 max-w-2xl mx-auto">
                 <span className="font-semibold">Điểm khác biệt lớn nhất:</span> Xem, thêm, và chỉnh sửa dữ liệu ngay cả khi mất kết nối. <br/> Ứng dụng sẽ tự động đồng bộ mọi thứ ngay khi có mạng trở lại. Hoàn hảo cho các chuyến đi xem đất nền hoặc vào tầng hầm các dự án.

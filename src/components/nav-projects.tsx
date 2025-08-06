@@ -5,7 +5,6 @@ import {
   Forward,
   MoreHorizontal,
   Trash2,
-  type LucideIcon,
 } from "lucide-react"
 
 import {
@@ -31,7 +30,7 @@ export function NavProjects({
   projects: {
     name: string
     url: string
-    icon: LucideIcon
+    icon: React.ElementType
   }[]
 }) {
   const { isMobile } = useSidebar()

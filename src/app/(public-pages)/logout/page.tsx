@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import { IconLoader2 } from "@tabler/icons-react";
 import {
   Card,
   CardContent,
@@ -42,7 +42,7 @@ export default function LogoutPage() {
           <CardDescription>Vui lòng chờ trong giây lát...</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center gap-4 p-6 pt-0">
-          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          <IconLoader2 className="h-12 w-12 animate-spin text-primary" />
           <p className="text-sm text-muted-foreground">
             Bạn sẽ được tự động chuyển về trang chủ.
           </p>

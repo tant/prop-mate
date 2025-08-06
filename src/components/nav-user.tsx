@@ -1,13 +1,13 @@
 "use client"
 
 import {
-  BadgeCheck,
-  Bell,
-  ChevronsUpDown,
-  CreditCard,
-  LogOut,
-  Sparkles,
-} from "lucide-react"
+  IconBadgeCc,
+  IconBell,
+  IconChevronsDown,
+  IconCreditCard,
+  IconLogout,
+  IconSparkles,
+} from "@tabler/icons-react"
 import type { User } from "@/types/user"
 
 import {
@@ -65,7 +65,7 @@ export function NavUser({ user }: { user: User | null }) {
                 </span>
                 <span className="truncate text-xs">{user.email}</span>
               </div>
-              <ChevronsUpDown className="ml-auto size-4" />
+              <IconChevronsDown className="ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -97,22 +97,22 @@ export function NavUser({ user }: { user: User | null }) {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <Sparkles />
+                <IconSparkles />
                 Upgrade to Pro
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <BadgeCheck />
+                <IconBadgeCc />
                 Account
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <CreditCard />
+                <IconCreditCard />
                 Billing
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Bell />
+                <IconBell />
                 Notifications
               </DropdownMenuItem>
             </DropdownMenuGroup>
@@ -126,7 +126,7 @@ export function NavUser({ user }: { user: User | null }) {
                 window.location.href = "/login";
               }}
             >
-              <LogOut />
+              <IconLogout />
               Đăng xuất
             </DropdownMenuItem>
           </DropdownMenuContent>
