@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.css";
+import "../globals.css";
+import { ReactQueryProvider } from "@/lib/queryClient";
 
 const inter = Inter({
   subsets: ["latin", "vietnamese"],
@@ -41,7 +42,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="vi">
-      <body className={`${inter.variable} font-inter antialiased`}>{children}</body>
+      <body className={`${inter.variable} font-inter antialiased`}>
+        <ReactQueryProvider>{children}</ReactQueryProvider>
+      </body>
     </html>
   );
 }

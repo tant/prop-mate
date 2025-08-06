@@ -1,7 +1,5 @@
 'use client'
-import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { cn } from "@/lib/utils";
 import { motion } from "motion/react"
 import BottomNav from "@/components/layout/bottom-nav";
 const story = [
