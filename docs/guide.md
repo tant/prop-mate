@@ -9,7 +9,7 @@
 
 2. **Business logic layer (server)**
    - Tạo file trong `src/server/` để chứa các hàm xử lý nghiệp vụ, thao tác database (Firestore) cho entity.
-   - Ví dụ: `src/server/propertyService.ts`.
+   - Ví dụ: `src/server/propertyS.server.ts`.
    - Lý do: Tách biệt logic nghiệp vụ khỏi API, dễ test, dễ tái sử dụng, không phụ thuộc framework.
 
 3. **Định nghĩa router tRPC (api)**

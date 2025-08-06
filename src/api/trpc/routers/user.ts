@@ -27,9 +27,9 @@ export const userRouter = router({
   getById: protectedProcedure.input(userIdSchema).query(async ({ input }) => {
     try {
       return await userService.getUserById(input);
-    } catch (err: any) {
-      if (err.message === 'Not found') throw new TRPCError({ code: 'NOT_FOUND' });
-      throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: err.message });
+    } catch (err) {
+      if (err instanceof Error && err.message === 'Not found') throw new TRPCError({ code: 'NOT_FOUND' });
+      throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: err instanceof Error ? err.message : 'Unknown error' });
     }
   }),
 
@@ -37,9 +37,9 @@ export const userRouter = router({
   create: publicProcedure.input(userCreateSchema).mutation(async ({ input }) => {
     try {
       return await userService.createUser(input as User);
-    } catch (err: any) {
-      if (err.message === 'User already exists') throw new TRPCError({ code: 'CONFLICT', message: err.message });
-      throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: err.message });
+    } catch (err) {
+      if (err instanceof Error && err.message === 'User already exists') throw new TRPCError({ code: 'CONFLICT', message: err.message });
+      throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: err instanceof Error ? err.message : 'Unknown error' });
     }
   }),
 
@@ -47,9 +47,9 @@ export const userRouter = router({
   update: protectedProcedure.input(z.object({ uid: userIdSchema, data: userUpdateSchema })).mutation(async ({ input }) => {
     try {
       return await userService.updateUser(input.uid, input.data);
-    } catch (err: any) {
-      if (err.message === 'Not found') throw new TRPCError({ code: 'NOT_FOUND' });
-      throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: err.message });
+    } catch (err) {
+      if (err instanceof Error && err.message === 'Not found') throw new TRPCError({ code: 'NOT_FOUND' });
+      throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: err instanceof Error ? err.message : 'Unknown error' });
     }
   }),
 
@@ -58,9 +58,9 @@ export const userRouter = router({
     try {
       await userService.softDeleteUser(input);
       return { success: true };
-    } catch (err: any) {
-      if (err.message === 'Not found') throw new TRPCError({ code: 'NOT_FOUND' });
-      throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: err.message });
+    } catch (err) {
+      if (err instanceof Error && err.message === 'Not found') throw new TRPCError({ code: 'NOT_FOUND' });
+      throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: err instanceof Error ? err.message : 'Unknown error' });
     }
   }),
 
@@ -68,8 +68,8 @@ export const userRouter = router({
   list: protectedProcedure.query(async () => {
     try {
       return await userService.listUsers();
-    } catch (err: any) {
-      throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: err.message });
+    } catch (err) {
+      throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: err instanceof Error ? err.message : 'Unknown error' });
     }
   }),
 });
