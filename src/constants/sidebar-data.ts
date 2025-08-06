@@ -19,7 +19,7 @@ const iconMap = {
 const navMainRaw = [
   {
     title: "Dashboard",
-    url: "/Dashboard",
+    url: "/dashboard",
     icon: "Gauge",
     isActive: true,
   },
