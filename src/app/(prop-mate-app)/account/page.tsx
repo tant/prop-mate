@@ -8,10 +8,6 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 
-import { SectionCards } from "@/components/section-cards"
-import { ChartAreaInteractive } from "@/components/chart-area-interactive"
-import { DataTable } from "@/components/data-table"
-
 
 
 export default function Page() {

@@ -182,7 +182,7 @@ export function LoginForm({
         </CardContent>
       </Card>
       <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-        Khi tiếp tục, bạn đồng ý với <a href="/terms">Điều khoản dịch vụ</a>{" "}
+        Khi tiếp tục, bạn đồng ý với <a href="/terms-and-conditions">Điều khoản dịch vụ</a>{" "}
         và <a href="/privacy">Chính sách bảo mật</a> của chúng tôi.
       </div>
     </div>

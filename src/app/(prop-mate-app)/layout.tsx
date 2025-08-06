@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "../globals.css";
 import { ReactQueryProvider } from "@/lib/queryClient";
 import { redirect } from "next/navigation";
@@ -8,10 +7,6 @@ import { adminAuth } from "@/lib/firebase/admin";
 import { UserProvider } from "@/contexts/UserProvider";
 import { userService } from "@/server/user.server";
 
-const inter = Inter({
-  subsets: ["latin", "vietnamese"],
-  variable: "--font-inter",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(

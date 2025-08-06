@@ -120,3 +120,11 @@
     @apply bg-background text-foreground;
   }
 }
+
+/*
+  Custom styles for Terms and Conditions page:
+  - .line-y and its pseudo-elements are defined below
+  - All other classnames used in the page are Tailwind utility classes or arbitrary variants
+  - No additional custom CSS is required for the T&C page
+  - If you add new custom classes for this page, define them below this comment
+*/
