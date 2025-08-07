@@ -122,8 +122,10 @@ export const userRouter = createTRPCRouter({
             firstName: z.string().optional(),
             lastName: z.string().optional(),
             phoneNumber: z.string().optional(),
+            address: z.string().optional(),
+            profileImage: z.string().optional(),
           })
-          .refine((data) => Object.keys(data).length > 0, {
+          .refine((data) => Object.values(data).some((v) => v !== undefined && v !== null && v !== ""), {
             message: "At least one field must be provided to update.",
           }),
       })

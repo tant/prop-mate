@@ -11,17 +11,16 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useUser } from "@/contexts/UserContext"
+import { api } from "@/app/_trpc/client";
 import { formatDate } from "@/lib/utils"
 import { z } from "zod"
 import { useMemo, useState, useEffect } from "react"
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export default function Page() {
-  const user = useUser();
-  const loadingAuth = false;
-  const isLoading = !user;
-  const isError = false;
-
+  const { data: user, isLoading, isError } = api.user.me.useQuery();
+  const queryClient = useQueryClient();
+  const updateUser = api.user.update.useMutation();
   // State cho form edit (không phụ thuộc user)
   const [editMode, setEditMode] = useState(false);
   const [form, setForm] = useState({
@@ -50,6 +49,8 @@ export default function Page() {
     return user ? `${user.firstName} ${user.lastName}` : "";
   }, [user]);
 
+  if (isLoading) return <Skeleton className="h-40 w-full rounded-xl" />;
+  if (isError) return <div className="text-destructive">Không thể tải thông tin tài khoản.</div>;
   if (!user) return null;
 
   // Xử lý thay đổi input
@@ -77,8 +78,8 @@ export default function Page() {
     address: z.string().optional(),
   });
 
-  // Xử lý submit (chỉ demo, thực tế nên gọi API update user)
-  function handleSubmit(e: React.FormEvent) {
+  // Xử lý submit (gọi API update user)
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const result = userFormSchema.safeParse(form);
     if (!result.success) {
@@ -86,8 +87,23 @@ export default function Page() {
       return;
     }
     setFormError(null);
-    // TODO: Gọi API cập nhật user ở đây
-    setEditMode(false);
+    if (!user) return;
+    try {
+      await updateUser.mutateAsync({
+        uid: user.uid,
+        data: {
+          firstName: form.firstName,
+          lastName: form.lastName,
+          phoneNumber: form.phoneNumber,
+          address: form.address,
+          profileImage: form.profileImage,
+        },
+      });
+      setEditMode(false);
+      queryClient.invalidateQueries(api.user.me.getQueryKey());
+    } catch (err) {
+      setFormError((err as Error)?.message || "Cập nhật thất bại");
+    }
   }
 
   return (
@@ -268,8 +284,12 @@ export default function Page() {
                   )}
                   {editMode ? (
                     <div className="col-span-full flex gap-2 mt-4">
-                      <button type="submit" className="px-4 py-2 rounded bg-primary text-white">Lưu</button>
-                      <button type="button" className="px-4 py-2 rounded bg-muted" onClick={() => setEditMode(false)}>Huỷ</button>
+                      <button type="submit" className="px-4 py-2 rounded bg-primary text-white" disabled={updateUser.isLoading}>
+                        {updateUser.isLoading ? "Đang lưu..." : "Lưu"}
+                      </button>
+                      <button type="button" className="px-4 py-2 rounded bg-muted" onClick={() => setEditMode(false)} disabled={updateUser.isLoading}>
+                        Huỷ
+                      </button>
                     </div>
                   ) : (
                     <div className="col-span-full flex gap-2 mt-4">
