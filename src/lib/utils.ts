@@ -22,3 +22,10 @@ export function formatDate(date: unknown): string {
   }
   return d && !Number.isNaN(d.getTime()) ? d.toLocaleString() : 'Không hợp lệ';
 }
+
+export function toDateSafe(val: Date | { toDate: () => Date } | undefined | null): Date {
+  if (!val) return new Date(0);
+  if (val instanceof Date) return val;
+  if (typeof val === 'object' && typeof val.toDate === 'function') return val.toDate();
+  return new Date(0);
+}

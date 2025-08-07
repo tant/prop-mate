@@ -14,6 +14,8 @@ import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { api } from "@/app/_trpc/client";
+import Link from "next/link";
+import { Eye, EyeOff } from "lucide-react";
 
 
 const passwordRequirements = [
@@ -45,11 +47,13 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 export function RegisterForm() {
   const [serverError, setServerError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
     control,
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -92,12 +96,13 @@ export function RegisterForm() {
       router.push("/dashboard");
     } catch (err: unknown) {
       const error = err as { code?: string };
-      if (error?.code === "auth/email-already-in-use") {
-        setServerError("Email này đã được đăng ký. Vui lòng dùng email khác.");
-      } else if (error?.code === "auth/invalid-email") {
-        setServerError("Email không hợp lệ.");
-      } else if (error?.code === "auth/weak-password") {
-        setServerError("Mật khẩu quá yếu. Vui lòng chọn mật khẩu mạnh hơn.");
+      const errorMessages: Record<string, string> = {
+        "auth/email-already-in-use": "Email này đã được đăng ký. Vui lòng dùng email khác.",
+        "auth/invalid-email": "Email không hợp lệ.",
+        "auth/weak-password": "Mật khẩu quá yếu. Vui lòng chọn mật khẩu mạnh hơn.",
+      };
+      if (error?.code && errorMessages[error.code]) {
+        setServerError(errorMessages[error.code]);
       } else {
         setServerError("Đăng ký thất bại. Vui lòng thử lại.");
       }
@@ -105,6 +110,42 @@ export function RegisterForm() {
       setLoading(false);
     }
   };
+
+  // Helper: kiểm tra từng điều kiện password
+  const passwordChecks = [
+    {
+      label: "Tối thiểu 8 ký tự",
+      test: (pw: string) => pw.length >= 8,
+    },
+    {
+      label: "Có chữ hoa (A-Z)",
+      test: (pw: string) => /[A-Z]/.test(pw),
+    },
+    {
+      label: "Có chữ thường (a-z)",
+      test: (pw: string) => /[a-z]/.test(pw),
+    },
+    {
+      label: "Có số (0-9)",
+      test: (pw: string) => /[0-9]/.test(pw),
+    },
+    {
+      label: "Có ký tự đặc biệt (!@#$...)",
+      test: (pw: string) => /[^A-Za-z0-9]/.test(pw),
+    },
+  ];
+
+  function PasswordRequirements({ password }: { password: string }) {
+    return (
+      <ul className="list-disc ml-5">
+        {passwordChecks.map((item) => (
+          <li key={item.label} className={item.test(password) ? "text-green-600" : ""}>
+            {item.label}
+          </li>
+        ))}
+      </ul>
+    );
+  }
 
   return (
     <div className={cn("min-h-screen flex items-center justify-center flex-col gap-6")}> 
@@ -136,15 +177,27 @@ export function RegisterForm() {
               </div>
               <div className="grid gap-3">
                 <Label htmlFor="password">Mật khẩu</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  autoComplete="new-password"
-                  {...register("password")}
-                  disabled={loading}
-                  aria-invalid={!!errors.password}
-                  aria-describedby="password-help password-error"
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="new-password"
+                    {...register("password")}
+                    disabled={loading}
+                    aria-invalid={!!errors.password}
+                    aria-describedby="password-help password-error"
+                  />
+                  <button
+                    type="button"
+                    tabIndex={-1}
+                    className="absolute right-3 top-2.5 p-1 text-muted-foreground hover:text-primary"
+                    style={{background: 'none', border: 'none', cursor: 'pointer'}}
+                    onClick={() => setShowPassword((v) => !v)}
+                    aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
                 {/* Progress bar for password strength */}
                 <div className="h-2 w-full bg-muted rounded mt-2 overflow-hidden">
                   <div
@@ -169,18 +222,7 @@ export function RegisterForm() {
                 </div>
                 <div id="password-help" className="text-xs text-muted-foreground mt-1">
                   Mật khẩu phải đáp ứng:
-                  <ul className="list-disc ml-5">
-                    {passwordRequirements.map((req, i) => (
-                      <li key={req} className={
-                        i === 0 && (passwordValue?.length ?? 0) >= 8 ? "text-green-600" :
-                        i === 1 && /[A-Z]/.test(passwordValue ?? "") ? "text-green-600" :
-                        i === 2 && /[a-z]/.test(passwordValue ?? "") ? "text-green-600" :
-                        i === 3 && /[0-9]/.test(passwordValue ?? "") ? "text-green-600" :
-                        i === 4 && /[^A-Za-z0-9]/.test(passwordValue ?? "") ? "text-green-600" :
-                        ""
-                      }>{req}</li>
-                    ))}
-                  </ul>
+                  <PasswordRequirements password={passwordValue ?? ""} />
                 </div>
                 {errors.password && (
                   <span id="password-error" className="text-destructive text-xs mt-1">{errors.password.message}</span>
@@ -188,15 +230,27 @@ export function RegisterForm() {
               </div>
               <div className="grid gap-3">
                 <Label htmlFor="confirmPassword">Xác nhận mật khẩu</Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  autoComplete="new-password"
-                  {...register("confirmPassword")}
-                  disabled={loading}
-                  aria-invalid={!!errors.confirmPassword}
-                  aria-describedby="confirmPassword-error"
-                />
+                <div className="relative">
+                  <Input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    autoComplete="new-password"
+                    {...register("confirmPassword")}
+                    disabled={loading}
+                    aria-invalid={!!errors.confirmPassword}
+                    aria-describedby="confirmPassword-error"
+                  />
+                  <button
+                    type="button"
+                    tabIndex={-1}
+                    className="absolute right-3 top-2.5 p-1 text-muted-foreground hover:text-primary"
+                    style={{background: 'none', border: 'none', cursor: 'pointer'}}
+                    onClick={() => setShowConfirmPassword((v) => !v)}
+                    aria-label={showConfirmPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+                  >
+                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
                 {errors.confirmPassword && (
                   <span id="confirmPassword-error" className="text-destructive text-xs mt-1">{errors.confirmPassword.message}</span>
                 )}
@@ -219,7 +273,7 @@ export function RegisterForm() {
               {serverError && (
                 <div className="text-destructive text-sm text-center">{serverError}</div>
               )}
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button type="submit" className="w-full" disabled={loading || !isValid}>
                 {loading ? "Đang đăng ký..." : "Đăng ký"}
               </Button>
               <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
@@ -243,9 +297,9 @@ export function RegisterForm() {
               </div>
               <div className="text-center text-sm">
                 Đã có tài khoản?{" "}
-                <a href="/public-pages/login" className="underline underline-offset-4">
+                <Link href="/public-pages/login" className="underline underline-offset-4">
                   Đăng nhập
-                </a>
+                </Link>
               </div>
             </div>
           </form>

@@ -3,16 +3,9 @@ import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
 import type { User } from "@/types/user";
 import { adminDb, admin } from "@/lib/firebase/admin";
+import { toDateSafe } from "@/lib/utils";
 
 const usersCollection = adminDb.collection("users");
-
-type FirestoreDateLike = Date | { toDate: () => Date } | undefined | null;
-function toDateSafe(val: FirestoreDateLike): Date {
-  if (!val) return new Date(0);
-  if (val instanceof Date) return val;
-  if (typeof val === 'object' && typeof val.toDate === 'function') return val.toDate();
-  return new Date(0);
-}
 
 type FirestoreUser = Partial<Omit<User, 'uid'>>;
 

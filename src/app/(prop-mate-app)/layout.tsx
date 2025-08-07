@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
 import "@/app/globals.css";
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
-import { adminAuth } from "@/lib/firebase/admin";
+import { getServerUser } from "@/server/auth/getServerUser";
 import { UserProvider } from "@/contexts/UserProvider";
 import TRPCProvider from "@/app/_trpc/TRPCProvider";
-import { appRouter } from "@/server/api/root";
-import { createContextInner } from "@/server/api/trpc";
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -40,28 +37,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const cookieStore = await cookies();
-  const idToken = cookieStore.get("token")?.value;
-
-  let authUser = null;
-  let firestoreUser = null;
-  if (idToken) {
-    try {
-      authUser = await adminAuth.verifyIdToken(idToken);
-      // Tạo context cho tRPC caller
-      const ctx = await createContextInner({ headers: new Headers(), user: authUser });
-      const caller = appRouter.createCaller(ctx);
-      firestoreUser = await caller.user.getById(authUser.uid);
-    } catch {
-      authUser = null;
-      firestoreUser = null;
-    }
-  }
-
+  const firestoreUser = await getServerUser();
   if (!firestoreUser) {
     redirect("/login");
   }
-
   return (
     <UserProvider user={firestoreUser}>
       <TRPCProvider>{children}</TRPCProvider>
