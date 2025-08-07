@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "@/app/globals.css";
 import TRPCProvider from "@/app/_trpc/TRPCProvider";
+import { redirect } from "next/navigation";
+import { getServerUser } from "@/server/auth/getServerUser";
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -29,10 +31,12 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const user = await getServerUser();
+  if (!user) redirect("/login");
   return <TRPCProvider>{children}</TRPCProvider>;
 }
