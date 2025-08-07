@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useUser } from "@/contexts/UserContext"
 import { formatDate } from "@/lib/utils"
+import { z } from "zod"
 import { useMemo, useState, useEffect } from "react"
 
 export default function Page() {
@@ -30,6 +31,7 @@ export default function Page() {
     phoneNumber: "",
     address: "",
   });
+  const [formError, setFormError] = useState<string | null>(null);
 
   // Khi user thay đổi, đồng bộ lại form
   useEffect(() => {
@@ -66,9 +68,24 @@ export default function Page() {
     reader.readAsDataURL(file);
   }
 
+  // Zod schema cho form user
+  const userFormSchema = z.object({
+    firstName: z.string().min(1, "Vui lòng nhập tên"),
+    lastName: z.string().min(1, "Vui lòng nhập họ"),
+    profileImage: z.string().optional(),
+    phoneNumber: z.string().min(8, "Số điện thoại không hợp lệ"),
+    address: z.string().optional(),
+  });
+
   // Xử lý submit (chỉ demo, thực tế nên gọi API update user)
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const result = userFormSchema.safeParse(form);
+    if (!result.success) {
+      setFormError(result.error.errors[0]?.message || "Dữ liệu không hợp lệ");
+      return;
+    }
+    setFormError(null);
     // TODO: Gọi API cập nhật user ở đây
     setEditMode(false);
   }
@@ -246,6 +263,9 @@ export default function Page() {
                       <div><span className="font-semibold">Đăng nhập gần nhất:</span> {formatDate(user.lastLoginAt) === 'Không có' ? <span className="italic text-muted-foreground">Không có</span> : formatDate(user.lastLoginAt)}</div>
                     </div>
                   </div>
+                  {formError && (
+                    <div className="col-span-full text-destructive text-sm mb-2">{formError}</div>
+                  )}
                   {editMode ? (
                     <div className="col-span-full flex gap-2 mt-4">
                       <button type="submit" className="px-4 py-2 rounded bg-primary text-white">Lưu</button>
