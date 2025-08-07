@@ -106,6 +106,33 @@ export default function Page() {
     }
   }
 
+  // Helper component cho 1 dòng thông tin cá nhân
+  function InfoRow({ label, value, name, editMode, onChange, placeholder }: {
+    label: string;
+    value: string | undefined;
+    name: string;
+    editMode: boolean;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    placeholder?: string;
+  }) {
+    return (
+      <div>
+        <span className="font-semibold">{label}:</span>{" "}
+        {editMode ? (
+          <input
+            className="border rounded px-2 py-1 w-40"
+            name={name}
+            value={value || ""}
+            onChange={onChange}
+            placeholder={placeholder || label}
+          />
+        ) : (
+          value || <span className="italic text-muted-foreground">{placeholder || "Chưa cập nhật"}</span>
+        )}
+      </div>
+    );
+  }
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -121,7 +148,7 @@ export default function Page() {
           </div>
         </header>
         <div className="p-4 max-w-2xl mx-auto">
-          {isLoading || loadingAuth ? (
+          {isLoading ? (
             <Skeleton className="h-40 w-full rounded-xl" />
           ) : isError ? (
             <div className="text-destructive">Không thể tải thông tin tài khoản.</div>
@@ -187,62 +214,10 @@ export default function Page() {
                   <div>
                     <div className="mb-2 font-medium">Thông tin cá nhân</div>
                     <div className="space-y-1 text-sm">
-                      <div>
-                        <span className="font-semibold">Họ:</span>{" "}
-                        {editMode ? (
-                          <input
-                            className="border rounded px-2 py-1 w-40"
-                            name="lastName"
-                            value={form.lastName}
-                            onChange={handleChange}
-                            placeholder="Họ"
-                          />
-                        ) : (
-                          user.lastName || <span className="italic text-muted-foreground">...</span>
-                        )}
-                      </div>
-                      <div>
-                        <span className="font-semibold">Tên:</span>{" "}
-                        {editMode ? (
-                          <input
-                            className="border rounded px-2 py-1 w-40"
-                            name="firstName"
-                            value={form.firstName}
-                            onChange={handleChange}
-                            placeholder="Tên"
-                          />
-                        ) : (
-                          user.firstName
-                        )}
-                      </div>
-                      <div>
-                        <span className="font-semibold">Số điện thoại:</span>{" "}
-                        {editMode ? (
-                          <input
-                            className="border rounded px-2 py-1 w-40"
-                            name="phoneNumber"
-                            value={form.phoneNumber}
-                            onChange={handleChange}
-                            placeholder="Số điện thoại"
-                          />
-                        ) : (
-                          user.phoneNumber
-                        )}
-                      </div>
-                      <div>
-                        <span className="font-semibold">Địa chỉ:</span>{" "}
-                        {editMode ? (
-                          <input
-                            className="border rounded px-2 py-1 w-40"
-                            name="address"
-                            value={form.address}
-                            onChange={handleChange}
-                            placeholder="Địa chỉ"
-                          />
-                        ) : (
-                          user.address || <span className="italic text-muted-foreground">Chưa cập nhật</span>
-                        )}
-                      </div>
+                      <InfoRow label="Họ" value={form.lastName} name="lastName" editMode={editMode} onChange={handleChange} placeholder="Họ" />
+                      <InfoRow label="Tên" value={form.firstName} name="firstName" editMode={editMode} onChange={handleChange} placeholder="Tên" />
+                      <InfoRow label="Số điện thoại" value={form.phoneNumber} name="phoneNumber" editMode={editMode} onChange={handleChange} placeholder="Số điện thoại" />
+                      <InfoRow label="Địa chỉ" value={form.address} name="address" editMode={editMode} onChange={handleChange} placeholder="Địa chỉ" />
                       <div><span className="font-semibold">Xác thực SĐT:</span> {user.phoneVerified ? <span className="text-green-600">Đã xác thực</span> : <span className="text-muted-foreground">Chưa xác thực</span>}</div>
                     </div>
                   </div>
