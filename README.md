@@ -26,6 +26,9 @@ propmate/
 │   ├── api/                 # Định nghĩa backend (tRPC routers, handler)
 │   │   └── trpc/
 │   ├── app/                 # Next.js app directory (routes, layout, page)
+│   │   ├── api/
+│   │   │   └── trpc/
+│   │   │       └── route.ts # Route handler để expose endpoint /api/trpc cho tRPC (bắt buộc với Next.js app directory)
 │   │   ├── dashboard/
 │   │   ├── login/
 │   │   ├── favicon.ico
@@ -168,3 +171,25 @@ export default function Profile() {
   return <div>Hello, {user?.name}</div>
 }
 ```
+
+---
+
+### Lưu ý khi dùng tRPC với Next.js app directory
+
+- Để các router tRPC hoạt động, bạn phải tạo file handler tại: `src/app/api/trpc/route.ts`.
+- File này sẽ đăng ký appRouter và trả về handler cho Next.js, giúp client truy cập endpoint `/api/trpc`.
+- Các file trong `src/api/trpc/routers/` chỉ định nghĩa router, không tự động thành API endpoint.
+
+Ví dụ tối thiểu cho `src/app/api/trpc/route.ts`:
+
+```ts
+import { appRouter } from '@/api/trpc';
+import { createNextRouteHandler } from 'trpc-next/route-handler';
+
+export const { GET, POST } = createNextRouteHandler({
+  router: appRouter,
+  createContext: () => ({}),
+});
+```
+
+---

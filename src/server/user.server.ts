@@ -9,9 +9,14 @@ export const userService = {
    * Tạo mới user. Nếu đã tồn tại uid sẽ throw Error.
    */
   async createUser(data: User) {
+    console.log('[userService.createUser] data:', data);
     const doc = await usersCollection.doc(data.uid).get();
-    if (doc.exists) throw new Error('User already exists');
+    if (doc.exists) {
+      console.log('[userService.createUser] User already exists:', data.uid);
+      throw new Error('User already exists');
+    }
     await usersCollection.doc(data.uid).set({ ...data, createdAt: Timestamp.now(), updatedAt: Timestamp.now() });
+    console.log('[userService.createUser] User created:', data.uid);
     return { uid: data.uid };
   },
 

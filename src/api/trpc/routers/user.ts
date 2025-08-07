@@ -1,16 +1,16 @@
 import { z } from 'zod';
 import { TRPCError } from '@trpc/server';
-import { userService } from '../../../server/user.server';
+import { userService } from '../../../../src/server/user.server';
 import { protectedProcedure, publicProcedure, router } from '../trpc';
-import type { User } from '../../../types/user';
+import type { User } from '../../../../src/types/user';
 
 // Zod schema cho input
 const userIdSchema = z.string().min(1, 'User ID is required');
 const userCreateSchema = z.object({
   uid: z.string(),
   firstName: z.string(),
-  lastName: z.string(),
-  phoneNumber: z.string(),
+  lastName: z.string().optional(),
+  phoneNumber: z.string().optional(),
   email: z.string().email(),
   // Các trường optional khác có thể bổ sung nếu cần
 });
@@ -35,6 +35,7 @@ export const userRouter = router({
 
   // Tạo mới user (public, ví dụ cho đăng ký)
   create: publicProcedure.input(userCreateSchema).mutation(async ({ input }) => {
+    console.log('[tRPC user.create] input:', input);
     try {
       return await userService.createUser(input as User);
     } catch (err) {

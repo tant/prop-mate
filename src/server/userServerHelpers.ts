@@ -1,5 +1,5 @@
 import { createServerSideHelpers } from '@trpc/react-query/server';
-import { appRouter } from '@/api/trpc/routers/_app';
+import { appRouter } from '../api/trpc/routers/_app';
 import superjson from 'superjson';
 import { adminAuth } from '@/lib/firebase/admin';
 import type { User } from '@/types/user';

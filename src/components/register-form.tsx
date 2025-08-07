@@ -13,6 +13,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { userApi } from "@/services/user";
 
 const passwordRequirements = [
   "Tối thiểu 8 ký tự",
@@ -32,6 +33,7 @@ const registerSchema = z.object({
     .regex(/[^A-Za-z0-9]/, "Phải có ký tự đặc biệt (!@#$...)")
     .max(64, "Tối đa 64 ký tự"),
   confirmPassword: z.string(),
+  firstName: z.string().min(1, "Vui lòng nhập họ"),
 }).refine(data => data.password === data.confirmPassword, {
   message: "Mật khẩu xác nhận không khớp.",
   path: ["confirmPassword"],
@@ -73,6 +75,17 @@ export function RegisterForm() {
     try {
       const result = await createUserWithEmailAndPassword(auth, data.email, data.password);
       const idToken = await result.user.getIdToken();
+      // Gọi API tạo user Firestore
+      await userApi.create({
+        uid: result.user.uid,
+        email: data.email,
+        firstName: data.firstName,
+        emailVerified: result.user.emailVerified,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      // Tới đây là không chạy được
+
       await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -188,6 +201,21 @@ export function RegisterForm() {
                 />
                 {errors.confirmPassword && (
                   <span id="confirmPassword-error" className="text-destructive text-xs mt-1">{errors.confirmPassword.message}</span>
+                )}
+              </div>
+              <div className="grid gap-3">
+                <Label htmlFor="firstName">Tên</Label>
+                <Input
+                  id="firstName"
+                  type="text"
+                  placeholder="Nhập tên của bạn"
+                  {...register("firstName")}
+                  disabled={loading}
+                  aria-invalid={!!errors.firstName}
+                  aria-describedby="firstName-error"
+                />
+                {errors.firstName && (
+                  <span id="firstName-error" className="text-destructive text-xs mt-1">{errors.firstName.message}</span>
                 )}
               </div>
               {serverError && (

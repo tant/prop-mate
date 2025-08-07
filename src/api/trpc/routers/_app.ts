@@ -7,3 +7,5 @@ export const appRouter = router({
 });
 
 export type AppRouter = typeof appRouter;
+
+// Đã hợp nhất vào src/api/trpc/index.ts. File này không còn cần thiết.

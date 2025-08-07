@@ -14,8 +14,8 @@ export interface User {
   // --- Định danh & Thông tin cá nhân ---
   uid: string; // Firebase Auth UID
   firstName: string; // Họ
-  lastName: string; // Tên
-  phoneNumber: string; // Số điện thoại
+  lastName?: string; // Tên
+  phoneNumber?: string; // Số điện thoại
   email: string; // Email (đồng bộ với Firebase Auth)
   emailVerified?: boolean; // Đã xác thực email
   phoneVerified?: boolean; // Đã xác thực số điện thoại
