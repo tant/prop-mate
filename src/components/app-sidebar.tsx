@@ -43,7 +43,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavProjects projects={projects} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={user} isLoading={isLoading} />
+        <NavUser user={user ?? null} isLoading={isLoading} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

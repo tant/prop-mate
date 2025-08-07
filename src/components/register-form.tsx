@@ -18,14 +18,6 @@ import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 
 
-const passwordRequirements = [
-  "Tối thiểu 8 ký tự",
-  "Có chữ hoa (A-Z)",
-  "Có chữ thường (a-z)",
-  "Có số (0-9)",
-  "Có ký tự đặc biệt (!@#$...)"
-];
-
 const registerSchema = z.object({
   email: z.string().email({ message: "Email không hợp lệ" }),
   password: z.string()

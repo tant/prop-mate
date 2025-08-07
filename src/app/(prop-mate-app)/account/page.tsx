@@ -1,21 +1,21 @@
 "use client"
 
-import { AppSidebar } from "@/components/app-sidebar"
-import { Separator } from "@/components/ui/separator"
+import { AppSidebar } from "@/components/app-sidebar";
+import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from "@/components/ui/sidebar"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Skeleton } from "@/components/ui/skeleton"
+} from "@/components/ui/sidebar";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/app/_trpc/client";
-import { formatDate } from "@/lib/utils"
-import { z } from "zod"
-import { useMemo, useState, useEffect } from "react"
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { formatDate } from "@/lib/utils";
+import { z } from "zod";
+import { useMemo, useState, useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function Page() {
   const { data: user, isLoading, isError } = api.user.me.useQuery();
@@ -83,7 +83,7 @@ export default function Page() {
     e.preventDefault();
     const result = userFormSchema.safeParse(form);
     if (!result.success) {
-      setFormError(result.error.errors[0]?.message || "Dữ liệu không hợp lệ");
+      setFormError(result.error.issues[0]?.message || "Dữ liệu không hợp lệ");
       return;
     }
     setFormError(null);
@@ -100,7 +100,7 @@ export default function Page() {
         },
       });
       setEditMode(false);
-      queryClient.invalidateQueries(api.user.me.getQueryKey());
+      queryClient.invalidateQueries({ queryKey: ["user.me"] });
     } catch (err) {
       setFormError((err as Error)?.message || "Cập nhật thất bại");
     }
@@ -259,10 +259,10 @@ export default function Page() {
                   )}
                   {editMode ? (
                     <div className="col-span-full flex gap-2 mt-4">
-                      <button type="submit" className="px-4 py-2 rounded bg-primary text-white" disabled={updateUser.isLoading}>
-                        {updateUser.isLoading ? "Đang lưu..." : "Lưu"}
+                      <button type="submit" className="px-4 py-2 rounded bg-primary text-white" disabled={updateUser.status === 'pending'}>
+                        {updateUser.status === 'pending' ? "Đang lưu..." : "Lưu"}
                       </button>
-                      <button type="button" className="px-4 py-2 rounded bg-muted" onClick={() => setEditMode(false)} disabled={updateUser.isLoading}>
+                      <button type="button" className="px-4 py-2 rounded bg-muted" onClick={() => setEditMode(false)} disabled={updateUser.status === 'pending'}>
                         Huỷ
                       </button>
                     </div>
@@ -285,7 +285,6 @@ export default function Page() {
             </Card>
           ) : null}
         </div>
-        {/* Đã xoá bảng hiển thị tất cả các trường của user */}
       </SidebarInset>
     </SidebarProvider>
   );
