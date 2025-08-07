@@ -32,11 +32,27 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 
-export function NavUser({ user }: { user: User | null }) {
+export function NavUser({ user, isLoading }: { user: User | null, isLoading?: boolean }) {
   const { isMobile } = useSidebar()
   const router = useRouter()
 
-  if (!user) return null
+  if (isLoading) {
+    return (
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <SidebarMenuButton size="lg">
+            <Avatar className="h-8 w-8 rounded-lg animate-pulse bg-muted" />
+            <div className="grid flex-1 text-left text-sm leading-tight">
+              <span className="truncate font-medium bg-muted rounded w-20 h-4 animate-pulse" />
+              <span className="truncate text-xs bg-muted rounded w-28 h-3 animate-pulse" />
+            </div>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    );
+  }
+
+  if (!user) return null;
 
   const displayName = (user.firstName?.trim() || user.lastName?.trim())
     ? `${user.firstName || ""} ${user.lastName || ""}`.trim()

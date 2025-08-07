@@ -1,8 +1,5 @@
 import type { Metadata } from "next";
 import "@/app/globals.css";
-import { redirect } from "next/navigation";
-import { getServerUser } from "@/server/auth/getServerUser";
-import { UserProvider } from "@/contexts/UserProvider";
 import TRPCProvider from "@/app/_trpc/TRPCProvider";
 
 export const metadata: Metadata = {
@@ -32,18 +29,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const firestoreUser = await getServerUser();
-  if (!firestoreUser) {
-    redirect("/login");
-  }
-  return (
-    <UserProvider user={firestoreUser}>
-      <TRPCProvider>{children}</TRPCProvider>
-    </UserProvider>
-  );
+  return <TRPCProvider>{children}</TRPCProvider>;
 }

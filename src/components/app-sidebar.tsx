@@ -3,6 +3,7 @@
 import type * as React from "react"
 import { navMain, projects } from "@/constants"
 import { IconHome } from "@tabler/icons-react";
+import { api } from "@/app/_trpc/client";
 
 import { NavMain } from "@/components/nav-main"
 import { NavProjects } from "@/components/nav-projects"
@@ -17,10 +18,9 @@ import {
   SidebarMenuItem,
   SidebarMenuButton
 } from "@/components/ui/sidebar"
-import { useUser } from "@/contexts/UserContext"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const user = useUser();
+  const { data: user, isLoading } = api.user.me.useQuery();
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -43,7 +43,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavProjects projects={projects} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={user} />
+        <NavUser user={user} isLoading={isLoading} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

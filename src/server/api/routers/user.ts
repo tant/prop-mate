@@ -159,4 +159,16 @@ export const userRouter = createTRPCRouter({
         });
       }
     }),
+
+  me: protectedProcedure.query(async ({ ctx }) => {
+    const uid = ctx.user?.uid;
+    if (!uid) {
+      throw new TRPCError({ code: "UNAUTHORIZED", message: "Not authenticated" });
+    }
+    const doc = await usersCollection.doc(uid).get();
+    if (!doc.exists) {
+      throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+    }
+    return convertUserDates(doc.data() as FirestoreUser, uid);
+  }),
 });

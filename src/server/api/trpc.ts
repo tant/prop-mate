@@ -3,6 +3,7 @@ import superjson from 'superjson';
 import { ZodError } from 'zod';
 import { adminAuth } from '@/lib/firebase/admin';
 import type { DecodedIdToken } from 'firebase-admin/auth';
+import { cookies } from "next/headers";
 
 interface CreateContextOptions {
   headers: Headers;
@@ -18,15 +19,29 @@ export const createContextInner = async (opts: CreateContextOptions) => {
 
 export const createContext = async (opts: { headers: Headers }) => {
   const { headers } = opts;
-  try {
-    const authHeader = headers.get('authorization');
-    if (authHeader?.startsWith('Bearer ')) {
-      const idToken = authHeader.split('Bearer ')[1];
+  let idToken: string | undefined;
+
+  // Ưu tiên lấy từ Authorization header
+  const authHeader = headers.get('authorization');
+  if (authHeader?.startsWith('Bearer ')) {
+    idToken = authHeader.split('Bearer ')[1];
+  }
+
+  // Nếu không có, lấy từ cookie (Next.js App Router)
+  if (!idToken) {
+    try {
+      const cookieStore = await cookies();
+      idToken = cookieStore.get("token")?.value;
+    } catch {}
+  }
+
+  if (idToken) {
+    try {
       const decodedToken = await adminAuth.verifyIdToken(idToken);
       return await createContextInner({ headers, user: decodedToken });
+    } catch (error) {
+      console.warn("Could not verify ID token:", error);
     }
-  } catch (error) {
-    console.warn("Could not verify ID token:", error);
   }
   return await createContextInner({ headers, user: null });
 };
