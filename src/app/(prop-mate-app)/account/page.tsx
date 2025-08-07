@@ -11,30 +11,19 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { userHooks } from "../../../../docs/services/user"
-import { useAuthUser } from "@/hooks/use-auth-user"
+import { useUser } from "@/contexts/UserContext"
 import { useMemo } from "react"
 
 export default function Page() {
-  const { data: authUser, isLoading: loadingAuth } = useAuthUser();
-  const uid = authUser?.uid;
-  const {
-    data: user,
-    isLoading,
-    isError,
-  } = userHooks.useGetById(uid ?? "", { enabled: !!uid });
+  const user = useUser();
+  const loadingAuth = false;
+  const isLoading = !user;
+  const isError = false;
 
   const fullName = useMemo(() => {
     if (!user) return "";
     return `${user.firstName} ${user.lastName}`;
   }, [user]);
-
-  // Debug logs
-  console.log("authUser", authUser);
-  console.log("uid", uid);
-  console.log("user", user);
-  console.log("isLoading", isLoading, "loadingAuth", loadingAuth);
-  console.log("isError", isError);
 
   return (
     <SidebarProvider>
@@ -87,7 +76,7 @@ export default function Page() {
                       <div><span className="font-semibold">Gói:</span> {user.subscription.planName}</div>
                       <div><span className="font-semibold">Loại:</span> {user.subscription.type === 'MONTHLY' ? 'Theo tháng' : 'Theo năm'}</div>
                       <div><span className="font-semibold">Trạng thái:</span> <Badge>{user.subscription.status}</Badge></div>
-                      <div><span className="font-semibold">Hạn sử dụng:</span> {user.subscription.endDate?.toDate().toLocaleDateString()}</div>
+                      <div><span className="font-semibold">Hạn sử dụng:</span> {formatDate(user.subscription.endDate)}</div>
                       {user.subscription.lastPayment && (
                         <div><span className="font-semibold">Thanh toán gần nhất:</span> {user.subscription.lastPayment.amount.toLocaleString()}₫ ({user.subscription.lastPayment.method})</div>
                       )}
@@ -108,15 +97,60 @@ export default function Page() {
                   <div className="space-y-1 text-sm">
                     <div><span className="font-semibold">Mã giới thiệu:</span> {user.referralCode || <span className="italic text-muted-foreground">Không có</span>}</div>
                     <div><span className="font-semibold">Người giới thiệu:</span> {user.referredBy || <span className="italic text-muted-foreground">Không có</span>}</div>
-                    <div><span className="font-semibold">Ngày tạo:</span> {user.createdAt?.toDate().toLocaleString()}</div>
-                    <div><span className="font-semibold">Lần cập nhật cuối:</span> {user.updatedAt?.toDate().toLocaleString()}</div>
+                    <div><span className="font-semibold">Ngày tạo:</span> {formatDate(user.createdAt)}</div>
+                    <div><span className="font-semibold">Lần cập nhật cuối:</span> {formatDate(user.updatedAt)}</div>
                   </div>
                 </div>
               </CardContent>
             </Card>
           ) : null}
         </div>
+        {/* Bảng hiển thị tất cả các trường của user */}
+        {user && (
+          <div className="mt-8">
+            <h2 className="text-lg font-semibold mb-2">Tất cả trường dữ liệu user</h2>
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm border border-muted-foreground rounded-lg">
+                <tbody>
+                  {Object.entries(user).map(([key, value]) => (
+                    <tr key={key} className="border-b last:border-b-0">
+                      <td className="font-medium px-2 py-1 whitespace-nowrap align-top bg-muted/50">{key}</td>
+                      <td className="px-2 py-1 align-top">
+                        {typeof value === 'object' && value !== null ? (
+                          <pre className="whitespace-pre-wrap break-all bg-muted/20 rounded p-1">{JSON.stringify(value, null, 2)}</pre>
+                        ) : value === undefined || value === null ? (
+                          <span className="italic text-muted-foreground">Không có</span>
+                        ) : (
+                          String(value)
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </SidebarInset>
     </SidebarProvider>
   );
+}
+
+// Helper function
+function formatDate(date: unknown): React.ReactNode {
+  if (!date) return <span className="italic text-muted-foreground">Không có</span>;
+  let d: Date | null = null;
+  if (typeof date === 'string' || typeof date === 'number') {
+    d = new Date(date);
+  } else if (date instanceof Date) {
+    d = date;
+  } else if (
+    date &&
+    typeof date === 'object' &&
+    'toDate' in date &&
+    typeof (date as { toDate: () => Date }).toDate === 'function'
+  ) {
+    d = (date as { toDate: () => Date }).toDate();
+  }
+  return d && !Number.isNaN(d.getTime()) ? d.toLocaleString() : <span className="italic text-muted-foreground">Không hợp lệ</span>;
 }

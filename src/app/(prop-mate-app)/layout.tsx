@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
-import "../globals.css";
-import { ReactQueryProvider } from "@/lib/queryClient";
+import "@/app/globals.css";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { adminAuth } from "@/lib/firebase/admin";
 import { UserProvider } from "@/contexts/UserProvider";
-import { userService } from "../../../docs/server/user.server";
-import { TRPCReactProvider } from "@/lib/TRPCReactProvider";
-
+import TRPCProvider from "@/app/_trpc/TRPCProvider";
+import { appRouter } from "@/server/api/root";
+import { createContextInner } from "@/server/api/trpc";
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -41,32 +40,31 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Lấy cookie chứa Firebase ID token (ví dụ: "token" hoặc tên bạn lưu)
   const cookieStore = await cookies();
   const idToken = cookieStore.get("token")?.value;
 
-  let user = null;
+  let authUser = null;
+  let firestoreUser = null;
   if (idToken) {
     try {
-      const decoded = await adminAuth.verifyIdToken(idToken);
-      const rawUser = await userService.getUserById(decoded.uid);
-      // Ensure user is serializable (handles Firestore Timestamp, Date, etc.)
-      user = rawUser ? JSON.parse(JSON.stringify(rawUser)) : null;
+      authUser = await adminAuth.verifyIdToken(idToken);
+      // Tạo context cho tRPC caller
+      const ctx = await createContextInner({ headers: new Headers(), user: authUser });
+      const caller = appRouter.createCaller(ctx);
+      firestoreUser = await caller.user.getById(authUser.uid);
     } catch {
-      user = null;
+      authUser = null;
+      firestoreUser = null;
     }
   }
 
-  if (!user) {
+  if (!firestoreUser) {
     redirect("/login");
   }
 
-  // KHÔNG render <html> và <body> ở layout con
   return (
-    <UserProvider user={user}>
-      <TRPCReactProvider>
-        <ReactQueryProvider>{children}</ReactQueryProvider>
-      </TRPCReactProvider>
+    <UserProvider user={firestoreUser}>
+      <TRPCProvider>{children}</TRPCProvider>
     </UserProvider>
   );
 }

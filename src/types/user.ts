@@ -1,5 +1,3 @@
-import type { Timestamp } from 'firebase/firestore';
-
 /**
  * Đại diện cho một người dùng trong collection 'users' trên Firestore.
  *
@@ -27,7 +25,7 @@ export interface User {
    * Nếu deletedAt có giá trị (khác null) thì tài khoản được xem là đã bị xóa mềm (soft delete).
    * Nếu undefined hoặc null thì tài khoản còn hoạt động.
    */
-  deletedAt?: Timestamp; // Thời điểm xóa mềm tài khoản (nếu có)
+  deletedAt?: Date; // Thời điểm xóa mềm tài khoản (nếu có)
 
   // --- Referral & giới thiệu ---
   referralCode?: string; // Mã giới thiệu của user (dùng để mời người khác)
@@ -46,8 +44,8 @@ export interface User {
     type: 'MONTHLY' | 'YEARLY'; // Loại gói (theo tháng/năm)
     price: number; // Giá tiền (VND)
     autoRenew: boolean; // Có tự động gia hạn không
-    startDate: Timestamp; // Ngày bắt đầu sử dụng gói
-    endDate: Timestamp; // Ngày hết hạn gói
+    startDate: Date; // Ngày bắt đầu sử dụng gói
+    endDate: Date; // Ngày hết hạn gói
     /**
      * Trạng thái gói dịch vụ:
      * - 'TRIAL': Người dùng mới đăng ký, đang dùng thử miễn phí (thường là gói cao nhất). Có toàn quyền truy cập tính năng trả phí. Khi endDate qua đi sẽ chuyển thành 'EXPIRED'.
@@ -60,7 +58,7 @@ export interface User {
     lastPayment?: {
       transactionId: string; // Mã giao dịch thanh toán gần nhất
       amount: number; // Số tiền thanh toán
-      paidAt: Timestamp; // Thời điểm thanh toán
+      paidAt: Date; // Thời điểm thanh toán
       method: string; // Phương thức thanh toán (momo, vnpay, ...)
     }
   };
@@ -83,9 +81,9 @@ export interface User {
   notes?: string; // Ghi chú nội bộ cho user (chỉ admin thấy)
 
   // --- Timestamps (Quản lý bởi Firestore Server) ---
-  createdAt: Timestamp; // Ngày tạo tài khoản (do Firestore sinh ra)
-  updatedAt: Timestamp; // Ngày cập nhật gần nhất (do Firestore sinh ra)
-  lastLoginAt?: Timestamp; // Thời điểm đăng nhập gần nhất
+  createdAt: Date;
+  updatedAt: Date;
+  lastLoginAt?: Date; // Thời điểm đăng nhập gần nhất
 }
 
 /**
@@ -95,7 +93,7 @@ export interface User {
 export interface Payment {
   transactionId: string; // Mã giao dịch
   amount: number; // Số tiền thanh toán
-  paidAt: Timestamp; // Thời điểm thanh toán
+  paidAt: Date; // Thời điểm thanh toán
   method: string; // Phương thức thanh toán (momo, vnpay, ...)
   status: 'SUCCESS' | 'FAILED' | 'PENDING'; // Trạng thái giao dịch
   note?: string; // Ghi chú thêm (nếu có)

@@ -93,7 +93,7 @@ export function LoginForm({
                 <Input
                   id="email"
                   type="email"
-                  placeholder="m@example.com"
+                  placeholder="mail@example.com"
                   required
                   value={email}
                   onChange={e => setEmail(e.target.value)}
@@ -164,7 +164,7 @@ export function LoginForm({
               </div>
               <div className="text-center text-sm">
                 Bạn chưa có tài khoản?{" "}
-                <a href="/auth/register" className="underline underline-offset-4">
+                <a href="/register" className="underline underline-offset-4">
                   Đăng ký
                 </a>
               </div>

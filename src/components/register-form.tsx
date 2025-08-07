@@ -13,7 +13,8 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { userApi } from "../../docs/services/user";
+import { api } from "@/app/_trpc/client";
+
 
 const passwordRequirements = [
   "Tối thiểu 8 ký tự",
@@ -69,23 +70,20 @@ export function RegisterForm() {
 
   const passwordStrength = getPasswordStrength(passwordValue ?? "");
 
+  const createUser = api.user.create.useMutation();
+
   const onSubmit = async (data: RegisterFormValues) => {
     setLoading(true);
     setServerError(null);
     try {
       const result = await createUserWithEmailAndPassword(auth, data.email, data.password);
       const idToken = await result.user.getIdToken();
-      // Gọi API tạo user Firestore
-      await userApi.create({
+      // Tạo một user trong firestore qua tRPC
+      await createUser.mutateAsync({
         uid: result.user.uid,
         email: data.email,
         firstName: data.firstName,
-        emailVerified: result.user.emailVerified,
-        createdAt: new Date(),
-        updatedAt: new Date(),
       });
-      // Tới đây là không chạy được
-
       await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
