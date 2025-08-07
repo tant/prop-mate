@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/app/_trpc/client";
 import { formatDate } from "@/lib/utils";
-import { z } from "zod";
+import { userUpdateSchema } from "@/types/user.schema";
 import { useMemo, useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -69,14 +69,8 @@ export default function AccountPage() {
     reader.readAsDataURL(file);
   }
 
-  // Zod schema cho form user
-  const userFormSchema = z.object({
-    firstName: z.string().min(1, "Vui lòng nhập tên"),
-    lastName: z.string().min(1, "Vui lòng nhập họ"),
-    profileImage: z.string().optional(),
-    phoneNumber: z.string().min(8, "Số điện thoại không hợp lệ"),
-    address: z.string().optional(),
-  });
+  // Zod schema cho form user (đồng bộ với backend)
+  const userFormSchema = userUpdateSchema.shape.data;
 
   // Xử lý submit (gọi API update user)
   async function handleSubmit(e: React.FormEvent) {

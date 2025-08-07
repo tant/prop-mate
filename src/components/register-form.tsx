@@ -16,10 +16,10 @@ import { useRouter } from "next/navigation";
 import { api } from "@/app/_trpc/client";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
+import { userCreateSchema } from "@/types/user.schema";
 
 
-const registerSchema = z.object({
-  email: z.string().email({ message: "Email không hợp lệ" }),
+const registerSchema = userCreateSchema.extend({
   password: z.string()
     .min(8, "Tối thiểu 8 ký tự")
     .regex(/[A-Z]/, "Phải có chữ hoa (A-Z)")
@@ -28,7 +28,6 @@ const registerSchema = z.object({
     .regex(/[^A-Za-z0-9]/, "Phải có ký tự đặc biệt (!@#$...)")
     .max(64, "Tối đa 64 ký tự"),
   confirmPassword: z.string(),
-  firstName: z.string().min(1, "Vui lòng nhập họ"),
 }).refine(data => data.password === data.confirmPassword, {
   message: "Mật khẩu xác nhận không khớp.",
   path: ["confirmPassword"],
@@ -103,31 +102,30 @@ export function RegisterForm() {
     }
   };
 
-  // Helper: kiểm tra từng điều kiện password
-  const passwordChecks = [
-    {
-      label: "Tối thiểu 8 ký tự",
-      test: (pw: string) => pw.length >= 8,
-    },
-    {
-      label: "Có chữ hoa (A-Z)",
-      test: (pw: string) => /[A-Z]/.test(pw),
-    },
-    {
-      label: "Có chữ thường (a-z)",
-      test: (pw: string) => /[a-z]/.test(pw),
-    },
-    {
-      label: "Có số (0-9)",
-      test: (pw: string) => /[0-9]/.test(pw),
-    },
-    {
-      label: "Có ký tự đặc biệt (!@#$...)",
-      test: (pw: string) => /[^A-Za-z0-9]/.test(pw),
-    },
-  ];
-
+  // Helper: kiểm tra từng điều kiện password (chỉ dùng trong PasswordRequirements)
   function PasswordRequirements({ password }: { password: string }) {
+    const passwordChecks = [
+      {
+        label: "Tối thiểu 8 ký tự",
+        test: (pw: string) => pw.length >= 8,
+      },
+      {
+        label: "Có chữ hoa (A-Z)",
+        test: (pw: string) => /[A-Z]/.test(pw),
+      },
+      {
+        label: "Có chữ thường (a-z)",
+        test: (pw: string) => /[a-z]/.test(pw),
+      },
+      {
+        label: "Có số (0-9)",
+        test: (pw: string) => /[0-9]/.test(pw),
+      },
+      {
+        label: "Có ký tự đặc biệt (!@#$...)",
+        test: (pw: string) => /[^A-Za-z0-9]/.test(pw),
+      },
+    ];
     return (
       <ul className="list-disc ml-5">
         {passwordChecks.map((item) => (
