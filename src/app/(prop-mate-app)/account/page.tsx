@@ -12,7 +12,8 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useUser } from "@/contexts/UserContext"
-import { useMemo } from "react"
+import { formatDate } from "@/lib/utils"
+import { useMemo, useState, useEffect } from "react"
 
 export default function Page() {
   const user = useUser();
@@ -20,10 +21,57 @@ export default function Page() {
   const isLoading = !user;
   const isError = false;
 
-  const fullName = useMemo(() => {
-    if (!user) return "";
-    return `${user.firstName} ${user.lastName}`;
+  // State cho form edit (không phụ thuộc user)
+  const [editMode, setEditMode] = useState(false);
+  const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    profileImage: "",
+    phoneNumber: "",
+    address: "",
+  });
+
+  // Khi user thay đổi, đồng bộ lại form
+  useEffect(() => {
+    if (user) {
+      setForm({
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
+        profileImage: user.profileImage || "",
+        phoneNumber: user.phoneNumber || "",
+        address: user.address || "",
+      });
+    }
   }, [user]);
+
+  const fullName = useMemo(() => {
+    return user ? `${user.firstName} ${user.lastName}` : "";
+  }, [user]);
+
+  if (!user) return null;
+
+  // Xử lý thay đổi input
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  }
+
+  // Xử lý cập nhật avatar (chỉ demo, thực tế nên upload lên server)
+  function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      setForm((f) => ({ ...f, profileImage: ev.target?.result as string }));
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // Xử lý submit (chỉ demo, thực tế nên gọi API update user)
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    // TODO: Gọi API cập nhật user ở đây
+    setEditMode(false);
+  }
 
   return (
     <SidebarProvider>
@@ -47,12 +95,53 @@ export default function Page() {
           ) : user ? (
             <Card>
               <CardHeader className="flex flex-row items-center gap-4 border-b pb-4">
-                <Avatar className="size-16">
-                  <AvatarImage src={user.profileImage || undefined} alt={fullName} />
-                  <AvatarFallback>{user.firstName?.[0]}{user.lastName?.[0]}</AvatarFallback>
-                </Avatar>
+                <div className="flex flex-col items-center">
+                  <button
+                    type="button"
+                    className={editMode ? "cursor-pointer group outline-none bg-transparent border-0 p-0" : "bg-transparent border-0 p-0"}
+                    style={{ position: 'relative' }}
+                    onClick={editMode ? () => document.getElementById('avatar-upload')?.click() : undefined}
+                    onKeyDown={editMode ? (e) => { if (e.key === 'Enter' || e.key === ' ') document.getElementById('avatar-upload')?.click(); } : undefined}
+                    tabIndex={editMode ? 0 : -1}
+                    aria-label="Đổi ảnh đại diện"
+                    disabled={!editMode}
+                  >
+                    <Avatar className="size-16">
+                      <AvatarImage src={editMode ? form.profileImage || undefined : user.profileImage || undefined} alt={form.firstName || fullName} />
+                      <AvatarFallback>{user.firstName?.[0]}{user.lastName ? user.lastName[0] : '.'}</AvatarFallback>
+                    </Avatar>
+                    {editMode && (
+                      <>
+                        {/* Icon bút chì ở góc trên phải */}
+                        <span className="absolute top-0 right-0 bg-white rounded-full p-1 shadow" style={{ transform: 'translate(30%, -30%)' }}>
+                          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Chỉnh sửa ảnh đại diện">
+                            <title>Chỉnh sửa ảnh đại diện</title>
+                            <path d="M4 13.5V16h2.5l7.06-7.06-2.5-2.5L4 13.5z" fill="#888"/>
+                            <path d="M14.85 6.35a1.2 1.2 0 0 0 0-1.7l-1.5-1.5a1.2 1.2 0 0 0-1.7 0l-1.13 1.13 3.2 3.2 1.13-1.13z" fill="#888"/>
+                          </svg>
+                        </span>
+                        {/* Overlay đổi ảnh */}
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
+                          <span className="text-white text-xs">Đổi ảnh</span>
+                        </div>
+                      </>
+                    )}
+                  </button>
+                  {editMode && (
+                    <input
+                      id="avatar-upload"
+                      name="profileImage"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleAvatarChange}
+                    />
+                  )}
+                </div>
                 <div>
-                  <CardTitle className="text-xl font-bold">{fullName}</CardTitle>
+                  <CardTitle className="text-xl font-bold">
+                    {user.firstName} {user.lastName || <span className="italic text-muted-foreground">...</span>}
+                  </CardTitle>
                   <div className="flex items-center gap-2 mt-1">
                     <Badge variant="secondary">{user.email}</Badge>
                     {user.emailVerified && <Badge variant="outline">Đã xác thực email</Badge>}
@@ -61,96 +150,128 @@ export default function Page() {
                 </div>
               </CardHeader>
               <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-                <div>
-                  <div className="mb-2 font-medium">Thông tin cá nhân</div>
-                  <div className="space-y-1 text-sm">
-                    <div><span className="font-semibold">Họ tên:</span> {fullName}</div>
-                    <div><span className="font-semibold">Số điện thoại:</span> {user.phoneNumber}</div>
-                    <div><span className="font-semibold">Địa chỉ:</span> {user.address || <span className="italic text-muted-foreground">Chưa cập nhật</span>}</div>
-                  </div>
-                </div>
-                <div>
-                  <div className="mb-2 font-medium">Gói dịch vụ</div>
-                  {user.subscription ? (
+                <form onSubmit={handleSubmit} className="contents">
+                  <div>
+                    <div className="mb-2 font-medium">Thông tin cá nhân</div>
                     <div className="space-y-1 text-sm">
-                      <div><span className="font-semibold">Gói:</span> {user.subscription.planName}</div>
-                      <div><span className="font-semibold">Loại:</span> {user.subscription.type === 'MONTHLY' ? 'Theo tháng' : 'Theo năm'}</div>
-                      <div><span className="font-semibold">Trạng thái:</span> <Badge>{user.subscription.status}</Badge></div>
-                      <div><span className="font-semibold">Hạn sử dụng:</span> {formatDate(user.subscription.endDate)}</div>
-                      {user.subscription.lastPayment && (
-                        <div><span className="font-semibold">Thanh toán gần nhất:</span> {user.subscription.lastPayment.amount.toLocaleString()}₫ ({user.subscription.lastPayment.method})</div>
-                      )}
+                      <div>
+                        <span className="font-semibold">Họ:</span>{" "}
+                        {editMode ? (
+                          <input
+                            className="border rounded px-2 py-1 w-40"
+                            name="lastName"
+                            value={form.lastName}
+                            onChange={handleChange}
+                            placeholder="Họ"
+                          />
+                        ) : (
+                          user.lastName || <span className="italic text-muted-foreground">...</span>
+                        )}
+                      </div>
+                      <div>
+                        <span className="font-semibold">Tên:</span>{" "}
+                        {editMode ? (
+                          <input
+                            className="border rounded px-2 py-1 w-40"
+                            name="firstName"
+                            value={form.firstName}
+                            onChange={handleChange}
+                            placeholder="Tên"
+                          />
+                        ) : (
+                          user.firstName
+                        )}
+                      </div>
+                      <div>
+                        <span className="font-semibold">Số điện thoại:</span>{" "}
+                        {editMode ? (
+                          <input
+                            className="border rounded px-2 py-1 w-40"
+                            name="phoneNumber"
+                            value={form.phoneNumber}
+                            onChange={handleChange}
+                            placeholder="Số điện thoại"
+                          />
+                        ) : (
+                          user.phoneNumber
+                        )}
+                      </div>
+                      <div>
+                        <span className="font-semibold">Địa chỉ:</span>{" "}
+                        {editMode ? (
+                          <input
+                            className="border rounded px-2 py-1 w-40"
+                            name="address"
+                            value={form.address}
+                            onChange={handleChange}
+                            placeholder="Địa chỉ"
+                          />
+                        ) : (
+                          user.address || <span className="italic text-muted-foreground">Chưa cập nhật</span>
+                        )}
+                      </div>
+                      <div><span className="font-semibold">Xác thực SĐT:</span> {user.phoneVerified ? <span className="text-green-600">Đã xác thực</span> : <span className="text-muted-foreground">Chưa xác thực</span>}</div>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="mb-2 font-medium">Gói dịch vụ</div>
+                    {user.subscription ? (
+                      <div className="space-y-1 text-sm">
+                        <div><span className="font-semibold">Gói:</span> {user.subscription.planName}</div>
+                        <div><span className="font-semibold">Loại:</span> {user.subscription.type === 'MONTHLY' ? 'Theo tháng' : 'Theo năm'}</div>
+                        <div><span className="font-semibold">Trạng thái:</span> <Badge>{user.subscription.status}</Badge></div>
+                        <div><span className="font-semibold">Hạn sử dụng:</span> {formatDate(user.subscription.endDate)}</div>
+                        {user.subscription.lastPayment && (
+                          <div><span className="font-semibold">Thanh toán gần nhất:</span> {user.subscription.lastPayment.amount.toLocaleString()}₫ ({user.subscription.lastPayment.method})</div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="italic text-muted-foreground">Chưa đăng ký gói dịch vụ</div>
+                    )}
+                  </div>
+                  {/* Mục Giới thiệu */}
+                  <div>
+                    <div className="mb-2 font-medium">Giới thiệu</div>
+                    <div className="space-y-1 text-sm">
+                      <div><span className="font-semibold">Mã giới thiệu:</span> {user.referralCode || <span className="italic text-muted-foreground">Không có</span>}</div>
+                      <div><span className="font-semibold">Người giới thiệu:</span> {user.referredBy || <span className="italic text-muted-foreground">Không có</span>}</div>
+                    </div>
+                  </div>
+                  {/* Mục Thông tin */}
+                  <div>
+                    <div className="mb-2 font-medium">Thông tin tài khoản</div>
+                    <div className="space-y-1 text-sm">
+                      <div><span className="font-semibold">Ngày tạo:</span> {formatDate(user.createdAt) === 'Không có' ? <span className="italic text-muted-foreground">Không có</span> : formatDate(user.createdAt)}</div>
+                      <div><span className="font-semibold">Lần cập nhật cuối:</span> {formatDate(user.updatedAt) === 'Không có' ? <span className="italic text-muted-foreground">Không có</span> : formatDate(user.updatedAt)}</div>
+                      <div><span className="font-semibold">Đăng nhập gần nhất:</span> {formatDate(user.lastLoginAt) === 'Không có' ? <span className="italic text-muted-foreground">Không có</span> : formatDate(user.lastLoginAt)}</div>
+                    </div>
+                  </div>
+                  {editMode ? (
+                    <div className="col-span-full flex gap-2 mt-4">
+                      <button type="submit" className="px-4 py-2 rounded bg-primary text-white">Lưu</button>
+                      <button type="button" className="px-4 py-2 rounded bg-muted" onClick={() => setEditMode(false)}>Huỷ</button>
                     </div>
                   ) : (
-                    <div className="italic text-muted-foreground">Chưa đăng ký gói dịch vụ</div>
+                    <div className="col-span-full flex gap-2 mt-4">
+                      <button
+                        type="button"
+                        className="px-4 py-2 rounded bg-primary text-white"
+                        onClick={e => {
+                          e.preventDefault();
+                          setEditMode(true);
+                        }}
+                      >
+                        Cập nhật
+                      </button>
+                    </div>
                   )}
-                </div>
-                <div>
-                  <div className="mb-2 font-medium">Cài đặt</div>
-                  <div className="space-y-1 text-sm">
-                    <div><span className="font-semibold">Chủ đề:</span> {user.settings?.theme || 'system'}</div>
-                    <div><span className="font-semibold">Nhận thông báo:</span> {user.settings?.notificationEnabled ? 'Bật' : 'Tắt'}</div>
-                  </div>
-                </div>
-                <div>
-                  <div className="mb-2 font-medium">Khác</div>
-                  <div className="space-y-1 text-sm">
-                    <div><span className="font-semibold">Mã giới thiệu:</span> {user.referralCode || <span className="italic text-muted-foreground">Không có</span>}</div>
-                    <div><span className="font-semibold">Người giới thiệu:</span> {user.referredBy || <span className="italic text-muted-foreground">Không có</span>}</div>
-                    <div><span className="font-semibold">Ngày tạo:</span> {formatDate(user.createdAt)}</div>
-                    <div><span className="font-semibold">Lần cập nhật cuối:</span> {formatDate(user.updatedAt)}</div>
-                  </div>
-                </div>
+                </form>
               </CardContent>
             </Card>
           ) : null}
         </div>
-        {/* Bảng hiển thị tất cả các trường của user */}
-        {user && (
-          <div className="mt-8">
-            <h2 className="text-lg font-semibold mb-2">Tất cả trường dữ liệu user</h2>
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-sm border border-muted-foreground rounded-lg">
-                <tbody>
-                  {Object.entries(user).map(([key, value]) => (
-                    <tr key={key} className="border-b last:border-b-0">
-                      <td className="font-medium px-2 py-1 whitespace-nowrap align-top bg-muted/50">{key}</td>
-                      <td className="px-2 py-1 align-top">
-                        {typeof value === 'object' && value !== null ? (
-                          <pre className="whitespace-pre-wrap break-all bg-muted/20 rounded p-1">{JSON.stringify(value, null, 2)}</pre>
-                        ) : value === undefined || value === null ? (
-                          <span className="italic text-muted-foreground">Không có</span>
-                        ) : (
-                          String(value)
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
+        {/* Đã xoá bảng hiển thị tất cả các trường của user */}
       </SidebarInset>
     </SidebarProvider>
   );
-}
-
-// Helper function
-function formatDate(date: unknown): React.ReactNode {
-  if (!date) return <span className="italic text-muted-foreground">Không có</span>;
-  let d: Date | null = null;
-  if (typeof date === 'string' || typeof date === 'number') {
-    d = new Date(date);
-  } else if (date instanceof Date) {
-    d = date;
-  } else if (
-    date &&
-    typeof date === 'object' &&
-    'toDate' in date &&
-    typeof (date as { toDate: () => Date }).toDate === 'function'
-  ) {
-    d = (date as { toDate: () => Date }).toDate();
-  }
-  return d && !Number.isNaN(d.getTime()) ? d.toLocaleString() : <span className="italic text-muted-foreground">Không hợp lệ</span>;
 }
