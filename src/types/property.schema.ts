@@ -74,6 +74,7 @@ export const propertySchema = z.object({
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
   listingDuration: z.number().optional(),
+  agentId: z.string(), // UID của user (agent) đã tạo bất động sản này
 });
 
 // Schema cho tạo mới (bỏ id, createdAt, updatedAt)

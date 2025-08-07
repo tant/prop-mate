@@ -25,17 +25,17 @@ const navMainRaw = [
   },
   {
     title: "Bất động sản",
-    url: "#",
+    url: "/properties",
     icon: "Building2",
   },
   {
     title: "Bản đồ",
-    url: "#",
+    url: "/map",
     icon: "Map",
   },
   {
-    title: "Dự án bất động sản/chung cư",
-    url: "#",
+    title: "Dự án",
+    url: "projects",
     icon: "Landmark",
   },
 ]

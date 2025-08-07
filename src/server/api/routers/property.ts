@@ -54,10 +54,15 @@ export const propertyRouter = createTRPCRouter({
 
   create: protectedProcedure
     .input(propertyCreateSchema)
-    .mutation(async ({ input }): Promise<Property> => {
+    .mutation(async ({ input, ctx }): Promise<Property> => {
       const now = admin.firestore.Timestamp.now();
+      const agentId = ctx.user?.uid;
+      if (!agentId) {
+        throw new TRPCError({ code: "UNAUTHORIZED", message: "Missing agentId (user uid)" });
+      }
       const docRef = await propertiesCollection.add({
         ...input,
+        agentId,
         createdAt: now,
         updatedAt: now,
       });

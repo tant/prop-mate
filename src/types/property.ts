@@ -107,4 +107,7 @@ export interface Property {
   createdAt: Date;
   updatedAt: Date;
   listingDuration?: number; // Số ngày tin sẽ hiển thị (tùy chọn, phục vụ tự động ẩn khi hết hạn)
+
+  // --- Thông tin Agent ---
+  agentId: string; // UID của user (agent) đã tạo bất động sản này
 }
