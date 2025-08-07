@@ -152,3 +152,5 @@ export const userRouter = createTRPCRouter({
     return convertUserDates(doc.data() as FirestoreUser, uid);
   }),
 });
+
+export default userRouter;
