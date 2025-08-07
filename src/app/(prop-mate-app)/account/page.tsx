@@ -11,7 +11,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { userHooks } from "@/services/user"
+import { userHooks } from "../../../../docs/services/user"
 import { useAuthUser } from "@/hooks/use-auth-user"
 import { useMemo } from "react"
 

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { TRPCError } from '@trpc/server';
-import { userService } from '../../../../src/server/user.server';
+import { userService } from '../../../server/user.server';
 import { protectedProcedure, publicProcedure, router } from '../trpc';
 import type { User } from '../../../../src/types/user';
 

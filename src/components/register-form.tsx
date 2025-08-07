@@ -13,7 +13,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { userApi } from "@/services/user";
+import { userApi } from "../../docs/services/user";
 
 const passwordRequirements = [
   "Tối thiểu 8 ký tự",

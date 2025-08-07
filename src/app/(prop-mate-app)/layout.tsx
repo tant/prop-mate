@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { adminAuth } from "@/lib/firebase/admin";
 import { UserProvider } from "@/contexts/UserProvider";
-import { userService } from "@/server/user.server";
+import { userService } from "../../../docs/server/user.server";
 import { TRPCReactProvider } from "@/lib/TRPCReactProvider";
 
 

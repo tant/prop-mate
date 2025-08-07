@@ -1,5 +1,5 @@
 import { initTRPC } from '@trpc/server';
-import type { User } from '../../types/user';
+import type { User } from '../../../src/types/user';
 import type { DecodedIdToken } from 'firebase-admin/auth';
 import superjson from 'superjson';
 

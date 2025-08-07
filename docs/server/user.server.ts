@@ -1,5 +1,5 @@
-import { adminDb } from '../lib/firebase/admin';
-import type { User } from '../types/user';
+import { adminDb } from '../../src/lib/firebase/admin';
+import type { User } from '../../src/types/user';
 import { Timestamp } from 'firebase/firestore';
 
 const usersCollection = adminDb.collection('users');

@@ -1,5 +1,5 @@
-import { trpcReact } from '@/lib/trpcClient';
-import { trpcClient } from '@/lib/trpcClientInstance';
+import { trpcReact } from '../lib/trpcClient';
+import { trpcClient } from '../lib/trpcClientInstance';
 import type { User } from '@/types/user';
 
 // React hooks for use in components
