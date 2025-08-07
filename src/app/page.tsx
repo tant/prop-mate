@@ -20,7 +20,7 @@ export default function Home() {
             href="/dashboard"
             className="inline-block px-8 py-3 bg-blue-600 text-white rounded shadow hover:bg-blue-700 transition text-lg font-semibold mb-2"
           >
-            Vào App
+            Vào app
           </a>
           <StoryButton />
           <div className="text-sm text-gray-500 mt-2">

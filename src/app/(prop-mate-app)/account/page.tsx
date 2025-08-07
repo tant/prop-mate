@@ -17,7 +17,7 @@ import { z } from "zod";
 import { useMemo, useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
-export default function Page() {
+export default function AccountPage() {
   const { data: user, isLoading, isError } = api.user.me.useQuery();
   const queryClient = useQueryClient();
   const updateUser = api.user.update.useMutation();
