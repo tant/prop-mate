@@ -33,30 +33,77 @@ function removeUndefined<T>(obj: T): T {
 
 export type PropertyCreateInput = z.infer<typeof propertyCreateSchema>;
 
+import type { Property } from "@/types/property";
+
 interface PropertyFormProps {
   onSubmit: (data: PropertyCreateInput) => void;
   loading?: boolean;
   formRef?: (ref: HTMLFormElement | null) => void;
+  initialValues?: Partial<Property>;
+  mode?: "create" | "edit";
+  disabled?: boolean;
 }
 
 export function PropertyForm(props: PropertyFormProps) {
-  const { onSubmit, formRef } = props;
+  const { onSubmit, formRef, initialValues } = props;
 
 
   // Only set default for non-required fields or those with a true default
-  const defaultValues: Partial<PropertyCreateInput> = React.useMemo(() => ({
-    memorableName: "",
-    propertyType: "HOUSE",
-    listingType: "sale",
-    status: "DRAFT",
-    legalStatus: "PINK_BOOK",
-    imageUrls: [],
-  }), []);
+  const defaultValues: Partial<PropertyCreateInput> = React.useMemo(() => {
+    if (initialValues) {
+      // Map Property sang PropertyCreateInput (bỏ các field không có trong create schema)
+      const rest = { ...initialValues };
+      // Nếu có location, đảm bảo có đủ field
+      if (rest.location && typeof rest.location === 'object') {
+        rest.location = {
+          city: rest.location.city || '',
+          district: rest.location.district || '',
+          ward: rest.location.ward || '',
+          street: rest.location.street || '',
+          fullAddress: rest.location.fullAddress || '',
+          gps: rest.location.gps,
+        };
+      }
+      return {
+        memorableName: '',
+        propertyType: 'HOUSE',
+        listingType: 'sale',
+        status: 'DRAFT',
+        legalStatus: 'PINK_BOOK',
+        imageUrls: [],
+        ...rest,
+      };
+    }
+    return {
+      memorableName: '',
+      propertyType: 'HOUSE',
+      listingType: 'sale',
+      status: 'DRAFT',
+      legalStatus: 'PINK_BOOK',
+      imageUrls: [],
+    };
+  }, [initialValues]);
 
   const form = useForm<PropertyCreateInput>({
     resolver: zodResolver(propertyCreateSchema) as Resolver<PropertyCreateInput>,
     defaultValues: defaultValues as PropertyCreateInput,
   });
+
+  // Khi initialValues thay đổi (edit), reset lại form
+  React.useEffect(() => {
+    if (initialValues) {
+      const rest = { ...initialValues };
+      form.reset({
+        memorableName: '',
+        propertyType: 'HOUSE',
+        listingType: 'sale',
+        status: 'DRAFT',
+        legalStatus: 'PINK_BOOK',
+        imageUrls: [],
+        ...rest,
+      } as PropertyCreateInput);
+    }
+  }, [initialValues, form.reset]);
 
   React.useEffect(() => {
     // Debug: log validation errors on submit
@@ -91,7 +138,7 @@ export function PropertyForm(props: PropertyFormProps) {
 
   // Dialog state
   const [showDialog, setShowDialog] = useState(false);
-  const router = useRouter();
+  // const router = useRouter(); // Unused
 
   // Các trường option không tính là "đang nhập dở dang"
   const optionFields = [
@@ -140,26 +187,28 @@ export function PropertyForm(props: PropertyFormProps) {
         <PropertyFormMore form={form} />
         {/* Card 6: Hình ảnh & tài liệu */}
         <PropertyFormMedia form={form} />
-        <div className="md:col-span-2 flex justify-end gap-2 mt-4">
-          <button
-            type="submit"
-            className={
-              "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2" +
-              (shake ? " animate-shake" : "")
-            }
-            disabled={props.loading}
-          >
-            {props.loading ? 'Đang lưu...' : 'Lưu'}
-          </button>
-          <button
-            type="button"
-            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-muted text-gray-700 shadow-xs hover:bg-gray-200 h-9 px-4 py-2"
-            onClick={handleCancel}
-            disabled={props.loading}
-          >
-            Hủy
-          </button>
-        </div>
+        {(!props.disabled) && (
+          <div className="md:col-span-2 flex justify-end gap-2 mt-4">
+            <button
+              type="submit"
+              className={
+                "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2"+
+                (shake ? " animate-shake" : "")
+              }
+              disabled={props.loading}
+            >
+              {props.loading ? 'Đang lưu...' : 'Lưu'}
+            </button>
+            <button
+              type="button"
+              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-muted text-gray-700 shadow-xs hover:bg-gray-200 h-9 px-4 py-2"
+              onClick={handleCancel}
+              disabled={props.loading}
+            >
+              Hủy
+            </button>
+          </div>
+        )}
       </form>
       {showDialog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
@@ -167,12 +216,14 @@ export function PropertyForm(props: PropertyFormProps) {
             <div className="mb-4 text-base font-medium">Bạn có chắc muốn hủy? Dữ liệu đang nhập sẽ bị mất.</div>
             <div className="flex justify-end gap-2">
               <button
+                type="button"
                 className="px-4 py-2 rounded bg-muted text-gray-700 hover:bg-gray-200"
                 onClick={handleDialogCancel}
               >
                 Tiếp tục nhập
               </button>
               <button
+                type="button"
                 className="px-4 py-2 rounded bg-destructive text-white hover:bg-destructive/90"
                 onClick={handleDialogConfirm}
               >

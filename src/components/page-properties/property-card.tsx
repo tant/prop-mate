@@ -104,14 +104,20 @@ export function PropertyCard({ property, onView, onEdit, onDelete }: PropertyCar
           <span>PN: {property.bedrooms ?? '-'} phòng ngủ</span>
           <span>WC: {property.bathrooms ?? '-'} nhà tắm</span>
         </div>
-        <div className="flex gap-2 mt-2">
+        <div className="flex gap-2 mt-2 flex-wrap">
           <Button size="sm" variant="outline" onClick={onView} type="button">
             Xem
           </Button>
           {onEdit && (
-            <Button size="sm" variant="secondary" onClick={onEdit} type="button">
-              Sửa
-            </Button>
+            <>
+              <Button size="sm" variant="secondary" onClick={onEdit} type="button">
+                Sửa
+              </Button>
+              <Button size="sm" variant="secondary" type="button" onClick={() => alert('Sửa liên hệ')}>Sửa liên hệ</Button>
+              <Button size="sm" variant="secondary" type="button" onClick={() => alert('Sửa vị trí')}>Sửa vị trí</Button>
+              <Button size="sm" variant="secondary" type="button" onClick={() => alert('Sửa chi tiết')}>Sửa chi tiết</Button>
+              <Button size="sm" variant="secondary" type="button" onClick={() => alert('Sửa hình ảnh')}>Sửa hình ảnh</Button>
+            </>
           )}
           {onDelete && (
             <Button size="sm" variant="destructive" onClick={onDelete} type="button">

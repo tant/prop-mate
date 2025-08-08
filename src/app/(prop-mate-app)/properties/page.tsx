@@ -1,5 +1,6 @@
 "use client"
 
+
 import { AppSidebar } from "@/components/app-sidebar"
 import { Separator } from "@/components/ui/separator"
 import {
@@ -8,9 +9,14 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { useRouter } from "next/navigation"
+import { PropertyCard } from "@/components/page-properties/property-card"
+import { useCurrentUser } from "@/hooks/use-current-user"
+import { api } from "@/app/_trpc/client"
 
 export default function DashboardPage() {
-  const router = useRouter()
+  const router = useRouter();
+  const user = useCurrentUser();
+  const { data: properties, isLoading, error } = api.property.getMyProperties.useQuery(undefined, { enabled: !!user });
 
   return (
     <SidebarProvider>
@@ -35,13 +41,30 @@ export default function DashboardPage() {
                 className="bg-primary text-white px-3 py-1 rounded hover:bg-primary/90 transition-colors text-sm"
                 onClick={() => router.push("/properties/add")}
               >
-                + 
+                +
               </button>
             </div>
           </div>
         </header>
-        <div className="flex flex-1 flex-col"></div>
+        <div className="flex flex-1 flex-col">
+          {isLoading && <div className="p-4">Đang tải dữ liệu...</div>}
+          {error && <div className="p-4 text-red-500">Lỗi: {error.message}</div>}
+          {!isLoading && properties && properties.length === 0 && (
+            <div className="p-4 text-gray-500">Bạn chưa có bất động sản nào.</div>
+          )}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+            {properties?.map((property: import("@/types/property").Property) => (
+              <PropertyCard
+                key={property.id}
+                property={property}
+                onView={() => router.push(`/properties/${property.id}`)}
+                onEdit={() => router.push(`/properties/${property.id}/edit`)}
+                onDelete={undefined} // tuỳ chỉnh nếu có chức năng xoá/lưu trữ
+              />
+            ))}
+          </div>
+        </div>
       </SidebarInset>
     </SidebarProvider>
-  )
+  );
 }
