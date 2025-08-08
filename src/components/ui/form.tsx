@@ -1,7 +1,8 @@
 "use client"
 
 import * as React from "react"
-import * as LabelPrimitive from "@radix-ui/react-label"
+import { FormErrorIcon } from "@/components/ui/form-error-icon"
+// Removed unused LabelPrimitive import
 import { Slot } from "@radix-ui/react-slot"
 import {
   Controller,
@@ -87,12 +88,8 @@ function FormItem({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
-function FormLabel({
-  className,
-  ...props
-}: React.ComponentProps<typeof LabelPrimitive.Root>) {
-  const { error, formItemId } = useFormField()
-
+function FormLabel({ className, ...props }: React.ComponentProps<typeof Label>) {
+  const { error, formItemId } = useFormField();
   return (
     <Label
       data-slot="form-label"
@@ -101,7 +98,7 @@ function FormLabel({
       htmlFor={formItemId}
       {...props}
     />
-  )
+  );
 }
 
 function FormControl({ ...props }: React.ComponentProps<typeof Slot>) {
@@ -147,9 +144,10 @@ function FormMessage({ className, ...props }: React.ComponentProps<"p">) {
     <p
       data-slot="form-message"
       id={formMessageId}
-      className={cn("text-destructive text-sm", className)}
+      className={cn("text-destructive text-sm flex items-center gap-1", className)}
       {...props}
     >
+      {error && <FormErrorIcon />}
       {body}
     </p>
   )

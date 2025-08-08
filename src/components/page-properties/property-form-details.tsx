@@ -18,7 +18,13 @@ export function PropertyFormDetails({ form }: PropertyFormDetailsProps) {
             <FormItem>
               <FormLabel>Mặt tiền (m)</FormLabel>
               <FormControl>
-                <Input type="number" step="any" placeholder="Mặt tiền" {...field} />
+                <Input
+                  type="number"
+                  step="any"
+                  placeholder="Mặt tiền"
+                  value={field.value ?? ''}
+                  onChange={e => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -36,7 +42,12 @@ export function PropertyFormDetails({ form }: PropertyFormDetailsProps) {
             <FormItem>
               <FormLabel>Tầng</FormLabel>
               <FormControl>
-                <Input type="number" placeholder="Tầng" {...field} />
+                <Input
+                  type="number"
+                  placeholder="Tầng"
+                  value={field.value ?? ''}
+                  onChange={e => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -45,7 +56,12 @@ export function PropertyFormDetails({ form }: PropertyFormDetailsProps) {
             <FormItem>
               <FormLabel>Tổng số tầng</FormLabel>
               <FormControl>
-                <Input type="number" placeholder="Tổng số tầng" {...field} />
+                <Input
+                  type="number"
+                  placeholder="Tổng số tầng"
+                  value={field.value ?? ''}
+                  onChange={e => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -54,7 +70,12 @@ export function PropertyFormDetails({ form }: PropertyFormDetailsProps) {
             <FormItem>
               <FormLabel>Số căn/tầng</FormLabel>
               <FormControl>
-                <Input type="number" placeholder="Số căn/tầng" {...field} />
+                <Input
+                  type="number"
+                  placeholder="Số căn/tầng"
+                  value={field.value ?? ''}
+                  onChange={e => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -63,7 +84,12 @@ export function PropertyFormDetails({ form }: PropertyFormDetailsProps) {
             <FormItem>
               <FormLabel>Phòng ngủ</FormLabel>
               <FormControl>
-                <Input type="number" placeholder="Phòng ngủ" {...field} />
+                <Input
+                  type="number"
+                  placeholder="Phòng ngủ"
+                  value={field.value ?? ''}
+                  onChange={e => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -72,7 +98,12 @@ export function PropertyFormDetails({ form }: PropertyFormDetailsProps) {
             <FormItem>
               <FormLabel>Phòng tắm</FormLabel>
               <FormControl>
-                <Input type="number" placeholder="Phòng tắm" {...field} />
+                <Input
+                  type="number"
+                  placeholder="Phòng tắm"
+                  value={field.value ?? ''}
+                  onChange={e => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

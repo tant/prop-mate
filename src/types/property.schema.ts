@@ -77,11 +77,12 @@ export const propertySchema = z.object({
   agentId: z.string(), // UID của user (agent) đã tạo bất động sản này
 });
 
-// Schema cho tạo mới (bỏ id, createdAt, updatedAt)
+// Schema cho tạo mới (bỏ id, createdAt, updatedAt, agentId)
 export const propertyCreateSchema = propertySchema.omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+  agentId: true,
 });
 
 // Schema cho update (chỉ cho phép partial)

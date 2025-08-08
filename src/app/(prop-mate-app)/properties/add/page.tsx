@@ -8,7 +8,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { useRouter } from "next/navigation"
-import { PropertyForm } from "@/components/page-properties/property-form"
+import { CreatePropertyFormWrapper } from "@/components/page-properties/property-form"
 import { useState } from "react"
 
 export default function CreatePropertyPage() {
@@ -52,10 +52,7 @@ export default function CreatePropertyPage() {
           </div>
         </header>
         <div className="flex flex-1 flex-col p-4">
-          <PropertyForm
-            onSubmit={() => {}}
-            formRef={setFormRef}
-          />
+          <CreatePropertyFormWrapper formRef={setFormRef} />
         </div>
       </SidebarInset>
     </SidebarProvider>

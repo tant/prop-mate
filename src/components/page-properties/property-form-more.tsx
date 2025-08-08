@@ -53,7 +53,13 @@ export function PropertyFormMore({ form }: PropertyFormMoreProps) {
             <FormItem>
               <FormLabel>Giá/m²</FormLabel>
               <FormControl>
-                <Input type="number" step="any" placeholder="Giá/m²" {...field} />
+                <Input
+                  type="number"
+                  step="any"
+                  placeholder="Giá/m²"
+                  value={field.value ?? ''}
+                  onChange={e => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

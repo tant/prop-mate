@@ -149,7 +149,13 @@ export function PropertyFormBasics({ form }: PropertyFormBasicsProps) {
                       Diện tích <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input type="number" min={0} step={1} {...field} />
+                      <Input
+                        type="number"
+                        min={0}
+                        step={1}
+                        value={field.value ?? ''}
+                        onChange={e => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
+                      />
                     </FormControl>
                   </div>
                   <FormMessage />
@@ -168,7 +174,13 @@ export function PropertyFormBasics({ form }: PropertyFormBasicsProps) {
                       Giá <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input type="number" min={0} step={1000000} {...field} />
+                      <Input
+                        type="number"
+                        min={0}
+                        step={1000000}
+                        value={field.value ?? ''}
+                        onChange={e => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
+                      />
                     </FormControl>
                   </div>
                   <FormMessage />
