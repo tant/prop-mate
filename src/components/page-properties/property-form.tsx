@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useState } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { propertyCreateSchema } from "@/types/property.schema";
@@ -8,6 +9,7 @@ import type { z } from "zod";
 import { Form } from "@/components/ui/form";
 import { api } from "@/app/_trpc/client";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { PropertyFormMedia } from "./property-form-media";
 import { PropertyFormBasics } from "./property-form-basics";
 import { PropertyFormContact } from "./property-form-contact";
@@ -43,6 +45,7 @@ export function PropertyForm(props: PropertyFormProps) {
 
   // Only set default for non-required fields or those with a true default
   const defaultValues: Partial<PropertyCreateInput> = React.useMemo(() => ({
+    memorableName: "",
     propertyType: "HOUSE",
     listingType: "sale",
     status: "DRAFT",
@@ -86,6 +89,38 @@ export function PropertyForm(props: PropertyFormProps) {
     }
   }, []);
 
+  // Dialog state
+  const [showDialog, setShowDialog] = useState(false);
+  const router = useRouter();
+
+  // Các trường option không tính là "đang nhập dở dang"
+  const optionFields = [
+    "propertyType", "listingType", "status", "legalStatus", "imageUrls"
+  ];
+
+  // Kiểm tra có dữ liệu nhập dở dang không (trừ optionFields)
+  const hasDirtyNonOption = React.useMemo(() => {
+    const dirty = form.formState.dirtyFields;
+    return Object.keys(dirty).some((k) => !optionFields.includes(k));
+  }, [form.formState.dirtyFields]);
+
+  const handleCancel = () => {
+    if (hasDirtyNonOption) {
+      setShowDialog(true);
+    } else {
+      window.history.back();
+    }
+  };
+
+  const handleDialogConfirm = () => {
+    setShowDialog(false);
+    window.history.back();
+  };
+
+  const handleDialogCancel = () => {
+    setShowDialog(false);
+  };
+
   return (
     <Form {...form}>
       <form
@@ -116,8 +151,37 @@ export function PropertyForm(props: PropertyFormProps) {
           >
             {props.loading ? 'Đang lưu...' : 'Lưu'}
           </button>
+          <button
+            type="button"
+            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-muted text-gray-700 shadow-xs hover:bg-gray-200 h-9 px-4 py-2"
+            onClick={handleCancel}
+            disabled={props.loading}
+          >
+            Hủy
+          </button>
         </div>
       </form>
+      {showDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <div className="bg-white rounded shadow-lg p-6 min-w-[320px] max-w-[90vw]">
+            <div className="mb-4 text-base font-medium">Bạn có chắc muốn hủy? Dữ liệu đang nhập sẽ bị mất.</div>
+            <div className="flex justify-end gap-2">
+              <button
+                className="px-4 py-2 rounded bg-muted text-gray-700 hover:bg-gray-200"
+                onClick={handleDialogCancel}
+              >
+                Tiếp tục nhập
+              </button>
+              <button
+                className="px-4 py-2 rounded bg-destructive text-white hover:bg-destructive/90"
+                onClick={handleDialogConfirm}
+              >
+                Hủy bỏ
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Form>
   );
 }
@@ -125,8 +189,10 @@ export function PropertyForm(props: PropertyFormProps) {
 export function CreatePropertyFormWrapper({ formRef }: { formRef?: (ref: HTMLFormElement | null) => void }) {
   const router = useRouter();
   const createProperty = api.property.create.useMutation({
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       console.debug('Property created successfully:', data);
+      toast.success("Tạo bất động sản thành công!");
+      await new Promise((res) => setTimeout(res, 1000));
       router.push("/properties");
     },
     onError: (error) => {

@@ -35,7 +35,7 @@ export default function DashboardPage() {
                 className="bg-primary text-white px-3 py-1 rounded hover:bg-primary/90 transition-colors text-sm"
                 onClick={() => router.push("/properties/add")}
               >
-                + Thêm mới
+                + 
               </button>
             </div>
           </div>
