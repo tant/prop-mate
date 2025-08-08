@@ -55,8 +55,17 @@ export const propertySchema = z.object({
   images360: z.string().optional(), // chỉ 1 tấm
   videoUrl: z.string().optional(), // chỉ 1 video
   contactName: z.string().optional(),
-  contactPhone: z.string().optional(),
-  contactEmail: z.string().optional(),
+  contactPhone: z.string()
+    .optional()
+    .refine(
+      (val) => !val || /^((\+84|0)[3|5|7|8|9])+([0-9]{8})$/.test(val),
+      {
+        message: "Số điện thoại không hợp lệ (phải là số Việt Nam)",
+      }
+    ),
+  contactEmail: z.string()
+    .email({ message: "Email không hợp lệ" })
+    .optional(),
   contactRole: contactRoleEnum.optional(),
   ownershipType: ownershipTypeEnum.optional(),
   notes: z.array(z.object({
