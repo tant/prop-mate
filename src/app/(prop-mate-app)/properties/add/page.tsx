@@ -8,9 +8,18 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { useRouter } from "next/navigation"
+import { PropertyForm } from "@/components/page-properties/property-form"
+import { useState } from "react"
 
-export default function DashboardPage() {
+export default function CreatePropertyPage() {
   const router = useRouter()
+  const [formRef, setFormRef] = useState<HTMLFormElement | null>(null)
+
+  const handleSave = () => {
+    if (formRef) {
+      formRef.requestSubmit()
+    }
+  }
 
   return (
     <SidebarProvider>
@@ -23,24 +32,31 @@ export default function DashboardPage() {
               orientation="vertical"
               className="mr-2 data-[orientation=vertical]:h-4"
             />
-            <h1 className="text-lg font-semibold">Danh sách bất động sản</h1>
+            <h1 className="text-lg font-semibold">Thêm bất động sản</h1>
             <div className="flex items-center gap-2 ml-auto">
-              <input
-                type="text"
-                placeholder="Tìm kiếm bất động sản..."
-                className="border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-              />
               <button
                 type="button"
                 className="bg-primary text-white px-3 py-1 rounded hover:bg-primary/90 transition-colors text-sm"
-                onClick={() => router.push("/properties/add")}
+                onClick={handleSave}
               >
-                + Thêm mới
+                Lưu
+              </button>
+              <button
+                type="button"
+                className="bg-muted text-gray-700 px-3 py-1 rounded hover:bg-gray-200 transition-colors text-sm"
+                onClick={() => router.back()}
+              >
+                Hủy
               </button>
             </div>
           </div>
         </header>
-        <div className="flex flex-1 flex-col"></div>
+        <div className="flex flex-1 flex-col p-4">
+          <PropertyForm
+            onSubmit={() => {}}
+            formRef={setFormRef}
+          />
+        </div>
       </SidebarInset>
     </SidebarProvider>
   )

@@ -52,8 +52,8 @@ export const propertySchema = z.object({
   legalNote: z.string().optional(),
   documents: z.array(z.object({ name: z.string(), url: z.string() })).optional(),
   imageUrls: z.array(z.string()),
-  images360: z.array(z.string()).optional(),
-  videoUrls: z.array(z.string()).optional(),
+  images360: z.string().optional(), // chỉ 1 tấm
+  videoUrl: z.string().optional(), // chỉ 1 video
   contactName: z.string().optional(),
   contactPhone: z.string().optional(),
   contactEmail: z.string().optional(),

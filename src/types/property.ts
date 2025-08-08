@@ -59,8 +59,8 @@ export interface Property {
 
   // --- Media ---
   imageUrls: string[];
-  images360?: string[]; // Ảnh 360 độ (tùy chọn)
-  videoUrls?: string[]; // Video giới thiệu (tùy chọn)
+  images360?: string; // Ảnh 360 độ (tùy chọn, chỉ 1 tấm)
+  videoUrl?: string; // Video giới thiệu (tùy chọn, chỉ 1 link)
 
   // --- Quản lý & Liên hệ ---
   /**
