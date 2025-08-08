@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { CardContent } from "@/components/ui/card";
+import { PropertyFormCard } from "./property-form-card";
 import { FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import type { UseFormReturn } from "react-hook-form";
@@ -211,7 +211,8 @@ export function PropertyFormMedia({ form }: PropertyFormMediaProps) {
   };
 
   return (
-    <CardContent className="p-6 space-y-6">
+    <PropertyFormCard title="Hình ảnh & Tài liệu">
+      <div className="p-6 space-y-6">
       {/* Thư viện ảnh */}
       <div>
         <FormLabel className="mb-2 block">Thư viện ảnh</FormLabel>
@@ -382,6 +383,7 @@ export function PropertyFormMedia({ form }: PropertyFormMediaProps) {
           )}
         />
       </div>
-    </CardContent>
+      </div>
+    </PropertyFormCard>
   );
 }

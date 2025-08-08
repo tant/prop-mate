@@ -8,10 +8,10 @@ import type { z } from "zod";
 import { Form } from "@/components/ui/form";
 import { api } from "@/app/_trpc/client";
 import { useRouter } from "next/navigation";
-import { PropertyCardMedia } from "./property-card-media";
+import { PropertyFormMedia } from "./property-form-media";
 import { PropertyFormBasics } from "./property-form-basics";
 import { PropertyFormContact } from "./property-form-contact";
-import { PropertyCardLocation } from "./property-card-location";
+import { PropertyFormLocation } from "./property-form-location";
 import { PropertyFormDetails } from "./property-form-details";
 import { PropertyFormMore } from "./property-form-more";
 
@@ -57,14 +57,14 @@ export function PropertyForm(props: PropertyFormProps) {
   <PropertyFormBasics form={form} />
   {/* Card 2: Thông tin liên hệ */}
   <PropertyFormContact form={form} />
-        {/* Card 3: Vị trí */}
-  <PropertyCardLocation form={form} />
+    {/* Card 3: Vị trí */}
+  <PropertyFormLocation form={form} />
     {/* Card 4: Chi tiết nhà/đất */}
   <PropertyFormDetails form={form} />
     {/* Card 5: Bổ sung */}
   <PropertyFormMore form={form} />
   {/* Card 6: Hình ảnh & tài liệu */}
-  <PropertyCardMedia form={form} />
+  <PropertyFormMedia form={form} />
         <div className="md:col-span-2 flex justify-end gap-2 mt-4">
           {/* Nút submit đã được chuyển lên header */}
         </div>
