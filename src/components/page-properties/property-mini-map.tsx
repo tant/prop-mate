@@ -1,6 +1,7 @@
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import Image from "next/image";
 
 // Fix default icon issue for leaflet in Next.js
 if (typeof window !== "undefined" && L && L.Icon.Default) {
@@ -21,7 +22,7 @@ export default function PropertyMiniMap({ lat, lng }: Props) {
   if (typeof lat !== "number" || typeof lng !== "number") {
     return (
       <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded text-xs text-gray-400">
-        <img src="/globe.svg" alt="No location" className="w-8 h-8 opacity-40" />
+        <Image src="/globe.svg" alt="No location" width={32} height={32} className="w-8 h-8 opacity-40" />
         <span className="ml-2">Chưa có vị trí</span>
       </div>
     );

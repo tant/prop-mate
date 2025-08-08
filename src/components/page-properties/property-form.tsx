@@ -24,7 +24,7 @@ function removeUndefined<T>(obj: T): T {
   if (obj && typeof obj === 'object') {
     return Object.fromEntries(
       Object.entries(obj)
-        .filter(([_, v]) => v !== undefined)
+        .filter(([, v]) => v !== undefined)
         .map(([k, v]) => [k, removeUndefined(v)])
     ) as T;
   }
@@ -103,15 +103,14 @@ export function PropertyForm(props: PropertyFormProps) {
         ...rest,
       } as PropertyCreateInput);
     }
-  }, [initialValues, form.reset]);
+  }, [initialValues, form, form.reset]);
 
   React.useEffect(() => {
     // Debug: log validation errors on submit
     if (form.formState.isSubmitted) {
-      // eslint-disable-next-line no-console
       console.debug('Form errors:', form.formState.errors);
     }
-  }, [form.formState.isSubmitted, form.formState.errors]);
+  }, [form.formState.isSubmitted, form.formState.errors, form]);
 
   // Attach ref if provided
   const setFormRef = React.useCallback((el: HTMLFormElement | null) => {
@@ -140,13 +139,11 @@ export function PropertyForm(props: PropertyFormProps) {
   const [showDialog, setShowDialog] = useState(false);
   // const router = useRouter(); // Unused
 
-  // Các trường option không tính là "đang nhập dở dang"
-  const optionFields = [
-    "propertyType", "listingType", "status", "legalStatus", "imageUrls"
-  ];
-
   // Kiểm tra có dữ liệu nhập dở dang không (trừ optionFields)
   const hasDirtyNonOption = React.useMemo(() => {
+    const optionFields = [
+      "propertyType", "listingType", "status", "legalStatus", "imageUrls"
+    ];
     const dirty = form.formState.dirtyFields;
     return Object.keys(dirty).some((k) => !optionFields.includes(k));
   }, [form.formState.dirtyFields]);

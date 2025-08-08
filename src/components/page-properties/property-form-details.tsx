@@ -114,7 +114,7 @@ export function PropertyFormDetails({ form }: PropertyFormDetailsProps) {
               <FormControl>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Chọn tình trạng nội thất" />
+                    <SelectValue placeholder="Nội thất" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="FURNISHED">Đầy đủ nội thất</SelectItem>

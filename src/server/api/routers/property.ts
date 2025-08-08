@@ -4,7 +4,7 @@ function deepRemoveUndefined<T>(obj: T): T {
   if (obj && typeof obj === 'object') {
     return Object.fromEntries(
       Object.entries(obj)
-        .filter(([_, v]) => v !== undefined)
+        .filter(([, v]) => v !== undefined)
         .map(([k, v]) => [k, deepRemoveUndefined(v)])
     ) as T;
   }

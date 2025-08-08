@@ -109,15 +109,9 @@ export function PropertyCard({ property, onView, onEdit, onDelete }: PropertyCar
             Xem
           </Button>
           {onEdit && (
-            <>
-              <Button size="sm" variant="secondary" onClick={onEdit} type="button">
-                Sửa
-              </Button>
-              <Button size="sm" variant="secondary" type="button" onClick={() => alert('Sửa liên hệ')}>Sửa liên hệ</Button>
-              <Button size="sm" variant="secondary" type="button" onClick={() => alert('Sửa vị trí')}>Sửa vị trí</Button>
-              <Button size="sm" variant="secondary" type="button" onClick={() => alert('Sửa chi tiết')}>Sửa chi tiết</Button>
-              <Button size="sm" variant="secondary" type="button" onClick={() => alert('Sửa hình ảnh')}>Sửa hình ảnh</Button>
-            </>
+            <Button size="sm" variant="secondary" onClick={onEdit} type="button">
+              Sửa
+            </Button>
           )}
           {onDelete && (
             <Button size="sm" variant="destructive" onClick={onDelete} type="button">

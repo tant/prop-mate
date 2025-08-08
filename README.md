@@ -1,195 +1,123 @@
-# Tech Stack
 
-- **Next.js 15** (React framework)
-- **React 19**
-- **TypeScript**
-- **Tailwind CSS v4**
-- **Radix UI** (Avatar, Collapsible, Dialog, Dropdown Menu, Label, Separator, Slot, Tooltip)
-- **shadcn/ui**
-- **lucide-react** (icon library)
-- **Zod**
-- **TanStack Query (React Query)**
-- **tRPC**
-- **Firebase** & **Firebase Admin**
-- **Genkit** (AI/GoogleAI)
-- **ESLint**
+# PropMate: Real Estate Management App
+
+PropMate là ứng dụng hỗ trợ nhà môi giới bất động sản trong công tác tiếp thị bán hàng.
 
 ---
 
-## Cấu trúc thư mục dự án
+## 📚 Mục lục
 
-```
-propmate/
-├── public/                  # Ảnh, icon, file tĩnh
-├── scripts/                 # Script tiện ích (reset Firestore, ...)
-├── src/
-│   ├── api/                 # Định nghĩa backend (tRPC routers, handler)
-│   │   └── trpc/
-│   ├── app/                 # Next.js app directory (routes, layout, page)
-│   │   ├── api/
-│   │   │   └── trpc/
-│   │   │       └── route.ts # Route handler để expose endpoint /api/trpc cho tRPC (bắt buộc với Next.js app directory)
-│   │   ├── dashboard/
-│   │   ├── login/
-│   │   ├── favicon.ico
-│   │   ├── globals.css
-│   │   ├── layout.tsx
-│   │   └── page.tsx
-│   ├── components/          # UI components (chia nhỏ theo domain hoặc loại)
-│   │   ├── app-sidebar.tsx
-│   │   ├── login-form.tsx
-│   │   ├── nav-main.tsx
-│   │   ├── nav-projects.tsx
-│   │   ├── nav-user.tsx
-│   │   ├── team-switcher.tsx
-│   │   └── ui/              # Các UI component nhỏ (button, card, ...)
-│   ├── constants/            # Định nghĩa các hằng số dùng chung toàn dự án
-│   ├── queries/             # Custom hook data fetching/mutation (TanStack Query)
-│   ├── hooks/               # Custom hook UI, event, responsive, logic không liên quan đến data
-│   ├── lib/                 # Tiện ích, config, firebase, genkit, ...
-│   │   ├── firebase/
-│   │   ├── genkit/
-│   │   └── utils.ts
-│   ├── server/              # Business logic layer, service backend
-│   ├── services/            # Hàm gọi API, thao tác dữ liệu phía client
-│   ├── types/               # Định nghĩa type/interface chung
-│   ├── contexts/            # Chứa các React Context toàn cục (UserContext, ThemeContext, ...)
-├── docs/                    # Tài liệu dự án (nếu có)
-├── package.json
-├── README.md
-└── ...
-```
+- [Tính năng nổi bật](#tính-năng-nổi-bật)
+- [Cài đặt nhanh](#cài-đặt-nhanh)
+- [Cấu hình Firebase](#cấu-hình-firebase)
+- [Chạy local](#chạy-local)
+- [Công nghệ sử dụng](#công-nghệ-sử-dụng)
+- [Scripts](#scripts)
+- [Lưu ý về TailwindCSS](#lưu-ý-về-tailwindcss)
+- [License](#license)
 
 ---
 
-## Scripts
+## 🚀 Tính năng nổi bật
 
-Các lệnh có thể chạy trong dự án:
-
-- `pnpm dev`: Chạy server phát triển Next.js
-- `pnpm build`: Build project Next.js
-- `pnpm start`: Chạy project ở chế độ production
-- `pnpm lint`: Kiểm tra code với ESLint
-- `pnpm reset:db`: Xóa toàn bộ dữ liệu Firestore (chỉ dùng cho môi trường dev/test)
-
-> Lưu ý: Dự án này sử dụng **pnpm** để quản lý package, không dùng npm.
+- Quản lý tài sản, khách hàng, lịch hẹn trực quan
+- Tìm kiếm, lọc, xem chi tiết và bản đồ vị trí bất động sản
+- Đồng bộ dữ liệu real-time với Firebase
+- Đăng nhập, phân quyền, bảo mật dữ liệu
+- Hỗ trợ offline-first, tối ưu cho thiết bị di động
+- Giao diện hiện đại, dễ sử dụng
 
 ---
 
-## Hướng dẫn sử dụng & ví dụ
+## 🛠️ Cài đặt nhanh
 
-### 1. Cài đặt dependencies
 ```bash
+git clone https://github.com/tant/prop-mate
+cd prop-mate
 pnpm install
+cp .env.sample .env.local # Điền thông tin Firebase vào file này
 ```
 
-### 2. Chạy server phát triển
+---
+
+## 🔑 Cấu hình Firebase
+
+1. Làm theo hướng dẫn tại [`docs/make-firebase.md`](docs/make-firebase.md) để tạo project, lấy config, thiết lập rule bảo mật và Storage.
+2. Lưu ý: Để sử dụng Storage, cần nâng cấp Firebase lên gói Blaze (Pay as you go).
+
+---
+
+## ▶️ Chạy local
+
 ```bash
 pnpm dev
 ```
-Truy cập [http://localhost:3000](http://localhost:3000)
-
-### 3. Build project
-```bash
-pnpm build
-```
-
-### 4. Chạy production
-```bash
-pnpm start
-```
-
-### 5. Kiểm tra code với ESLint
-```bash
-pnpm lint
-```
-
-### 6. Reset toàn bộ dữ liệu Firestore (chỉ dùng cho dev/test)
-```bash
-pnpm reset:db
-```
-> Lưu ý: Cần cấu hình biến môi trường và service account cho Firebase Admin SDK.
+Truy cập: http://localhost:3000
 
 ---
 
-## Quản lý trạng thái đăng nhập (UserContext)
+## 🧩 Công nghệ sử dụng
 
-- Thư mục `src/contexts/` chứa các React Context dùng toàn app, ví dụ: `UserContext`.
-- `UserContext` giúp toàn bộ tree component truy cập thông tin user đã đăng nhập một cách an toàn, type-safe.
-- Ở layout server component, sau khi xác thực user thành công, user sẽ được truyền vào `UserContext.Provider`.
-- Các component con chỉ cần gọi `const user = useUser()` để lấy thông tin user, không cần truyền prop thủ công.
-- Nếu chưa đăng nhập, layout sẽ tự động redirect về `/login`, đảm bảo mọi nơi trong app chỉ nhận user hợp lệ.
-- Đây là best practice cho Next.js/React app hiện đại, giúp codebase dễ mở rộng, bảo trì và test.
+### Core
+- **Next.js 15** (React framework, SSR/SSG)
+- **React 19**
+- **TypeScript 5**
 
-Ví dụ sử dụng:
-```tsx
-import { useUser } from "@/contexts/UserContext"
+### Styling/UI
+- **Tailwind CSS 4** (utility-first CSS)
+- **Radix UI** (UI primitives: Avatar, Dialog, Dropdown, Tooltip...)
+- **shadcn/ui** (UI kit)
+- **lucide-react**, **@tabler/icons-react** (icon sets)
+- **Swiper** (carousel/slider)
+- **Recharts** (charts)
+- **Leaflet**, **react-leaflet** (interactive maps)
+- **@dnd-kit** (drag & drop)
+- **vaul** (UI components)
 
-function Profile() {
-  const user = useUser()
-  if (!user) return null // hoặc redirect/login UI
-  return <div>Xin chào, {user.firstName}!</div>
-}
-```
+### State & Data
+- **TanStack Query (React Query)** (server state)
+- **tRPC** (type-safe API communication)
+- **Zod** (schema validation)
 
----
+### Backend/Cloud
+- **Firebase** & **Firebase Admin SDK** (database, auth, storage)
+- **Genkit**, **@genkit-ai/googleai** (AI integration)
 
-### Ví dụ sử dụng TanStack Query & tRPC
+### Dev Tools
+- **ESLint**, **eslint-config-next**, **@biomejs/biome** (lint/format)
+- **tsx** (TS runtime)
+- **dotenv** (env config)
+- **PostCSS**
+- **pnpm** (package manager)
 
-#### Định nghĩa router tRPC (server-side)
-```ts
-// src/api/trpc/routers/user.ts
-import { router, publicProcedure } from '../trpc'
-export const userRouter = router({
-  getMe: publicProcedure.query(async ({ ctx }) => {
-    // Trả về thông tin user
-  }),
-})
-```
-
-#### Gọi tRPC từ client (services)
-```ts
-// src/services/user.ts
-import { trpc } from '@/lib/trpc'
-export const getMe = () => trpc.user.getMe.query()
-```
-
-#### Sử dụng trong custom hook với TanStack Query
-```ts
-// src/hooks/useUser.ts
-import { useQuery } from '@tanstack/react-query'
-import { getMe } from '@/services/user'
-export const useMe = () => useQuery({ queryKey: ['me'], queryFn: getMe })
-```
-
-#### Sử dụng trong component
-```tsx
-import { useMe } from '@/hooks/useUser'
-export default function Profile() {
-  const { data: user, isLoading } = useMe()
-  if (isLoading) return <div>Loading...</div>
-  return <div>Hello, {user?.name}</div>
-}
-```
+### Utilities
+- **class-variance-authority**, **clsx**, **tailwind-merge** (class helpers)
 
 ---
 
-### Lưu ý khi dùng tRPC với Next.js app directory
+## 📦 Scripts
 
-- Để các router tRPC hoạt động, bạn phải tạo file handler tại: `src/app/api/trpc/route.ts`.
-- File này sẽ đăng ký appRouter và trả về handler cho Next.js, giúp client truy cập endpoint `/api/trpc`.
-- Các file trong `src/api/trpc/routers/` chỉ định nghĩa router, không tự động thành API endpoint.
+Các lệnh có thể chạy trong dự án (dùng với pnpm):
 
-Ví dụ tối thiểu cho `src/app/api/trpc/route.ts`:
+- `pnpm dev` — Chạy server phát triển Next.js (hot reload, port 3000)
+- `pnpm build` — Build project Next.js ra .next/ (chuẩn bị cho production)
+- `pnpm start` — Chạy project ở chế độ production (sau khi build)
+- `pnpm lint` — Kiểm tra code với ESLint và Biome (tự động fix nếu có thể)
+- `pnpm reset:db` — Xóa toàn bộ dữ liệu Firestore (chạy script `scripts/reset-firestore.ts`, chỉ dùng cho môi trường dev/test)
+- `pnpm exec tsx scripts/test-firebase-admin-sdk.ts` — Test kết nối và quyền Firebase Admin SDK (xem file `scripts/test-firebase-admin-sdk.ts`)
+- `pnpm exec tsx scripts/test-firebase-clien-sdk.ts` — Test kết nối Firebase Client SDK (xem file `scripts/test-firebase-clien-sdk.ts`)
 
-```ts
-import { appRouter } from '@/api/trpc';
-import { createNextRouteHandler } from 'trpc-next/route-handler';
-
-export const { GET, POST } = createNextRouteHandler({
-  router: appRouter,
-  createContext: () => ({}),
-});
-```
+> Lưu ý: Dự án này sử dụng **pnpm** để quản lý package, không dùng npm/yarn. Nếu chưa cài pnpm, hãy xem hướng dẫn tại https://pnpm.io/installation
 
 ---
+
+## ⚠️ Lưu ý về TailwindCSS
+
+- Dự án sử dụng **TailwindCSS 4** (không dùng cú pháp, cấu hình, plugin cũ của Tailwind 3)
+- Tham khảo tài liệu chính thức TailwindCSS 4 để đảm bảo code luôn tương thích
+
+---
+
+## 📄 License
+
+MIT © 2025 Tan

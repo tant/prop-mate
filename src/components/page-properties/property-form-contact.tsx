@@ -19,9 +19,9 @@ export function PropertyFormContact({ form }: PropertyFormContactProps) {
             render={({ field }) => (
               <FormItem>
                 <div className="flex items-center gap-2">
-                  <FormLabel className="mb-0 whitespace-nowrap">Tên người liên hệ</FormLabel>
+                  <FormLabel className="mb-0 whitespace-nowrap">Tên</FormLabel>
                   <FormControl>
-                    <Input placeholder="Tên người liên hệ" {...field} />
+                    <Input placeholder="Tên" {...field} />
                   </FormControl>
                 </div>
                 <FormMessage />
@@ -37,7 +37,7 @@ export function PropertyFormContact({ form }: PropertyFormContactProps) {
               render={({ field }) => (
                 <FormItem>
                   <div className="flex items-center gap-2">
-                    <FormLabel className="mb-0 whitespace-nowrap">Số điện thoại liên hệ</FormLabel>
+                    <FormLabel className="mb-0 whitespace-nowrap">Điện thoại</FormLabel>
                     <FormControl>
                       <Input placeholder="Số điện thoại" {...field} />
                     </FormControl>
@@ -54,7 +54,7 @@ export function PropertyFormContact({ form }: PropertyFormContactProps) {
               render={({ field }) => (
                 <FormItem>
                   <div className="flex items-center gap-2">
-                    <FormLabel className="mb-0 whitespace-nowrap">Email liên hệ</FormLabel>
+                    <FormLabel className="mb-0 whitespace-nowrap">Email</FormLabel>
                     <FormControl>
                       <Input placeholder="Email" {...field} />
                     </FormControl>

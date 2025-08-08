@@ -99,7 +99,7 @@ export function PropertyFormBasics({ form }: PropertyFormBasicsProps) {
                     <FormControl>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <SelectTrigger>
-                          <SelectValue placeholder="Chọn tình trạng pháp lý" />
+                          <SelectValue placeholder="Pháp lý" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="PINK_BOOK">Sổ hồng</SelectItem>
