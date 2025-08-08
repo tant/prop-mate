@@ -11,7 +11,7 @@ interface PropertyFormContactProps {
 export function PropertyFormContact({ form }: PropertyFormContactProps) {
   return (
     <PropertyFormCard title="Thông tin liên hệ">
-      <div className="p-6">
+      <div className="px-6">
         <div className="mb-4">
           <FormField
             control={form.control}

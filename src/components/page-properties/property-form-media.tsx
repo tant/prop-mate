@@ -10,7 +10,7 @@ import type { PropertyCreateInput } from "./property-form";
 import { X, Upload, Image as ImageIcon, FileText } from "lucide-react";
 import Image from "next/image";
 import { storage } from "@/lib/firebase/client";
-import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import { getDownloadURL, ref, uploadBytesResumable, deleteObject } from "firebase/storage";
 
 interface PropertyFormMediaProps {
   form: UseFormReturn<PropertyCreateInput>;
@@ -31,6 +31,17 @@ function ProgressBar({ value }: { value: number }) {
       <div className="h-full bg-primary transition-[width]" style={{ width: `${pct}%` }} />
     </div>
   );
+}
+
+// Xóa file trên Firebase Storage
+async function removeFileFromFirebase(url?: string) {
+  if (!url) return;
+  try {
+    const storageRef = ref(storage, url.replace(/^https?:\/\/[^/]+\//, ""));
+    await deleteObject(storageRef);
+  } catch {
+    // Có thể log lỗi nếu cần
+  }
 }
 
 export function PropertyFormMedia({ form }: PropertyFormMediaProps) {
@@ -204,15 +215,19 @@ export function PropertyFormMedia({ form }: PropertyFormMediaProps) {
       form.setValue("imageUrls", next);
     }
   };
-  const removeDoc = (id: string) => {
+  const removeDoc = async (id: string) => {
     setDocuments((prev) => prev.filter((d) => d.id !== id));
+    const removed = documents.find((d) => d.id === id);
+    if (removed?.url) {
+      await removeFileFromFirebase(removed.url);
+    }
     const next = documents.filter((d) => d.id !== id).flatMap((d) => (d.url ? [{ name: d.name, url: d.url }] : []));
     form.setValue("documents", next);
   };
 
   return (
     <PropertyFormCard title="Hình ảnh & Tài liệu">
-      <div className="p-6 space-y-6">
+      <div className="px-6 space-y-6">
       {/* Thư viện ảnh */}
       <div>
         <FormLabel className="mb-2 block">Thư viện ảnh</FormLabel>
@@ -274,18 +289,7 @@ export function PropertyFormMedia({ form }: PropertyFormMediaProps) {
                     <span className="truncate" title={d.name}>{d.name}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Input
-                      value={d.name}
-                      onChange={(e) => setDocuments((prev) => prev.map((x) => x.id === d.id ? { ...x, name: e.target.value } : x))}
-                      className="h-8 w-40"
-                      placeholder="Tên hiển thị"
-                    />
-                    <Input
-                      value={d.url ?? ""}
-                      onChange={(e) => setDocuments((prev) => prev.map((x) => x.id === d.id ? { ...x, url: e.target.value || undefined } : x))}
-                      className="h-8 w-56"
-                      placeholder="URL"
-                    />
+                    {/* Ẩn input tên và input URL, chỉ hiện nút xóa */}
                     <button type="button" onClick={() => removeDoc(d.id)} className="text-red-600 hover:underline text-sm" disabled={d.status === "uploading"}>Xóa</button>
                   </div>
                 </div>

@@ -12,7 +12,7 @@ interface PropertyFormDetailsProps {
 export function PropertyFormDetails({ form }: PropertyFormDetailsProps) {
   return (
     <PropertyFormCard title="Chi tiết nhà/đất">
-      <div className="p-6">
+      <div className="px-6">
         <div className="mb-4 grid grid-cols-2 gap-4">
           <FormField control={form.control} name="frontage" render={({ field }) => (
             <FormItem>

@@ -1,19 +1,18 @@
-/* biome-ignore lint/suspicious/noExplicitAny: Dynamic import for SSR-safe leaflet usage */
-let MapContainer: any, TileLayer: any, Marker: any, useMapEvents: any, L: any;
+"use client";
+import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+import { useEffect } from "react";
 
-if (typeof window !== "undefined") {
-  // Import leaflet and leaflet.css only on client
-  // @ts-ignore
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  require("leaflet/dist/leaflet.css");
-  // @ts-ignore
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  L = require("leaflet");
-  // @ts-ignore
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  ({ MapContainer, TileLayer, Marker, useMapEvents } = require("react-leaflet"));
+type Props = {
+  lat?: number;
+  lng?: number;
+  onChange: (lat: number, lng: number) => void;
+};
 
-  if (L?.Icon?.Default) {
+// Fix marker icon URLs for leaflet
+function fixLeafletIcons() {
+  if (L?.Icon?.Default && typeof window !== "undefined") {
     L.Icon.Default.mergeOptions({
       iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
       iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
@@ -22,21 +21,14 @@ if (typeof window !== "undefined") {
   }
 }
 
-type Props = {
-  lat?: number;
-  lng?: number;
-  onChange: (lat: number, lng: number) => void;
-};
-
 export default function LocationPickerMap({ lat, lng, onChange }: Props) {
-  if (typeof window === "undefined") {
-    return null;
-  }
+  useEffect(() => {
+    fixLeafletIcons();
+  }, []);
 
   function LocationMarker() {
     useMapEvents({
-      // biome-ignore lint/suspicious/noExplicitAny: event from leaflet
-      click(e: any) {
+      click(e) {
         onChange(e.latlng.lat, e.latlng.lng);
       },
     });

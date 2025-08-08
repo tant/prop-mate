@@ -6,7 +6,7 @@ import { PropertyFormCard } from "./property-form-card";
 import type { UseFormReturn } from "react-hook-form";
 import type { PropertyCreateInput } from "./property-form";
 
-const LocationPickerMap = dynamic(() => import("./location-picker-map"), { ssr: false });
+const LocationPickerMap = dynamic(() => import("./LocationPickerMap.client"), { ssr: false });
 
 interface PropertyFormLocationProps {
   form: UseFormReturn<PropertyCreateInput>;
@@ -15,7 +15,7 @@ interface PropertyFormLocationProps {
 export function PropertyFormLocation({ form }: PropertyFormLocationProps) {
   return (
     <PropertyFormCard title="Vị trí">
-      <div className="p-6">
+      <div className="px-6">
         <div className="mb-4 grid grid-cols-2 gap-4">
           <FormField control={form.control} name="location.city" render={({ field }) => (
             <FormItem>
