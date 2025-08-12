@@ -46,6 +46,7 @@ interface PropertyFormProps {
 
 export function PropertyForm(props: PropertyFormProps) {
   const { onSubmit, formRef, initialValues } = props;
+  const router = useRouter();
 
 
   // Only set default for non-required fields or those with a true default
@@ -146,8 +147,21 @@ export function PropertyForm(props: PropertyFormProps) {
   }, [form.formState.dirtyFields]);
 
   const handleCancel = () => {
-    if (hasDirtyNonOption) {
+    // If in edit mode and form is dirty, show confirmation dialog
+    if (props.mode === "edit" && hasDirtyNonOption) {
       setShowDialog(true);
+      return;
+    }
+    
+    // If in create mode and form has any values, show confirmation dialog
+    if (props.mode === "create" && hasDirtyNonOption) {
+      setShowDialog(true);
+      return;
+    }
+    
+    // Otherwise, just go back
+    if (props.mode === "create") {
+      router.push("/properties");
     } else {
       window.history.back();
     }
@@ -210,7 +224,14 @@ export function PropertyForm(props: PropertyFormProps) {
       {showDialog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
           <div className="bg-white rounded shadow-lg p-6 min-w-[320px] max-w-[90vw]">
-            <div className="mb-4 text-base font-medium">Bạn có chắc muốn hủy? Dữ liệu đang nhập sẽ bị mất.</div>
+            <div className="mb-4 text-base font-medium">
+              {props.mode === "create" 
+                ? "Bạn có chắc muốn hủy tạo bất động sản?" 
+                : "Bạn có chắc muốn hủy chỉnh sửa?"}
+            </div>
+            <div className="mb-4 text-gray-600">
+              Dữ liệu đang nhập sẽ bị mất.
+            </div>
             <div className="flex justify-end gap-2">
               <button
                 type="button"
@@ -264,6 +285,7 @@ export function CreatePropertyFormWrapper({ formRef }: { formRef?: React.Ref<HTM
       }}
       loading={createProperty.isPending}
       formRef={formRef}
+      mode="create"
     />
   );
 }

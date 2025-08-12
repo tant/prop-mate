@@ -1,6 +1,6 @@
 "use client"
 
-
+import { useState, useEffect, useMemo } from "react";
 import { AppSidebar } from "@/components/app-sidebar"
 import { Separator } from "@/components/ui/separator"
 import {
@@ -10,13 +10,46 @@ import {
 } from "@/components/ui/sidebar"
 import { useRouter } from "next/navigation"
 import { PropertyCard } from "@/components/page-properties/property-card"
+import { PropertyCardSkeleton } from "@/components/page-properties/property-card-skeleton"
 import { useCurrentUser } from "@/hooks/use-current-user"
 import { api } from "@/app/_trpc/client"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Search, Plus } from "lucide-react"
 
 export default function DashboardPage() {
   const router = useRouter();
   const user = useCurrentUser();
-  const { data: properties, isLoading, error } = api.property.getMyProperties.useQuery(undefined, { enabled: !!user });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300);
+    
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+  
+  const { data: allProperties, isLoading, error } = api.property.getMyProperties.useQuery(
+    undefined, 
+    { enabled: !!user }
+  );
+  
+  // Filter properties based on search term
+  const filteredProperties = useMemo(() => {
+    if (!allProperties) return [];
+    
+    if (!debouncedSearchTerm) return allProperties;
+    
+    const term = debouncedSearchTerm.toLowerCase();
+    return allProperties.filter(property => 
+      property.memorableName?.toLowerCase().includes(term) ||
+      property.location?.fullAddress?.toLowerCase().includes(term) ||
+      property.propertyType?.toLowerCase().includes(term)
+    );
+  }, [allProperties, debouncedSearchTerm]);
 
   return (
     <SidebarProvider>
@@ -31,38 +64,55 @@ export default function DashboardPage() {
             />
             <h1 className="text-lg font-semibold">Danh sách bất động sản</h1>
             <div className="flex items-center gap-2 ml-auto">
-              <input
-                type="text"
-                placeholder="Tìm kiếm bất động sản..."
-                className="border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              <button
-                type="button"
-                className="bg-primary text-white px-3 py-1 rounded hover:bg-primary/90 transition-colors text-sm"
+              <div className="relative">
+                <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+                <Input
+                  type="text"
+                  placeholder="Tìm kiếm bất động sản..."
+                  className="pl-8 pr-4 py-1 text-sm w-64"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <Button
+                size="sm"
+                className="bg-primary text-white rounded hover:bg-primary/90 transition-colors"
                 onClick={() => router.push("/properties/add")}
               >
-                +
-              </button>
+                <Plus className="h-4 w-4" />
+              </Button>
             </div>
           </div>
         </header>
         <div className="flex flex-1 flex-col">
-          {isLoading && <div className="p-4">Đang tải dữ liệu...</div>}
-          {error && <div className="p-4 text-red-500">Lỗi: {error.message}</div>}
-          {!isLoading && properties && properties.length === 0 && (
-            <div className="p-4 text-gray-500">Bạn chưa có bất động sản nào.</div>
+          {isLoading && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
+              {Array.from({ length: 8 }).map((_, index) => (
+                <PropertyCardSkeleton key={index} />
+              ))}
+            </div>
           )}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
-            {properties?.map((property: import("@/types/property").Property) => (
-              <PropertyCard
-                key={property.id}
-                property={property}
-                onView={() => router.push(`/properties/${property.id}`)}
-                onEdit={() => router.push(`/properties/${property.id}/edit`)}
-                onDelete={undefined} // tuỳ chỉnh nếu có chức năng xoá/lưu trữ
-              />
-            ))}
-          </div>
+          {error && <div className="p-4 text-red-500">Lỗi: {error.message}</div>}
+          {!isLoading && filteredProperties && filteredProperties.length === 0 && (
+            <div className="p-4 text-gray-500">
+              {debouncedSearchTerm 
+                ? "Không tìm thấy bất động sản phù hợp." 
+                : "Bạn chưa có bất động sản nào."}
+            </div>
+          )}
+          {!isLoading && filteredProperties && filteredProperties.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
+              {filteredProperties.map((property: import("@/types/property").Property) => (
+                <PropertyCard
+                  key={property.id}
+                  property={property}
+                  onView={() => router.push(`/properties/${property.id}`)}
+                  onEdit={() => router.push(`/properties/${property.id}`)} // We'll handle edit mode in the detail page
+                  onDelete={undefined} // tuỳ chỉnh nếu có chức năng xoá/lưu trữ
+                />
+              ))}
+            </div>
+          )}
         </div>
       </SidebarInset>
     </SidebarProvider>

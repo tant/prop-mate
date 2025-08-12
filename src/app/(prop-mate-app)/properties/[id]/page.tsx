@@ -52,9 +52,43 @@ export default function PropertyDetailPage() {
     }
   };
 
-  if (isLoading) return <div className="p-4">Đang tải dữ liệu...</div>;
-  if (error) return <div className="p-4 text-red-500">Lỗi: {error.message}</div>;
-  if (!property) return <div className="p-4">Không tìm thấy bất động sản.</div>;
+  if (isLoading) return (
+    <div className="flex flex-1 flex-col p-4">
+      <div className="animate-pulse space-y-4">
+        <div className="h-8 bg-gray-200 rounded w-1/3"></div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="border rounded-lg p-4 space-y-4">
+              <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+              <div className="space-y-2">
+                <div className="h-4 bg-gray-200 rounded"></div>
+                <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+  if (error) return (
+    <div className="flex flex-1 flex-col items-center justify-center p-4">
+      <div className="text-red-500 text-center">
+        <div className="text-xl font-semibold mb-2">Lỗi</div>
+        <div className="mb-4">{error.message}</div>
+        <Button onClick={() => router.refresh()}>Thử lại</Button>
+      </div>
+    </div>
+  );
+  if (!property) return (
+    <div className="flex flex-1 flex-col items-center justify-center p-4">
+      <div className="text-gray-500 text-center">
+        <div className="text-xl font-semibold mb-2">Không tìm thấy</div>
+        <div className="mb-4">Không tìm thấy bất động sản này.</div>
+        <Button onClick={() => router.push("/properties")}>Quay lại danh sách</Button>
+      </div>
+    </div>
+  );
 
   return (
     <SidebarProvider>
@@ -130,6 +164,7 @@ export default function PropertyDetailPage() {
               }
             }}
             disabled={!editMode}
+            mode="edit"
           />
         </div>
       </SidebarInset>
