@@ -20,7 +20,7 @@ export default function TRPCProvider({ children }: TRPCProviderProps) {
           url: "/api/trpc",
           transformer: superjson,
           async headers() {
-            let token;
+            let token: string | undefined;
             try {
               if (auth.currentUser) {
                 token = await auth.currentUser.getIdToken();
