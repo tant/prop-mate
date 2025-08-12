@@ -38,7 +38,7 @@ import type { Property } from "@/types/property";
 interface PropertyFormProps {
   onSubmit: (data: PropertyCreateInput) => void;
   loading?: boolean;
-  formRef?: (ref: HTMLFormElement | null) => void;
+  formRef?: React.Ref<HTMLFormElement>;
   initialValues?: Partial<Property>;
   mode?: "create" | "edit";
   disabled?: boolean;
@@ -162,21 +162,12 @@ export function PropertyForm(props: PropertyFormProps) {
     setShowDialog(false);
   };
 
-  React.useEffect(() => {
-    if (formRef && typeof formRef === 'object' && 'current' in formRef) {
-      console.log('PropertyForm mounted, formRef.current:', formRef.current);
-    }
-  }, [formRef]);
+  // Remove the useEffect that was checking formRef as it's no longer needed
 
   return (
     <Form {...form}>
       <form
-        ref={el => {
-          if (formRef && typeof formRef === 'object') {
-            (formRef as React.MutableRefObject<HTMLFormElement | null>).current = el;
-            console.log('formRef set in <form>, el:', el);
-          }
-        }}
+        ref={formRef}
         onSubmit={e => {
           console.log('form onSubmit event');
           form.handleSubmit(onSubmit, handleError)(e);
@@ -184,52 +175,17 @@ export function PropertyForm(props: PropertyFormProps) {
         className="grid grid-cols-1 md:grid-cols-2 gap-6"
       >
         {/* Card 1: Thông tin cơ bản */}
-        <PropertyFormBasics form={form} hasError={Boolean(
-          form.formState.errors.memorableName ||
-          form.formState.errors.propertyType ||
-          form.formState.errors.listingType ||
-          form.formState.errors.status ||
-          form.formState.errors.legalStatus ||
-          form.formState.errors.area ||
-          form.formState.errors.price ||
-          form.formState.errors["price.value"] ||
-          form.formState.errors["location.fullAddress"]
-        )} />
+        <PropertyFormBasics form={form} />
         {/* Card 2: Thông tin liên hệ */}
-        <PropertyFormContact form={form} hasError={Boolean(
-          form.formState.errors.contactName ||
-          form.formState.errors.contactPhone ||
-          form.formState.errors.contactEmail
-        )} />
+        <PropertyFormContact form={form} />
         {/* Card 3: Vị trí */}
-        <PropertyFormLocation form={form} hasError={Boolean(
-          form.formState.errors.location ||
-          form.formState.errors["location.city"] ||
-          form.formState.errors["location.district"] ||
-          form.formState.errors["location.ward"] ||
-          form.formState.errors["location.street"] ||
-          form.formState.errors["location.gps"]
-        )} />
+        <PropertyFormLocation form={form} />
         {/* Card 4: Chi tiết nhà/đất */}
-        <PropertyFormDetails form={form} hasError={Boolean(
-          form.formState.errors.frontage ||
-          form.formState.errors.direction ||
-          form.formState.errors.floor ||
-          form.formState.errors.totalFloors ||
-          form.formState.errors.unitsPerFloor ||
-          form.formState.errors.bedrooms ||
-          form.formState.errors.bathrooms ||
-          form.formState.errors.interiorStatus ||
-          form.formState.errors.amenities
-        )} />
+        <PropertyFormDetails form={form} />
         {/* Card 5: Bổ sung */}
-        <PropertyFormMore form={form} hasError={Boolean(
-          form.formState.errors.notes
-        )} />
+        <PropertyFormMore form={form} />
         {/* Card 6: Hình ảnh & tài liệu */}
-        <PropertyFormMedia form={form} hasError={Boolean(
-          form.formState.errors.imageUrls
-        )} />
+        <PropertyFormMedia form={form} />
         <div className="md:col-span-2 flex justify-end gap-2 mt-4">
           <button
             type="submit"
@@ -278,7 +234,7 @@ export function PropertyForm(props: PropertyFormProps) {
   );
 }
 
-export function CreatePropertyFormWrapper({ formRef }: { formRef?: (ref: HTMLFormElement | null) => void }) {
+export function CreatePropertyFormWrapper({ formRef }: { formRef?: React.Ref<HTMLFormElement> }) {
   const router = useRouter();
   const createProperty = api.property.create.useMutation({
     onSuccess: async (data) => {

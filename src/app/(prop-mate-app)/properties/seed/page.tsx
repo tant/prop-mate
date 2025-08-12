@@ -47,7 +47,6 @@ export default function PropertySeedPage() {
             successCount++;
           } catch (err) {
             failCount++;
-            // eslint-disable-next-line no-console
             console.error("Lỗi khi seed property:", err);
           }
         }

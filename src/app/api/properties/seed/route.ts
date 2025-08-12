@@ -11,12 +11,12 @@ export async function POST(req: NextRequest) {
   if (!description || typeof count !== 'number' || count < 1) {
     return NextResponse.json({ error: 'Thiếu mô tả hoặc số lượng không hợp lệ.' }, { status: 400 });
   }
-  // Prompt động: count=1 trả về object, count>1 trả về mảng
+  // Prompt động: luôn yêu cầu có trường title (memorableName) thật đẹp, gợi nhớ, hấp dẫn
   let prompt = '';
   if (count === 1) {
-    prompt = `Hãy tạo ra 1 bất động sản phù hợp mô tả: "${description}".\nTrả về DUY NHẤT 1 object JSON với đầy đủ các trường sau (và giá trị hợp lý, thực tế, không cần trường id):\n- contactEmail: phải là email hợp lệ, có dạng tên thật, không dùng email giả hoặc chuỗi ngẫu nhiên.\n- Nếu có trường nào là email (ví dụ: contactEmail, ownerEmail, agentEmail, ...) đều phải là email hợp lệ, đúng định dạng, không dùng email giả hoặc chuỗi ngẫu nhiên.\n...\nChỉ trả về object JSON, không giải thích gì thêm.`;
+    prompt = `Hãy tạo ra 1 bất động sản phù hợp mô tả: "${description}".\nTrả về DUY NHẤT 1 object JSON với đầy đủ các trường sau (và giá trị hợp lý, thực tế, không cần trường id):\n- title: tên gợi nhớ thật đẹp, hấp dẫn, súc tích, giúp người xem dễ nhớ về căn nhà này (ví dụ: "Nhà phố Hoa Sữa, Góc Xanh Bình Yên", "Biệt thự Ánh Dương, Gần Công Viên", ...).\n- contactEmail: phải là email hợp lệ, có dạng tên thật, không dùng email giả hoặc chuỗi ngẫu nhiên.\n- Nếu có trường nào là email (ví dụ: contactEmail, ownerEmail, agentEmail, ...) đều phải là email hợp lệ, đúng định dạng, không dùng email giả hoặc chuỗi ngẫu nhiên.\n...\nChỉ trả về object JSON, không giải thích gì thêm.`;
   } else {
-    prompt = `Hãy tạo ra đúng ${count} bất động sản phù hợp mô tả: "${description}".\nTrả về DUY NHẤT 1 mảng JSON gồm đúng ${count} object, mỗi object có đầy đủ các trường sau (và giá trị hợp lý, thực tế, không cần trường id):\n- contactEmail: phải là email hợp lệ, có dạng tên thật, không dùng email giả hoặc chuỗi ngẫu nhiên.\n- Nếu có trường nào là email (ví dụ: contactEmail, ownerEmail, agentEmail, ...) đều phải là email hợp lệ, đúng định dạng, không dùng email giả hoặc chuỗi ngẫu nhiên.\n...\nChỉ trả về mảng JSON, không giải thích gì thêm.`;
+    prompt = `Hãy tạo ra đúng ${count} bất động sản phù hợp mô tả: "${description}".\nTrả về DUY NHẤT 1 mảng JSON gồm đúng ${count} object, mỗi object có đầy đủ các trường sau (và giá trị hợp lý, thực tế, không cần trường id):\n- title: tên gợi nhớ thật đẹp, hấp dẫn, súc tích, giúp người xem dễ nhớ về căn nhà này (ví dụ: "Nhà phố Hoa Sữa, Góc Xanh Bình Yên", "Biệt thự Ánh Dương, Gần Công Viên", ...).\n- contactEmail: phải là email hợp lệ, có dạng tên thật, không dùng email giả hoặc chuỗi ngẫu nhiên.\n- Nếu có trường nào là email (ví dụ: contactEmail, ownerEmail, agentEmail, ...) đều phải là email hợp lệ, đúng định dạng, không dùng email giả hoặc chuỗi ngẫu nhiên.\n...\nChỉ trả về mảng JSON, không giải thích gì thêm.`;
   }
   try {
     const result = await callGemini(prompt, apiKey);
