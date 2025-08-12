@@ -183,7 +183,6 @@ export function PropertyForm(props: PropertyFormProps) {
       <form
         ref={formRef}
         onSubmit={e => {
-          console.log('form onSubmit event');
           form.handleSubmit(onSubmit, handleError)(e);
         }}
         className="grid grid-cols-1 md:grid-cols-2 gap-6"

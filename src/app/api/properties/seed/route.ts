@@ -15,8 +15,7 @@ export async function POST(req: NextRequest) {
   const prompt = `Generate exactly ${count} real estate properties that match the following description: "${description}".\nReturn EXACTLY 1 JSON array with ${count} objects, each object must have all of the following fields (with reasonable, realistic values, no id field needed):\n- title: a beautiful, catchy, memorable name for the property, in Vietnamese, that helps people remember it easily (e.g. \"Nhà phố Hoa Sữa, Góc Xanh Bình Yên\", \"Biệt thự Ánh Dương, Gần Công Viên\", ...).\n- gps: an object with lat and lng, both must be valid coordinates within Ho Chi Minh City (lat between 10.7 and 10.9, lng between 106.6 and 106.85).\n- contactEmail: must be a valid email, looks like a real person's name, do not use fake or random strings.\n- If there are any other email fields (e.g. contactEmail, ownerEmail, agentEmail, ...), all must be valid, real-looking emails, not fake or random.\n...\nIMPORTANT: All data (including title, address, etc.) must be generated in Vietnamese.\nReturn only the JSON array, no explanation.`;
   try {
     const result = await callGemini(prompt, apiKey);
-    // eslint-disable-next-line no-console
-    // console.log('[SEED] Gemini raw output:', result);
+    
     // Xử lý kết quả trả về từ Gemini
     let cleanResult = result.trim();
     if (cleanResult.startsWith('```json')) {
@@ -105,14 +104,14 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   // Lưu danh sách property xuống Firestore
   const { properties } = await req.json();
-  // console.log('API PUT /api/properties/seed nhận được:', properties);
+  
   if (!Array.isArray(properties) || properties.length === 0) {
     return NextResponse.json({ error: 'Thiếu dữ liệu property.' }, { status: 400 });
   }
   try {
     // Import Firestore adminDb
     const { adminDb } = await import('@/lib/firebase/admin');
-    // console.log('Bắt đầu lưu properties:', properties);
+    
     const batch = adminDb.batch();
     properties.forEach((property) => {
       const ref = adminDb.collection('properties').doc();
@@ -124,7 +123,7 @@ export async function PUT(req: NextRequest) {
       });
     });
     await batch.commit();
-    // console.log('Đã lưu thành công', properties.length, 'property vào Firestore');
+    
     return NextResponse.json({ success: true, count: properties.length });
   } catch (error) {
     console.error('Lỗi khi lưu property:', error);

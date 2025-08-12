@@ -181,8 +181,6 @@ export const propertyRouter = createTRPCRouter({
     }))
     .mutation(async ({ input, ctx }): Promise<Property> => {
       const { id, data } = input;
-      console.log('[property.update] input:', input);
-      console.log('[property.update] ctx.user:', ctx.user);
       if (!data || Object.keys(data).length === 0) {
         console.error('[property.update] No data to update');
         throw new TRPCError({ code: "BAD_REQUEST", message: "No data to update" });

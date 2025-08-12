@@ -44,7 +44,6 @@ export default function PropertyDetailPage() {
   };
 
   const handleSave = () => {
-    console.log('handleSave called, formRef.current:', formRef.current);
     if (formRef.current) {
       formRef.current.requestSubmit();
     } else {
@@ -150,7 +149,6 @@ export default function PropertyDetailPage() {
             formRef={formRef}
             loading={loading}
             onSubmit={async (data) => {
-              console.log('onSubmit called with data:', data);
               setLoading(true);
               try {
                 await updateProperty.mutateAsync({ id: propertyId, data });
