@@ -137,14 +137,19 @@ export default function DashboardPage() {
                 ))}
               </div>
               <div className="flex justify-center py-4">
-                {propertiesQuery.hasNextPage && (
+                {propertiesQuery.hasNextPage ? (
                   <div ref={ref} className="flex items-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Đang tải thêm...</span>
+                    {isFetchingMore ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <span>Đang tải thêm...</span>
+                      </>
+                    ) : (
+                      <span>Cuộn xuống để tải thêm...</span>
+                    )}
                   </div>
-                )}
-                {isFetchingMore && !propertiesQuery.hasNextPage && (
-                  <div>Đã tải tất cả bất động sản</div>
+                ) : (
+                  <div className="text-gray-500">Đã tải tất cả bất động sản</div>
                 )}
               </div>
             </>

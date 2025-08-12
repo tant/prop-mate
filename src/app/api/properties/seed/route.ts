@@ -60,12 +60,14 @@ export async function POST(req: NextRequest) {
     // Map và cập nhật gps cho từng property
     const properties: Omit<Property, 'id' | 'agentId' | 'createdAt' | 'updatedAt'>[] = [];
     for (const item of arr) {
-  const fullAddress = typeof item.address === 'string' ? item.address : '';
-  const gps = { lat: 0, lng: 0 };
-  const city = '';
-  const district = '';
-  const ward = '';
-  const street = '';
+      const fullAddress = typeof item.address === 'string' ? item.address : '';
+      const gps = (typeof item.gps === 'object' && item.gps)
+        ? { lat: Number(item.gps.lat) || 0, lng: Number(item.gps.lng) || 0 }
+        : { lat: 0, lng: 0 };
+      const city = '';
+      const district = '';
+      const ward = '';
+      const street = '';
       properties.push({
         memorableName: typeof item.title === 'string' ? item.title : '',
         propertyType: 'HOUSE',
