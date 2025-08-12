@@ -7,11 +7,12 @@ import type { PropertyCreateInput } from "./property-form";
 
 interface PropertyFormDetailsProps {
   form: UseFormReturn<PropertyCreateInput>;
+    hasError?: boolean; // Ensure hasError is destructured correctly
 }
 
-export function PropertyFormDetails({ form }: PropertyFormDetailsProps) {
+export function PropertyFormDetails({ form, hasError }: PropertyFormDetailsProps) {
   return (
-    <PropertyFormCard title="Chi tiết nhà/đất">
+    <PropertyFormCard title="Chi tiết nhà/đất" hasError={!!hasError}>
       <div className="px-6">
         <div className="mb-4 grid grid-cols-2 gap-4">
           <FormField control={form.control} name="frontage" render={({ field }) => (

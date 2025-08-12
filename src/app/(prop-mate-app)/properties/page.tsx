@@ -52,7 +52,7 @@ export default function DashboardPage() {
           {!isLoading && properties && properties.length === 0 && (
             <div className="p-4 text-gray-500">Bạn chưa có bất động sản nào.</div>
           )}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
             {properties?.map((property: import("@/types/property").Property) => (
               <PropertyCard
                 key={property.id}

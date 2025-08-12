@@ -10,11 +10,12 @@ const LocationPickerMap = dynamic(() => import("./LocationPickerMap.client"), { 
 
 interface PropertyFormLocationProps {
   form: UseFormReturn<PropertyCreateInput>;
+  hasError?: boolean;
 }
 
-export function PropertyFormLocation({ form }: PropertyFormLocationProps) {
+export function PropertyFormLocation({ form, hasError }: PropertyFormLocationProps) {
   return (
-    <PropertyFormCard title="Vị trí">
+    <PropertyFormCard title="Vị trí" hasError={!!hasError}>
       <div className="px-6">
         <div className="mb-4 grid grid-cols-2 gap-4">
           <FormField control={form.control} name="location.city" render={({ field }) => (

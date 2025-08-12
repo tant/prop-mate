@@ -6,11 +6,12 @@ import type { PropertyCreateInput } from "./property-form";
 
 interface PropertyFormContactProps {
   form: UseFormReturn<PropertyCreateInput>;
+  hasError?: boolean;
 }
 
-export function PropertyFormContact({ form }: PropertyFormContactProps) {
+export function PropertyFormContact({ form, hasError }: PropertyFormContactProps) {
   return (
-    <PropertyFormCard title="Thông tin liên hệ">
+    <PropertyFormCard title="Thông tin liên hệ" hasError={!!hasError}>
       <div className="px-6">
         <div className="mb-4">
           <FormField

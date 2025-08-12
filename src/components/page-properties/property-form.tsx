@@ -112,16 +112,13 @@ export function PropertyForm(props: PropertyFormProps) {
     }
   }, [form.formState.isSubmitted, form.formState.errors, form]);
 
-  // Attach ref if provided
-  const setFormRef = React.useCallback((el: HTMLFormElement | null) => {
-    if (formRef) formRef(el);
-  }, [formRef]);
 
   // Shake animation for save button on error
   const [shake, setShake] = React.useState(false);
 
   // Scroll to first error field and shake button
   const handleError = React.useCallback((errors: Record<string, unknown>) => {
+    console.warn('Form validation errors:', errors);
     const keys = Object.keys(errors);
     if (keys.length > 0) {
       const firstErrorKey = keys[0];
@@ -165,47 +162,94 @@ export function PropertyForm(props: PropertyFormProps) {
     setShowDialog(false);
   };
 
+  React.useEffect(() => {
+    if (formRef && typeof formRef === 'object' && 'current' in formRef) {
+      console.log('PropertyForm mounted, formRef.current:', formRef.current);
+    }
+  }, [formRef]);
+
   return (
     <Form {...form}>
       <form
-        ref={setFormRef}
-        onSubmit={form.handleSubmit(onSubmit, handleError)}
+        ref={el => {
+          if (formRef && typeof formRef === 'object') {
+            (formRef as React.MutableRefObject<HTMLFormElement | null>).current = el;
+            console.log('formRef set in <form>, el:', el);
+          }
+        }}
+        onSubmit={e => {
+          console.log('form onSubmit event');
+          form.handleSubmit(onSubmit, handleError)(e);
+        }}
         className="grid grid-cols-1 md:grid-cols-2 gap-6"
       >
         {/* Card 1: Thông tin cơ bản */}
-        <PropertyFormBasics form={form} />
+        <PropertyFormBasics form={form} hasError={Boolean(
+          form.formState.errors.memorableName ||
+          form.formState.errors.propertyType ||
+          form.formState.errors.listingType ||
+          form.formState.errors.status ||
+          form.formState.errors.legalStatus ||
+          form.formState.errors.area ||
+          form.formState.errors.price ||
+          form.formState.errors["price.value"] ||
+          form.formState.errors["location.fullAddress"]
+        )} />
         {/* Card 2: Thông tin liên hệ */}
-        <PropertyFormContact form={form} />
+        <PropertyFormContact form={form} hasError={Boolean(
+          form.formState.errors.contactName ||
+          form.formState.errors.contactPhone ||
+          form.formState.errors.contactEmail
+        )} />
         {/* Card 3: Vị trí */}
-        <PropertyFormLocation form={form} />
+        <PropertyFormLocation form={form} hasError={Boolean(
+          form.formState.errors.location ||
+          form.formState.errors["location.city"] ||
+          form.formState.errors["location.district"] ||
+          form.formState.errors["location.ward"] ||
+          form.formState.errors["location.street"] ||
+          form.formState.errors["location.gps"]
+        )} />
         {/* Card 4: Chi tiết nhà/đất */}
-        <PropertyFormDetails form={form} />
+        <PropertyFormDetails form={form} hasError={Boolean(
+          form.formState.errors.frontage ||
+          form.formState.errors.direction ||
+          form.formState.errors.floor ||
+          form.formState.errors.totalFloors ||
+          form.formState.errors.unitsPerFloor ||
+          form.formState.errors.bedrooms ||
+          form.formState.errors.bathrooms ||
+          form.formState.errors.interiorStatus ||
+          form.formState.errors.amenities
+        )} />
         {/* Card 5: Bổ sung */}
-        <PropertyFormMore form={form} />
+        <PropertyFormMore form={form} hasError={Boolean(
+          form.formState.errors.notes
+        )} />
         {/* Card 6: Hình ảnh & tài liệu */}
-        <PropertyFormMedia form={form} />
-        {(!props.disabled) && (
-          <div className="md:col-span-2 flex justify-end gap-2 mt-4">
-            <button
-              type="submit"
-              className={
-                "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2"+
-                (shake ? " animate-shake" : "")
-              }
-              disabled={props.loading}
-            >
-              {props.loading ? 'Đang lưu...' : 'Lưu'}
-            </button>
-            <button
-              type="button"
-              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-muted text-gray-700 shadow-xs hover:bg-gray-200 h-9 px-4 py-2"
-              onClick={handleCancel}
-              disabled={props.loading}
-            >
-              Hủy
-            </button>
-          </div>
-        )}
+        <PropertyFormMedia form={form} hasError={Boolean(
+          form.formState.errors.imageUrls
+        )} />
+        <div className="md:col-span-2 flex justify-end gap-2 mt-4">
+          <button
+            type="submit"
+            className={
+              "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2"+
+              (shake ? " animate-shake" : "")
+            }
+            disabled={props.loading}
+          >
+            {props.loading ? 'Đang lưu...' : 'Lưu'}
+          </button>
+          <button
+            type="button"
+            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-muted text-gray-700 shadow-xs hover:bg-gray-200 h-9 px-4 py-2"
+            onClick={handleCancel}
+            disabled={props.loading}
+          >
+            Hủy
+          </button>
+        </div>
       </form>
       {showDialog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">

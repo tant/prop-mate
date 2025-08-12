@@ -9,14 +9,16 @@ interface PropertyFormCardProps {
   collapsible?: boolean;
   triggerAriaLabel?: string;
   cardFooter?: React.ReactNode;
+  hasError?: boolean;
+  defaultOpen?: boolean;
 }
 
-export function PropertyFormCard({ title, collapsible = true, triggerAriaLabel = "Mở/đóng", children, cardFooter }: PropsWithChildren<PropertyFormCardProps>) {
+export function PropertyFormCard({ title, collapsible = true, triggerAriaLabel = "Mở/đóng", children, cardFooter, hasError, defaultOpen }: PropsWithChildren<PropertyFormCardProps>) {
   if (!collapsible) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{title}</CardTitle>
+          <CardTitle className={hasError ? "text-red-500" : undefined}>{title}</CardTitle>
         </CardHeader>
         <Separator className="my-0" />
         {children}
@@ -26,10 +28,10 @@ export function PropertyFormCard({ title, collapsible = true, triggerAriaLabel =
   }
 
   return (
-    <Collapsible>
+    <Collapsible defaultOpen={hasError || defaultOpen}>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>{title}</CardTitle>
+          <CardTitle className={hasError ? "text-red-500" : undefined}>{title}</CardTitle>
           <CollapsibleTrigger asChild>
             <button type="button" className="text-blue-600 p-1 rounded-full hover:bg-blue-50 transition" aria-label={triggerAriaLabel}>
               <ChevronDown size={20} />

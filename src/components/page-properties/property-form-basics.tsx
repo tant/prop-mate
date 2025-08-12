@@ -8,11 +8,12 @@ import type { PropertyCreateInput } from "./property-form";
 
 interface PropertyFormBasicsProps {
   form: UseFormReturn<PropertyCreateInput>;
+  hasError?: boolean;
 }
 
-export function PropertyFormBasics({ form }: PropertyFormBasicsProps) {
+export function PropertyFormBasics({ form, hasError }: PropertyFormBasicsProps) {
   return (
-    <PropertyFormCard title="Thông tin cơ bản" collapsible={false}>
+    <PropertyFormCard title="Thông tin cơ bản" collapsible={false} hasError={!!hasError}>
       <div className="px-6">
         {/* Trạng thái, Loại hình (dòng 1) */}
         <div className="flex gap-4 w-full mb-4">
