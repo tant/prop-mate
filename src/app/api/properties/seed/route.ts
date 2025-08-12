@@ -39,52 +39,82 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: `AI trả về ${arr.length} property, không khớp số lượng yêu cầu (${count}).` }, { status: 500 });
     }
     // Map sang schema property chuẩn
-    const emailRegex = /^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]+)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$/;
-    const properties: Omit<Property, 'id' | 'agentId' | 'createdAt' | 'updatedAt'>[] = arr.map((item) => ({
-      memorableName: typeof item.title === 'string' ? item.title : '',
-      propertyType: 'HOUSE',
-      listingType: 'sale',
-      status: 'AVAILABLE',
-      location: {
-        city: 'TP.HCM',
-        district: 'Quận 3',
-        ward: '',
-        street: '',
-        fullAddress: typeof item.address === 'string' ? item.address : '',
-        gps: { lat: 0, lng: 0 },
-      },
-      area: typeof item.area === 'number' ? item.area : 0,
-      frontage: 0,
-      direction: '',
-      floor: 0,
-      bedrooms: typeof item.bedroom === 'number' ? item.bedroom : 0,
-      bathrooms: typeof item.bathroom === 'number' ? item.bathroom : 0,
-      interiorStatus: 'FURNISHED',
-      amenities: [],
-      totalFloors: 0,
-      unitsPerFloor: 0,
-      handoverDate: undefined,
-      currentStatus: 'VACANT',
-      price: { value: typeof item.price === 'number' ? item.price : 0, pricePerSqm: typeof item.price_per_sqm === 'number' ? item.price_per_sqm : 0 },
-      commission: {},
-      serviceFee: 0,
-      legalStatus: 'PINK_BOOK',
-      legalNote: typeof item.legal === 'string' ? item.legal : '',
-      documents: [],
-      imageUrls: [],
-      images360: '',
-      videoUrl: '',
-      contactName: typeof item.contact_name === 'string' ? item.contact_name : '',
-      contactPhone: typeof item.contact_phone === 'string' ? item.contact_phone : '',
-      // contactEmail không truyền nữa
-      contactRole: undefined,
-      ownershipType: undefined,
-      notes: [],
-      postedAt: undefined,
-      expiredAt: undefined,
-      listingDuration: undefined,
-      // createdAt, updatedAt, agentId, id sẽ được thêm khi lưu
-    }));
+    // Hàm lấy lat/lng từ Nominatim
+    async function getLatLngFromAddress(address: string): Promise<{ lat: number; lng: number } | null> {
+      if (!address) return null;
+      try {
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`;
+        const res = await fetch(url, {
+          headers: {
+            'User-Agent': 'propmate/1.0 (contact@propmate.app)',
+            'Accept-Language': 'vi,en',
+          },
+        });
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+        }
+      } catch {
+        // ignore
+      }
+      return null;
+    }
+
+    // Map và cập nhật gps cho từng property
+    const properties: Omit<Property, 'id' | 'agentId' | 'createdAt' | 'updatedAt'>[] = [];
+    for (const item of arr) {
+      const fullAddress = typeof item.address === 'string' ? item.address : '';
+      let gps = { lat: 0, lng: 0 };
+      if (fullAddress) {
+        const geo = await getLatLngFromAddress(fullAddress);
+        if (geo) gps = geo;
+      }
+      properties.push({
+        memorableName: typeof item.title === 'string' ? item.title : '',
+        propertyType: 'HOUSE',
+        listingType: 'sale',
+        status: 'AVAILABLE',
+        location: {
+          city: 'TP.HCM',
+          district: 'Quận 3',
+          ward: '',
+          street: '',
+          fullAddress,
+          gps,
+        },
+        area: typeof item.area === 'number' ? item.area : 0,
+        frontage: 0,
+        direction: '',
+        floor: 0,
+        bedrooms: typeof item.bedroom === 'number' ? item.bedroom : 0,
+        bathrooms: typeof item.bathroom === 'number' ? item.bathroom : 0,
+        interiorStatus: 'FURNISHED',
+        amenities: [],
+        totalFloors: 0,
+        unitsPerFloor: 0,
+        handoverDate: undefined,
+        currentStatus: 'VACANT',
+        price: { value: typeof item.price === 'number' ? item.price : 0, pricePerSqm: typeof item.price_per_sqm === 'number' ? item.price_per_sqm : 0 },
+        commission: {},
+        serviceFee: 0,
+        legalStatus: 'PINK_BOOK',
+        legalNote: typeof item.legal === 'string' ? item.legal : '',
+        documents: [],
+        imageUrls: [],
+        images360: '',
+        videoUrl: '',
+        contactName: typeof item.contact_name === 'string' ? item.contact_name : '',
+        contactPhone: typeof item.contact_phone === 'string' ? item.contact_phone : '',
+        // contactEmail không truyền nữa
+        contactRole: undefined,
+        ownershipType: undefined,
+        notes: [],
+        postedAt: undefined,
+        expiredAt: undefined,
+        listingDuration: undefined,
+        // createdAt, updatedAt, agentId, id sẽ được thêm khi lưu
+      });
+    }
     // Trả về cho client xem trước, chưa lưu
     return NextResponse.json({ preview: properties });
   } catch (error) {

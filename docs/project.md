@@ -24,7 +24,7 @@
 
 ## Backend/Cloud
 - **Firebase** & **Firebase Admin SDK** (database, auth, storage)
-- **Genkit**, **@genkit-ai/googleai** (AI integration)
+- **Google AI API** (gọi trực tiếp, không dùng Genkit)
 
 ## Dev Tools
 - **ESLint**, **eslint-config-next**, **@biomejs/biome** (lint/format)
@@ -70,7 +70,6 @@ propmate/
 │   ├── hooks/               # Custom hook UI, logic
 │   ├── lib/                 # Tiện ích, config, firebase, genkit
 │   │   ├── firebase/        # Firebase client & admin
-│   │   ├── genkit/          # Genkit AI
 │   │   └── utils.ts
 │   ├── server/              # Business logic layer, backend service
 │   │   ├── api/             # tRPC root, routers, ...

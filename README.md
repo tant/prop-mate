@@ -81,7 +81,7 @@ Truy cập: http://localhost:3000
 
 ### Backend/Cloud
 - **Firebase** & **Firebase Admin SDK** (database, auth, storage)
-- **Genkit**, **@genkit-ai/googleai** (AI integration)
+- **Google AI API** (gọi trực tiếp, không dùng Genkit)
 
 ### Dev Tools
 - **ESLint**, **eslint-config-next**, **@biomejs/biome** (lint/format)
