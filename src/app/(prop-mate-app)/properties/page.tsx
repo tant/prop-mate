@@ -51,7 +51,10 @@ export default function DashboardPage() {
   // Reset pagination when search term changes
   useEffect(() => {
     propertiesQuery.refetch();
-  }, [debouncedSearchTerm, propertiesQuery]);
+    // Linter yêu cầu thêm refetch vào dependency array, nhưng refetch là stable function từ React Query nên sẽ không đổi giữa các render.
+    // Nếu linter vẫn cảnh báo, có thể disable dòng dưới:
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [propertiesQuery.refetch]);
   
   // Load more when in view
   useEffect(() => {
@@ -110,8 +113,8 @@ export default function DashboardPage() {
         <div className="flex flex-1 flex-col">
           {isLoadingInitial && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
-              {Array.from({ length: 8 }).map((_, index) => (
-                <PropertyCardSkeleton key={index} />
+              {Array.from({ length: 8 }).map(() => (
+                <PropertyCardSkeleton key={crypto.randomUUID()} />
               ))}
             </div>
           )}

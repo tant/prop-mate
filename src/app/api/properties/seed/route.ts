@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
   try {
     const result = await callGemini(prompt, apiKey);
     // eslint-disable-next-line no-console
-    console.log('[SEED] Gemini raw output:', result);
+    // console.log('[SEED] Gemini raw output:', result);
     // Xử lý kết quả trả về từ Gemini
     let cleanResult = result.trim();
     if (cleanResult.startsWith('```json')) {
@@ -37,25 +37,6 @@ export async function POST(req: NextRequest) {
     }
     // Map sang schema property chuẩn
     // Hàm lấy lat/lng từ Nominatim
-    async function getLatLngFromAddress(address: string): Promise<{ lat: number; lng: number } | null> {
-      if (!address) return null;
-      try {
-        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`;
-        const res = await fetch(url, {
-          headers: {
-            'User-Agent': 'propmate/1.0 (contact@propmate.app)',
-            'Accept-Language': 'vi,en',
-          },
-        });
-        const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) {
-          return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
-        }
-      } catch {
-        // ignore
-      }
-      return null;
-    }
 
     // Map và cập nhật gps cho từng property
     const properties: Omit<Property, 'id' | 'agentId' | 'createdAt' | 'updatedAt'>[] = [];
@@ -124,14 +105,14 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   // Lưu danh sách property xuống Firestore
   const { properties } = await req.json();
-  console.log('API PUT /api/properties/seed nhận được:', properties);
+  // console.log('API PUT /api/properties/seed nhận được:', properties);
   if (!Array.isArray(properties) || properties.length === 0) {
     return NextResponse.json({ error: 'Thiếu dữ liệu property.' }, { status: 400 });
   }
   try {
     // Import Firestore adminDb
     const { adminDb } = await import('@/lib/firebase/admin');
-    console.log('Bắt đầu lưu properties:', properties);
+    // console.log('Bắt đầu lưu properties:', properties);
     const batch = adminDb.batch();
     properties.forEach((property) => {
       const ref = adminDb.collection('properties').doc();
@@ -140,11 +121,10 @@ export async function PUT(req: NextRequest) {
         ...property,
         createdAt: now,
         updatedAt: now,
-        agentId: 'seed-script', // hoặc lấy từ auth nếu cần
       });
     });
     await batch.commit();
-    console.log('Đã lưu thành công', properties.length, 'property vào Firestore');
+    // console.log('Đã lưu thành công', properties.length, 'property vào Firestore');
     return NextResponse.json({ success: true, count: properties.length });
   } catch (error) {
     console.error('Lỗi khi lưu property:', error);
