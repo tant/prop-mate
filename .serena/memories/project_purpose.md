@@ -1,0 +1,2 @@
+# Project Purpose
+PropMate là ứng dụng hỗ trợ nhà môi giới bất động sản trong công tác tiếp thị bán hàng, quản lý tài sản, khách hàng, lịch hẹn, đồng bộ dữ liệu real-time với Firebase, hỗ trợ offline, giao diện hiện đại, dễ sử dụng.

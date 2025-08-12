@@ -1,0 +1,11 @@
+# Code Style & Conventions
+- TypeScript, strict mode, type-safe xuyên suốt backend/frontend
+- Định nghĩa type/interface trong src/types/
+- Business logic tách biệt ở src/server/
+- API typesafe với tRPC, validate input bằng Zod
+- UI component chia nhỏ, đặt trong src/components/[entity]/
+- Custom hooks chia thành queries/ (data fetching/mutation) và hooks/ (UI logic)
+- Đặt tên rõ ràng: usePropertyQuery, useAuth, useMobile...
+- Không throw TRPCError ở tầng service, luôn catch và chuyển lỗi thành TRPCError ở router
+- Sử dụng ESLint, Biome để lint/format code
+- Sử dụng pnpm để quản lý package
