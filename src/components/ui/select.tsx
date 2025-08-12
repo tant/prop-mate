@@ -6,10 +6,8 @@ import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
-function Select({
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.Root>) {
-  return <SelectPrimitive.Root data-slot="select" {...props} />
+function Select({ disabled, ...props }: React.ComponentProps<typeof SelectPrimitive.Root> & { disabled?: boolean }) {
+  return <SelectPrimitive.Root data-slot="select" disabled={disabled} {...props} />
 }
 
 function SelectGroup({

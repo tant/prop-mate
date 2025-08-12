@@ -89,7 +89,7 @@ export default function PropertyDetailPage() {
             </div>
           </div>
         </header>
-        <div className="flex flex-1 flex-col p-4">
+        <div className={`flex flex-1 flex-col p-4 transition-opacity duration-300 ${editMode ? 'opacity-100' : 'opacity-80'} animate-fade`}>
           <PropertyForm
             initialValues={property}
             formRef={setFormRef}
@@ -107,7 +107,7 @@ export default function PropertyDetailPage() {
                 setLoading(false);
               }
             }}
-            {...(!editMode && { disabled: true })}
+            disabled={!editMode}
           />
         </div>
       </SidebarInset>

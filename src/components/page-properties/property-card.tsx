@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import type { Property } from "@/types/property";
 import dynamic from "next/dynamic";
 import { useState } from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import { IconShare } from "@tabler/icons-react";
@@ -121,7 +121,11 @@ export function PropertyCard({ property, onView, onEdit, onDelete }: PropertyCar
         </div>
       </CardFooter>
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent className="flex items-center justify-center">
+        <DialogContent className="flex flex-col items-center justify-center">
+          <div className="sr-only">
+            <DialogTitle>Xem ảnh bất động sản</DialogTitle>
+            <DialogDescription>Ảnh phóng to của bất động sản này</DialogDescription>
+          </div>
           {modalImg && (
             <Image src={modalImg} alt="Xem ảnh" className="max-h-[80vh] max-w-full object-contain rounded" width={800} height={600} />
           )}
