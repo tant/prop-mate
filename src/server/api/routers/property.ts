@@ -66,6 +66,88 @@ export const propertyRouter = createTRPCRouter({
     return snapshot.docs.map((doc) => convertPropertyDates(doc.data() as FirestoreProperty, doc.id));
   }),
 
+  getMyPropertiesPaginated: protectedProcedure
+    .input(z.object({
+      limit: z.number().min(1).max(100).default(20),
+      cursor: z.string().optional(),
+      searchTerm: z.string().optional(),
+    }))
+    .query(async ({ input, ctx }): Promise<{ properties: Property[]; nextCursor: string | null }> => {
+      const agentId = ctx.user?.uid;
+      if (!agentId) {
+        throw new TRPCError({ code: "UNAUTHORIZED", message: "Missing agentId (user uid)" });
+      }
+
+      let query = propertiesCollection
+        .where("agentId", "==", agentId)
+        .orderBy("createdAt", "desc")
+        .limit(input.limit + 1);
+
+      if (input.cursor) {
+        const cursorDoc = await propertiesCollection.doc(input.cursor).get();
+        if (cursorDoc.exists) {
+          query = query.startAfter(cursorDoc);
+        }
+      }
+
+      // If there's a search term, we need to filter differently
+      // This is a simplified approach - in production, you might want to use Firestore's text search capabilities
+      if (input.searchTerm) {
+        const snapshot = await propertiesCollection
+          .where("agentId", "==", agentId)
+          .get();
+        
+        if (snapshot.empty) {
+          return { properties: [], nextCursor: null };
+        }
+        
+        const allProperties = snapshot.docs.map((doc) => 
+          convertPropertyDates(doc.data() as FirestoreProperty, doc.id)
+        );
+        
+        const term = input.searchTerm.toLowerCase();
+        const filteredProperties = allProperties.filter(property => 
+          property.memorableName?.toLowerCase().includes(term) ||
+          property.location?.fullAddress?.toLowerCase().includes(term) ||
+          property.propertyType?.toLowerCase().includes(term)
+        );
+        
+        // Apply pagination to filtered results
+        const startIndex = input.cursor ? 
+          filteredProperties.findIndex(p => p.id === input.cursor) + 1 : 0;
+        const endIndex = startIndex + input.limit;
+        const paginatedProperties = filteredProperties.slice(startIndex, endIndex);
+        const nextCursor = endIndex < filteredProperties.length ? 
+          paginatedProperties[paginatedProperties.length - 1]?.id : null;
+          
+        return { 
+          properties: paginatedProperties, 
+          nextCursor: nextCursor 
+        };
+      }
+
+      const snapshot = await query.get();
+      
+      if (snapshot.empty) {
+        return { properties: [], nextCursor: null };
+      }
+
+      const docs = snapshot.docs;
+      const hasMore = docs.length > input.limit;
+      
+      if (hasMore) {
+        docs.pop(); // Remove the extra document
+      }
+
+      const properties = docs.map((doc) => 
+        convertPropertyDates(doc.data() as FirestoreProperty, doc.id)
+      );
+
+      const nextCursor = hasMore ? docs[docs.length - 1]?.id : null;
+
+      return { properties, nextCursor };
+    }),
+
   getById: publicProcedure
     .input(z.string().min(1, "Property ID cannot be empty."))
     .query(async ({ input: id }): Promise<Property> => {

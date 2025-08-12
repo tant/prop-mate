@@ -15,7 +15,10 @@ import { useCurrentUser } from "@/hooks/use-current-user"
 import { api } from "@/app/_trpc/client"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Search, Plus } from "lucide-react"
+import { Search, Plus, Loader2 } from "lucide-react"
+import { useInView } from "react-intersection-observer"
+
+const PAGE_SIZE = 20;
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -32,24 +35,44 @@ export default function DashboardPage() {
     return () => clearTimeout(timer);
   }, [searchTerm]);
   
-  const { data: allProperties, isLoading, error } = api.property.getMyProperties.useQuery(
-    undefined, 
-    { enabled: !!user }
+  const propertiesQuery = api.property.getMyPropertiesPaginated.useInfiniteQuery(
+    {
+      limit: PAGE_SIZE,
+      searchTerm: debouncedSearchTerm || undefined,
+    },
+    {
+      enabled: !!user,
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+    }
   );
   
-  // Filter properties based on search term
-  const filteredProperties = useMemo(() => {
-    if (!allProperties) return [];
-    
-    if (!debouncedSearchTerm) return allProperties;
-    
-    const term = debouncedSearchTerm.toLowerCase();
-    return allProperties.filter(property => 
-      property.memorableName?.toLowerCase().includes(term) ||
-      property.location?.fullAddress?.toLowerCase().includes(term) ||
-      property.propertyType?.toLowerCase().includes(term)
-    );
-  }, [allProperties, debouncedSearchTerm]);
+  const { ref, inView } = useInView();
+  
+  // Reset pagination when search term changes
+  useEffect(() => {
+    propertiesQuery.refetch();
+  }, [debouncedSearchTerm, propertiesQuery]);
+  
+  // Load more when in view
+  useEffect(() => {
+    if (inView && propertiesQuery.hasNextPage && !propertiesQuery.isFetching) {
+      propertiesQuery.fetchNextPage();
+    }
+  }, [inView, propertiesQuery]);
+  
+  // Flatten pages into a single array
+  const allProperties = useMemo(() => {
+    return propertiesQuery.data?.pages.flatMap(page => page.properties) ?? [];
+  }, [propertiesQuery.data]);
+  
+  // Check if we're still loading initial data
+  const isLoadingInitial = propertiesQuery.isLoading;
+  
+  // Check if we're fetching more data
+  const isFetchingMore = propertiesQuery.isFetching && propertiesQuery.data;
+  
+  // Check if there's an error
+  const error = propertiesQuery.error;
 
   return (
     <SidebarProvider>
@@ -85,7 +108,7 @@ export default function DashboardPage() {
           </div>
         </header>
         <div className="flex flex-1 flex-col">
-          {isLoading && (
+          {isLoadingInitial && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
               {Array.from({ length: 8 }).map((_, index) => (
                 <PropertyCardSkeleton key={index} />
@@ -93,25 +116,38 @@ export default function DashboardPage() {
             </div>
           )}
           {error && <div className="p-4 text-red-500">Lỗi: {error.message}</div>}
-          {!isLoading && filteredProperties && filteredProperties.length === 0 && (
+          {!isLoadingInitial && allProperties.length === 0 && (
             <div className="p-4 text-gray-500">
               {debouncedSearchTerm 
                 ? "Không tìm thấy bất động sản phù hợp." 
                 : "Bạn chưa có bất động sản nào."}
             </div>
           )}
-          {!isLoading && filteredProperties && filteredProperties.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
-              {filteredProperties.map((property: import("@/types/property").Property) => (
-                <PropertyCard
-                  key={property.id}
-                  property={property}
-                  onView={() => router.push(`/properties/${property.id}`)}
-                  onEdit={() => router.push(`/properties/${property.id}`)} // We'll handle edit mode in the detail page
-                  onDelete={undefined} // tuỳ chỉnh nếu có chức năng xoá/lưu trữ
-                />
-              ))}
-            </div>
+          {!isLoadingInitial && allProperties.length > 0 && (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
+                {allProperties.map((property: import("@/types/property").Property) => (
+                  <PropertyCard
+                    key={property.id}
+                    property={property}
+                    onView={() => router.push(`/properties/${property.id}`)}
+                    onEdit={() => router.push(`/properties/${property.id}`)} // We'll handle edit mode in the detail page
+                    onDelete={undefined} // tuỳ chỉnh nếu có chức năng xoá/lưu trữ
+                  />
+                ))}
+              </div>
+              <div className="flex justify-center py-4">
+                {propertiesQuery.hasNextPage && (
+                  <div ref={ref} className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>Đang tải thêm...</span>
+                  </div>
+                )}
+                {isFetchingMore && !propertiesQuery.hasNextPage && (
+                  <div>Đã tải tất cả bất động sản</div>
+                )}
+              </div>
+            </>
           )}
         </div>
       </SidebarInset>

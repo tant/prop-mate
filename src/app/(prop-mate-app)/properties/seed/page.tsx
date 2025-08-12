@@ -9,9 +9,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 export default function PropertySeedPage() {
-  const [count, setCount] = useState(2);
+  const [count, setCount] = useState(50);
   const [description, setDescription] = useState(
-    "nhà gần trường học ở quận 3 giá khoảng 850 triệu tới 4 tỉ"
+    "nhà ở trong khu vực thành phố hồ chí minh có giá 850 triệu tới 4 tỉ"
   );
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
@@ -81,7 +81,6 @@ export default function PropertySeedPage() {
               id="count-input"
               type="number"
               min={1}
-              max={5}
               value={count}
               onChange={(e) => setCount(Number(e.target.value))}
               required
