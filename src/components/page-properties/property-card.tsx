@@ -41,7 +41,7 @@ export function PropertyCard({ property, onView, onEdit, onDelete }: PropertyCar
   };
 
   return (
-    <Card className="p-4 flex flex-col gap-2 shadow hover:shadow-lg transition">
+    <Card className="p-4 flex flex-col gap-2 shadow hover:shadow-lg transition" data-testid="property-card">
       <CardHeader>
         <CardDescription>{property.memorableName}</CardDescription>
         <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
