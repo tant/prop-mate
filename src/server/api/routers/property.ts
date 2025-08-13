@@ -179,7 +179,7 @@ export const propertyRouter = createTRPCRouter({
       id: z.string().min(1),
       data: propertyUpdateSchema,
     }))
-    .mutation(async ({ input, ctx }): Promise<Property> => {
+    .mutation(async ({ input }): Promise<Property> => {
       const { id, data } = input;
       if (!data || Object.keys(data).length === 0) {
         console.error('[property.update] No data to update');
