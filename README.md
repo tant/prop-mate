@@ -157,7 +157,36 @@ pnpm test
 pnpm test:ui
 ```
 
-Các test cases sẽ chạy trên trình duyệt Firefox.
+### ⚙️ Cấu hình Playwright
+
+Playwright được cấu hình để chạy test trên trình duyệt Firefox trong chế độ headless. Các cấu hình chính:
+
+- **Trình duyệt**: Firefox (chỉ chạy trên 1 trình duyệt để tiết kiệm tài nguyên)
+- **Chế độ**: Headless (không hiển thị giao diện trình duyệt)
+- **Timeout**: 120 giây cho web server
+- **Base URL**: http://localhost:3000
+- **Report**: Hiển thị kết quả test dạng list trong console
+
+Chi tiết cấu hình có thể xem trong file `playwright.config.ts`.
+
+### 🛠 Hướng dẫn cải thiện các test cases bị fail
+
+1. **"should display properties list"**:
+   - Kiểm tra lại logic kiểm tra sự tồn tại của property cards hoặc thông báo "Bạn chưa có bất động sản nào"
+   - Có thể cần tăng timeout cho việc load dữ liệu từ Firebase
+
+2. **"should allow adding a new property"**:
+   - Kiểm tra lại selector cho button "Thêm bất động sản" 
+   - Có thể cần tối ưu hóa thời gian load trang `/properties/add`
+
+Để debug các test cases bị fail, có thể chạy:
+```bash
+# Chạy test cụ thể với giao diện để xem trực quan
+pnpm test:ui tests/properties.spec.ts:4
+
+# Hoặc chạy với chế độ trace để xem chi tiết
+pnpm test --trace on
+```
 
 ---
 

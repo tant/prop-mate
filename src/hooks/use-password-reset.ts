@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { auth } from "@/lib/firebase/client";
-import { sendPasswordResetEmail } from "firebase/auth";
+import { sendPasswordResetEmail, AuthError } from "firebase/auth";
 
 interface UsePasswordResetProps {
   onSuccess?: () => void;
@@ -25,12 +25,14 @@ export function usePasswordReset({ onSuccess, onError }: UsePasswordResetProps =
       console.error("Password reset error:", err);
       let errorMessage = "Có lỗi xảy ra. Vui lòng thử lại sau.";
       
-      if (err instanceof Error) {
-        if (err.code === "auth/user-not-found") {
+      // Type guard to check if error is AuthError
+      if (err instanceof Error && 'code' in err) {
+        const authError = err as AuthError;
+        if (authError.code === "auth/user-not-found") {
           errorMessage = "Không tìm thấy tài khoản với email này.";
-        } else if (err.code === "auth/invalid-email") {
+        } else if (authError.code === "auth/invalid-email") {
           errorMessage = "Email không hợp lệ.";
-        } else if (err.code === "auth/too-many-requests") {
+        } else if (authError.code === "auth/too-many-requests") {
           errorMessage = "Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau.";
         }
       }
