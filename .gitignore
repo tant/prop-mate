@@ -1,3 +1,7 @@
+# qwen, gemni, serena
+.qwen/
+.gemni/
+.serena/
 # bmad-core
 .bmad-core/
 # web-bundles
