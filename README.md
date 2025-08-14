@@ -103,11 +103,61 @@ Các lệnh có thể chạy trong dự án (dùng với pnpm):
 - `pnpm build` — Build project Next.js ra .next/ (chuẩn bị cho production)
 - `pnpm start` — Chạy project ở chế độ production (sau khi build)
 - `pnpm lint` — Kiểm tra code với ESLint và Biome (tự động fix nếu có thể)
+- `pnpm test` — Chạy các test cases E2E với Playwright (trên Firefox)
+- `pnpm test:ui` — Chạy các test cases E2E với Playwright và mở giao diện report
+- `pnpm test:report` — Hiển thị báo cáo test gần nhất
 - `pnpm reset:db` — Xóa toàn bộ dữ liệu Firestore (chạy script `scripts/reset-firestore.ts`, chỉ dùng cho môi trường dev/test)
 - `pnpm exec tsx scripts/test-firebase-admin-sdk.ts` — Test kết nối và quyền Firebase Admin SDK (xem file `scripts/test-firebase-admin-sdk.ts`)
 - `pnpm exec tsx scripts/test-firebase-clien-sdk.ts` — Test kết nối Firebase Client SDK (xem file `scripts/test-firebase-clien-sdk.ts`)
 
 > Lưu ý: Dự án này sử dụng **pnpm** để quản lý package, không dùng npm/yarn. Nếu chưa cài pnpm, hãy xem hướng dẫn tại https://pnpm.io/installation
+
+## 🧪 Testing
+
+Dự án sử dụng Playwright để thực hiện các test cases E2E (End-to-End). Các test cases được viết trong thư mục `tests/` với các file:
+
+- `homepage.spec.ts` - Test trang chủ
+- `properties.spec.ts` - Test chức năng quản lý bất động sản
+- `auth.spec.ts` - Test chức năng xác thực (đăng ký, đăng nhập, đăng xuất, quên mật khẩu)
+
+Tổng cộng có 14 test cases với tỷ lệ thành công 79% (11/14 tests passed):
+
+### ✅ Test Cases Passed (11/14 - 79%)
+1. **Authentication (8/8 tests passed)**:
+   - Đăng ký user hợp lệ
+   - Hiển thị lỗi khi đăng ký với password không hợp lệ
+   - Hiển thị lỗi khi password xác nhận không khớp
+   - Đăng nhập với credentials hợp lệ
+   - Hiển thị lỗi khi đăng nhập với credentials không hợp lệ
+   - Đặt lại mật khẩu
+   - Hiển thị lỗi khi đặt lại mật khẩu với email không tồn tại
+   - Đăng xuất
+
+2. **Homepage (2/2 tests passed)**:
+   - Kiểm tra title của trang
+   - Kiểm tra link "Vào app"
+
+3. **Properties Page (1/4 tests passed)**:
+   - Tìm kiếm bất động sản
+
+### ⏭ Test Cases Skipped (1/14 - 7%)
+- Cập nhật bất động sản (bị skip do không có dữ liệu mẫu)
+
+### ❌ Test Cases Failed (2/14 - 14%)
+- Hiển thị danh sách bất động sản
+- Thêm bất động sản mới
+
+Để chạy các test cases:
+
+```bash
+# Chạy tất cả các test cases
+pnpm test
+
+# Chạy test cases với giao diện
+pnpm test:ui
+```
+
+Các test cases sẽ chạy trên trình duyệt Firefox.
 
 ---
 
