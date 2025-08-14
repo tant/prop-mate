@@ -38,4 +38,8 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+# playwright test results
+/playwright-report/
+/test-results/
 next-env.d.ts
