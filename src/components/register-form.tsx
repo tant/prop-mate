@@ -19,7 +19,10 @@ import { Eye, EyeOff } from "lucide-react";
 import { userCreateSchema } from "@/types/user.schema";
 
 
-const registerSchema = userCreateSchema.extend({
+const registerSchema = userCreateSchema.pick({
+  email: true,
+  firstName: true,
+}).extend({
   password: z.string()
     .min(8, "Tối thiểu 8 ký tự")
     .regex(/[A-Z]/, "Phải có chữ hoa (A-Z)")
