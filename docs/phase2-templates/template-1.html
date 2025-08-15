@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Layout BĐS - Động & Tương tác</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Be Vietnam Pro', sans-serif; background-color: #f8fafc; }
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.75);
+            transition: opacity 0.3s ease-in-out;
+        }
+        .modal-content {
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        // --- DỮ LIỆU VÀ HÀM HỖ TRỢ ---
+        const mockProperty = {
+          memorableName: "Penthouse Sky Villa - Biểu tượng sống trên không",
+          propertyType: "APARTMENT",
+          location: { fullAddress: "Tầng 45, Empire City, TP. Thủ Đức, TP. Hồ Chí Minh" },
+          area: 350, bedrooms: 4, bathrooms: 5,
+          price: { value: 95000000000 },
+          imageUrls: [
+            "https://placehold.co/1200x800/2d3748/ffffff?text=View+Panorama",
+            "https://placehold.co/1200x800/4a5568/ffffff?text=Phong+Khach+Thong+Tang",
+            "https://placehold.co/1200x800/718096/ffffff?text=Ho+Boi+Vo+Cuc",
+            "https://placehold.co/1200x800/a0aec0/ffffff?text=Phong+Ngu+Master",
+            "https://placehold.co/1200x800/cbd5e0/ffffff?text=Phong+Tam+Luxury"
+          ],
+          contactName: "Phan Hoàng Minh", contactPhone: "0918777999", contactRole: "AGENT",
+          description: "Tọa lạc tại tầng cao nhất của tòa tháp biểu tượng, căn Penthouse Sky Villa này định nghĩa lại khái niệm sống sang. Với thiết kế thông tầng ấn tượng, hồ bơi vô cực riêng và tầm nhìn 360 độ bao trọn thành phố, đây là không gian sống dành riêng cho những chủ nhân danh giá nhất."
+        };
+        const formatCurrency = (value) => {
+          if (!value) return '';
+          return `${(value / 1e9).toLocaleString('vi-VN', {maximumFractionDigits: 1})} tỷ VNĐ`;
+        };
+        const translations = { APARTMENT: 'Penthouse', AGENT: 'Chuyên viên tư vấn cấp cao' };
+        
+        // --- HOOK CHO ANIMATION KHI CUỘN ---
+        const useScrollAnimation = () => {
+            React.useEffect(() => {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-visible');
+                        }
+                    });
+                }, { threshold: 0.1 });
+
+                document.querySelectorAll('.fade-in-up').forEach(el => observer.observe(el));
+                
+                return () => observer.disconnect();
+            }, []);
+        };
+
+        // --- COMPONENT MODAL ---
+        const ImageGalleryModal = ({ images, startIndex, onClose }) => {
+            const [currentIndex, setCurrentIndex] = React.useState(startIndex);
+
+            const nextImage = () => setCurrentIndex((prev) => (prev + 1) % images.length);
+            const prevImage = () => setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+            
+            React.useEffect(() => {
+                const handleKeyDown = (e) => {
+                    if (e.key === 'Escape') onClose();
+                    if (e.key === 'ArrowRight') nextImage();
+                    if (e.key === 'ArrowLeft') prevImage();
+                };
+                window.addEventListener('keydown', handleKeyDown);
+                return () => window.removeEventListener('keydown', handleKeyDown);
+            }, []);
+
+            return (
+                <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop" onClick={onClose}>
+                    <div className="relative w-full h-full max-w-5xl max-h-screen p-4" onClick={(e) => e.stopPropagation()}>
+                        <img src={images[currentIndex]} className="w-full h-full object-contain" />
+                        <button onClick={onClose} className="absolute top-4 right-4 text-white bg-black bg-opacity-50 rounded-full p-2">
+                           <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                        <button onClick={prevImage} className="absolute left-4 top-1/2 -translate-y-1/2 text-white bg-black bg-opacity-50 rounded-full p-2">
+                            <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
+                        </button>
+                        <button onClick={nextImage} className="absolute right-4 top-1/2 -translate-y-1/2 text-white bg-black bg-opacity-50 rounded-full p-2">
+                           <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+        
+        const ContactModal = ({ onClose, property }) => {
+             return (
+                <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop" onClick={onClose}>
+                    <div className="bg-white rounded-lg shadow-2xl w-full max-w-md p-8 m-4 modal-content transform scale-95 opacity-0 animate-scale-in" onClick={(e) => e.stopPropagation()}>
+                        <h2 className="text-2xl font-bold mb-2">Yêu cầu tư vấn</h2>
+                        <p className="text-gray-600 mb-6">Vui lòng để lại thông tin, chúng tôi sẽ liên hệ với bạn ngay.</p>
+                        <form>
+                            <div className="mb-4">
+                                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">Họ và Tên</label>
+                                <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="name" type="text" placeholder="Nguyễn Văn A" />
+                            </div>
+                            <div className="mb-4">
+                                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="phone">Số điện thoại</label>
+                                <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="phone" type="text" placeholder="0901234567" />
+                            </div>
+                            <div className="flex items-center justify-between mt-8">
+                                <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg focus:outline-none focus:shadow-outline w-full" type="button">
+                                    Gửi yêu cầu
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <style>{`
+                        @keyframes scale-in {
+                            to { transform: scale(1); opacity: 1; }
+                        }
+                        .animate-scale-in { animation: scale-in 0.3s forwards; }
+                    `}</style>
+                </div>
+            );
+        };
+
+        // --- COMPONENT CHÍNH ---
+        function DynamicPropertyPage() {
+            const property = mockProperty;
+            const [galleryOpen, setGalleryOpen] = React.useState(false);
+            const [contactOpen, setContactOpen] = React.useState(false);
+            const [startImageIndex, setStartImageIndex] = React.useState(0);
+            
+            useScrollAnimation();
+
+            const openGallery = (index) => {
+                setStartImageIndex(index);
+                setGalleryOpen(true);
+            };
+
+            return (
+                <>
+                    {galleryOpen && <ImageGalleryModal images={property.imageUrls} startIndex={startImageIndex} onClose={() => setGalleryOpen(false)} />}
+                    {contactOpen && <ContactModal onClose={() => setContactOpen(false)} property={property} />}
+
+                    <div className="container mx-auto max-w-7xl p-4 md:p-8">
+                        <div className="grid grid-cols-1 lg:grid-cols-3 lg:gap-8">
+                            
+                            {/* MAIN CONTENT (LEFT) */}
+                            <main className="lg:col-span-2">
+                                <section className="mb-8">
+                                    <h1 className="text-4xl md:text-5xl font-bold text-gray-900 fade-in-up">{property.memorableName}</h1>
+                                    <p className="text-lg text-gray-500 mt-2 fade-in-up" style={{transitionDelay: '100ms'}}>{property.location.fullAddress}</p>
+                                </section>
+
+                                <section className="grid grid-cols-2 gap-2 mb-12 fade-in-up" style={{transitionDelay: '200ms'}}>
+                                    <div className="col-span-2">
+                                        <img src={property.imageUrls[0]} onClick={() => openGallery(0)} className="w-full h-auto object-cover rounded-lg cursor-pointer shadow-lg hover:shadow-2xl transition-shadow duration-300"/>
+                                    </div>
+                                    {property.imageUrls.slice(1, 3).map((url, i) => (
+                                        <div key={i}>
+                                            <img src={url} onClick={() => openGallery(i + 1)} className="w-full h-full object-cover rounded-lg cursor-pointer shadow-md hover:shadow-xl transition-shadow duration-300"/>
+                                        </div>
+                                    ))}
+                                </section>
+
+                                <section className="bg-white p-8 rounded-lg shadow-md mb-8 fade-in-up">
+                                    <h2 className="text-2xl font-bold mb-4">Mô tả chi tiết</h2>
+                                    <p className="text-gray-700 leading-relaxed">{property.description}</p>
+                                </section>
+                                
+                                <section className="bg-white p-8 rounded-lg shadow-md fade-in-up">
+                                    <h2 className="text-2xl font-bold mb-4">Thông số</h2>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <p><strong className="font-semibold">Diện tích:</strong> {property.area} m²</p>
+                                        <p><strong className="font-semibold">Phòng ngủ:</strong> {property.bedrooms}</p>
+                                        <p><strong className="font-semibold">Phòng tắm:</strong> {property.bathrooms}</p>
+                                        <p><strong className="font-semibold">Loại hình:</strong> {translations[property.propertyType]}</p>
+                                    </div>
+                                </section>
+                            </main>
+
+                            {/* STICKY SIDEBAR (RIGHT) */}
+                            <aside className="lg:col-span-1 mt-8 lg:mt-0">
+                                <div className="sticky top-8 bg-white p-6 rounded-lg shadow-xl fade-in-up" style={{transitionDelay: '300ms'}}>
+                                    <p className="text-sm text-gray-500">Giá chào bán</p>
+                                    <p className="text-4xl font-bold text-blue-600 my-2">{formatCurrency(property.price.value)}</p>
+                                    <hr className="my-6"/>
+                                    <div className="text-center">
+                                        <p className="font-bold text-lg">{property.contactName}</p>
+                                        <p className="text-gray-500">{translations[property.contactRole]}</p>
+                                        <a href={`tel:${property.contactPhone}`} className="block text-xl font-bold text-blue-600 my-2">{property.contactPhone}</a>
+                                    </div>
+                                    <button onClick={() => setContactOpen(true)} className="w-full mt-4 bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300">
+                                        Yêu cầu tư vấn
+                                    </button>
+                                </div>
+                            </aside>
+                        </div>
+                    </div>
+                </>
+            );
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<DynamicPropertyPage />);
+    </script>
+</body>
+</html>

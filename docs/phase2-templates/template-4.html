@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi Tiết Bất Động Sản</title>
+    
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React via CDN -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel for JSX Transpilation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Sử dụng font Be Vietnam Pro cho toàn trang */
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // Dữ liệu mẫu dựa trên Zod schema của bạn
+        const mockProperty = {
+          memorableName: "Bán Căn hộ Cao cấp The Metropole Thủ Thiêm, 2PN, View Sông Sài Gòn",
+          propertyType: "APARTMENT",
+          listingType: "sale",
+          status: "AVAILABLE",
+          location: {
+            fullAddress: "157 Lương Định Của, Phường An Phú, TP. Thủ Đức, TP. Hồ Chí Minh",
+            gps: { lat: 10.785, lng: 106.727 },
+          },
+          projectName: "The Metropole Thủ Thiêm",
+          area: 90,
+          bedrooms: 2,
+          bathrooms: 2,
+          direction: "Đông Nam",
+          floor: 15,
+          interiorStatus: "FURNISHED",
+          legalStatus: "PINK_BOOK",
+          currentStatus: "VACANT",
+          price: {
+            value: 15000000000, // 15 tỷ
+            pricePerSqm: 166000000,
+          },
+          imageUrls: [
+            "https://placehold.co/1200x800/e2e8f0/64748b?text=Anh+Chinh",
+            "https://placehold.co/600x400/e2e8f0/64748b?text=Phong+Khach",
+            "https://placehold.co/600x400/e2e8f0/64748b?text=Phong+Ngu",
+            "https://placehold.co/600x400/e2e8f0/64748b?text=Tien+Ich"
+          ],
+          amenities: ["Hồ bơi tràn bờ", "Phòng Gym & Yoga", "Khu BBQ", "Công viên ven sông", "Trường học quốc tế", "Trung tâm thương mại"],
+          contactName: "Nguyễn Văn An",
+          contactPhone: "0901234567",
+          contactRole: "AGENT",
+        };
+
+        // Helper function để định dạng tiền tệ
+        const formatCurrency = (value) => {
+          if (!value) return '';
+          const billions = value / 1e9;
+          if (billions >= 1) {
+            // Làm tròn đến 2 chữ số thập phân nếu cần
+            return `${Math.round(billions * 100) / 100} tỷ`;
+          }
+          return `${(value / 1e6).toLocaleString('vi-VN')} triệu`;
+        };
+
+        // Bảng dịch các giá trị Enum
+        const translations = {
+          APARTMENT: 'Căn hộ',
+          HOUSE: 'Nhà riêng',
+          LAND: 'Đất nền',
+          VILLA: 'Biệt thự',
+          OFFICE: 'Văn phòng',
+          FURNISHED: 'Đầy đủ nội thất',
+          UNFURNISHED: 'Không có nội thất',
+          PARTIALLY_FURNISHED: 'Nội thất cơ bản',
+          PINK_BOOK: 'Đã có Sổ hồng',
+          RED_BOOK: 'Đã có Sổ đỏ',
+          SALE_CONTRACT: 'Hợp đồng mua bán',
+          VACANT: 'Nhà trống, ở ngay',
+          OCCUPIED: 'Đang có người ở',
+          RENTED_OUT: 'Đang cho thuê',
+          AGENT: 'Chuyên viên tư vấn'
+        };
+
+        // SVG Icons as React Components
+        const Icon = ({ children, className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>{children}</svg>;
+        const MapPin = ({className}) => <Icon className={className}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></Icon>;
+        const BedDouble = ({className}) => <Icon className={className}><path d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8"/><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M12 12v8"/><path d="M2 18h20"/></Icon>;
+        const Bath = ({className}) => <Icon className={className}><path d="M9 6 6.5 3.5a1.5 1.5 0 0 0-2.12 0L3 5"/><path d="M9 12v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1Z"/><path d="m21 15-2-2-1.5 1.5-2-2-1.5 1.5-2-2-1.5 1.5-2-2-4 4"/><path d="M21 12v3a1 1 0 0 1-1 1h-2.5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1H20a1 1 0 0 1 1 1Z"/></Icon>;
+        const Square = ({className}) => <Icon className={className}><rect width="18" height="18" x="3" y="3" rx="2"/></Icon>;
+        const Compass = ({className}) => <Icon className={className}><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></Icon>;
+        const Landmark = ({className}) => <Icon className={className}><line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/></Icon>;
+        const CheckCircle = ({className}) => <Icon className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></Icon>;
+        const Building = ({className}) => <Icon className={className}><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/></Icon>;
+        const Wallet = ({className}) => <Icon className={className}><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></Icon>;
+
+        function PropertyPage() {
+            const property = mockProperty;
+            const [mainImage, setMainImage] = React.useState(property.imageUrls[0]);
+
+            return (
+                <div className="bg-gray-50 min-h-screen">
+                    <div className="container mx-auto p-4 md:p-8 max-w-6xl">
+
+                        {/* === HERO SECTION === */}
+                        <section className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                            <div className="lg:col-span-3">
+                                <img 
+                                    src={mainImage} 
+                                    alt="Main property view" 
+                                    className="w-full h-auto object-cover rounded-lg shadow-lg aspect-video transition-all duration-300"
+                                    onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/1200x800/f87171/ffffff?text=Loi+Anh'; }}
+                                />
+                                <div className="grid grid-cols-4 gap-2 mt-2">
+                                    {property.imageUrls.map((url, index) => (
+                                        <img 
+                                            key={index}
+                                            src={url} 
+                                            alt={`Property view ${index + 1}`} 
+                                            className={`w-full h-auto object-cover rounded-md cursor-pointer border-2 ${mainImage === url ? 'border-blue-600' : 'border-transparent'} hover:border-blue-400`}
+                                            onClick={() => setMainImage(url)}
+                                            onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/400x300/f87171/ffffff?text=Loi'; }}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                          
+                            <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow-md flex flex-col">
+                                <h1 className="text-2xl md:text-3xl font-bold text-gray-800 leading-tight">{property.memorableName}</h1>
+                                <div className="flex items-center text-gray-500 mt-2 text-sm">
+                                    <MapPin className="mr-2 h-4 w-4"/>
+                                    <span>{property.location.fullAddress}</span>
+                                </div>
+
+                                <div className="my-6">
+                                    <p className="text-4xl font-bold text-red-600">{formatCurrency(property.price.value)}</p>
+                                    <p className="text-gray-600 mt-1">~ {formatCurrency(property.price.pricePerSqm)}/m²</p>
+                                </div>
+                                
+                                <div className="grid grid-cols-2 gap-4 text-gray-700 mb-6">
+                                    <div className="flex items-center"><BedDouble className="mr-2 text-blue-500 h-5 w-5"/> {property.bedrooms} Phòng ngủ</div>
+                                    <div className="flex items-center"><Bath className="mr-2 text-blue-500 h-5 w-5"/> {property.bathrooms} Phòng tắm</div>
+                                    <div className="flex items-center"><Square className="mr-2 text-blue-500 h-5 w-5"/> {property.area} m²</div>
+                                    <div className="flex items-center"><Compass className="mr-2 text-blue-500 h-5 w-5"/> Hướng {property.direction}</div>
+                                </div>
+
+                                <div className="mt-auto">
+                                    <a href={`tel:${property.contactPhone}`} className="w-full block text-center bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-300 text-lg">
+                                      Gọi ngay: {property.contactPhone}
+                                    </a>
+                                    <button className="w-full mt-2 bg-gray-200 text-gray-800 font-bold py-3 px-6 rounded-lg hover:bg-gray-300 transition duration-300">
+                                      Yêu cầu tư vấn
+                                    </button>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* === OVERVIEW & LOCATION SECTION === */}
+                        <section className="grid grid-cols-1 md:grid-cols-5 gap-8 mt-12">
+                            <div className="md:col-span-3">
+                                <div className="bg-white p-6 rounded-lg shadow-md">
+                                    <h2 className="text-2xl font-bold text-gray-800 mb-4">Thông tin chi tiết</h2>
+                                    <div className="grid grid-cols-2 md:grid-cols-2 gap-x-6 gap-y-4">
+                                        <div className="flex items-start"><CheckCircle className="mr-3 text-green-500 mt-1 flex-shrink-0 h-5 w-5"/><div><h3 className="font-semibold text-gray-500">Loại hình</h3><p className="font-medium">{translations[property.propertyType]}</p></div></div>
+                                        <div className="flex items-start"><Wallet className="mr-3 text-green-500 mt-1 flex-shrink-0 h-5 w-5"/><div><h3 className="font-semibold text-gray-500">Pháp lý</h3><p className="font-bold text-green-700">{translations[property.legalStatus]}</p></div></div>
+                                        <div className="flex items-start"><Landmark className="mr-3 text-green-500 mt-1 flex-shrink-0 h-5 w-5"/><div><h3 className="font-semibold text-gray-500">Nội thất</h3><p className="font-medium">{translations[property.interiorStatus]}</p></div></div>
+                                        <div className="flex items-start"><Building className="mr-3 text-green-500 mt-1 flex-shrink-0 h-5 w-5"/><div><h3 className="font-semibold text-gray-500">Tầng</h3><p className="font-medium">{property.floor}</p></div></div>
+                                        <div className="flex items-start"><Landmark className="mr-3 text-green-500 mt-1 flex-shrink-0 h-5 w-5"/><div><h3 className="font-semibold text-gray-500">Thuộc dự án</h3><p className="font-medium">{property.projectName}</p></div></div>
+                                        <div className="flex items-start"><CheckCircle className="mr-3 text-green-500 mt-1 flex-shrink-0 h-5 w-5"/><div><h3 className="font-semibold text-gray-500">Tình trạng</h3><p className="font-medium">{translations[property.currentStatus]}</p></div></div>
+                                    </div>
+                                </div>
+                                <div className="bg-white p-6 rounded-lg shadow-md mt-8">
+                                    <h2 className="text-2xl font-bold text-gray-800 mb-4">Mô tả</h2>
+                                    <p className="text-gray-600 leading-relaxed">
+                                        Căn hộ cao cấp tại dự án {property.projectName} với tầm nhìn panorama tuyệt đẹp ra sông Sài Gòn và trung tâm thành phố. Thiết kế hiện đại, bàn giao với {translations[property.interiorStatus].toLowerCase()}.
+                                        Vị trí kim cương tại khu đô thị mới Thủ Thiêm, kết nối dễ dàng đến Quận 1 và các khu vực lân cận. Tiện ích nội khu đẳng cấp 5 sao, cộng đồng dân cư văn minh. Đây là cơ hội đầu tư và an cư lý tưởng.
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="md:col-span-2">
+                                <div className="bg-white p-6 rounded-lg shadow-md">
+                                    <h3 className="text-xl font-bold text-gray-800 mb-4">Tiện ích nổi bật</h3>
+                                    <ul className="space-y-3">
+                                        {property.amenities.map(amenity => (
+                                            <li key={amenity} className="flex items-center text-gray-700"><CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0"/> {amenity}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                                <div className="h-64 bg-gray-300 rounded-lg shadow-md mt-8 flex items-center justify-center overflow-hidden">
+                                    <iframe 
+                                        width="100%" 
+                                        height="100%" 
+                                        style={{ border:0 }} 
+                                        loading="lazy" 
+                                        allowFullScreen
+                                        src={`https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=${property.location.fullAddress}`}>
+                                    </iframe>
+                                </div>
+                            </div>
+                        </section>
+                        
+                        {/* === CONTACT SECTION === */}
+                        <section className="mt-12 text-center bg-blue-600 text-white p-8 rounded-lg shadow-xl">
+                             <h2 className="text-3xl font-bold">Quan tâm đến bất động sản này?</h2>
+                             <p className="mt-2 text-blue-100">Liên hệ ngay với chuyên viên tư vấn của chúng tôi để không bỏ lỡ cơ hội!</p>
+                             <div className="mt-6 inline-block bg-white text-gray-800 rounded-lg p-4">
+                                <p className="font-semibold text-lg">{property.contactName} - {translations[property.contactRole]}</p>
+                                <a href={`tel:${property.contactPhone}`} className="text-2xl font-bold text-blue-600 mt-1 block">{property.contactPhone}</a>
+                             </div>
+                        </section>
+
+                    </div>
+                </div>
+            );
+        }
+
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(<PropertyPage />);
+    </script>
+
+</body>
+</html>

@@ -50,11 +50,8 @@
 2.  **Chọn:** Người dùng chọn bất động sản liên quan (nếu chưa có context) và chọn template.
 3.  **Nhập liệu:** Người dùng chỉ cần nhập đối tượng khách hàng mục tiêu (càng chi tiết càng tốt).
 4.  **Sinh trang:** Hệ thống gọi AI (Gemini) để tự động sinh tiêu đề (title), USP và toàn bộ nội dung trang sản phẩm dựa trên đối tượng khách hàng vừa nhập.
-5.  **Xem trước & quyết định:** Sau khi sinh, người dùng xem trước và chọn:
-    a.  **Xuất bản ngay.**
-    b.  **Chỉnh sửa thủ công** trước khi xuất bản.
-    c.  **Xóa & làm lại** để sinh lại bằng AI.
-6.  **Xuất bản:** Người dùng cấu hình quyền truy cập (`Công khai`/`Không công khai`) và hệ thống sinh ra `slug` duy nhất. Trang được public tại `/p/[slug]`.
+5.  **Chỉnh sửa & Hoàn thiện:** Người dùng được tự động chuyển đến trang chỉnh sửa chi tiết. Tại đây, họ có thể xem lại nội dung do AI tạo, tùy chỉnh, và quyết định publish.
+6.  **Xuất bản:** Người dùng cấu hình quyền truy cập (`Công khai`/`Không công khai`) và hệ thống sinh ra `slug` duy nhất. Trang được public tại `/products/[slug]`.
 7.  **Quản lý:** Người dùng có thể tìm, lọc, quản lý các trang sản phẩm đã tạo tại dashboard quản lý tập trung (URL: `/property-pages`).
 
 ---
@@ -63,14 +60,16 @@
 
 ### 5.1. Template & Data Model (Cứng)
 
--   **Schema template:** Mỗi template là một object định nghĩa trong code, gồm metadata (id, name, thumbnail) và schema các section, slot, kiểu dữ liệu.
--   **Lưu trữ (Firestore):** Collection `propertyPages` lưu dữ liệu trang sản phẩm. Mỗi document gồm:
+-   **Schema template:** Mỗi template là một object định nghĩa trong code, gồm metadata (id, name, thumbnail) và schema các section. Schema sẽ định nghĩa rõ `componentType` (ví dụ: `HeroWithOverlay`, `ThumbnailGallery`) và các `fields` cần thiết (bao gồm cả `icon` nếu có).
+-   **Lưu trữ (Firestore):** Collection `productPages` lưu dữ liệu trang sản phẩm. Mỗi document gồm:
     -   `userId`: ID chủ sở hữu. **(Quan trọng cho kiểm soát truy cập)**
     -   `propertyId`: BĐS liên quan.
     -   `templateId`: ID template sử dụng.
     -   `status`: `draft` | `published` | `unlisted`.
     -   `slug`: Định danh duy nhất cho URL.
-    -   `content`: JSON nội dung trang, kiểm tra theo schema template.
+    -   `audience`: Dữ liệu người dùng nhập để AI xử lý.
+    -   `title`, `usp`: Do AI sinh ra.
+    -   `content`: JSON nội dung trang, có cấu trúc chi tiết tuân theo `fields` của schema template.
     -   `seo`: { `title`, `description`, `ogImageUrl` }.
     -   Timestamps (`createdAt`, `updatedAt`).
 
@@ -81,7 +80,7 @@
 
 ### 5.3. Xuất bản & hiển thị
 
--   **Cấu trúc URL:** Trang công khai tại `/p/[slug]`. Dashboard quản lý tại `/property-pages`.
+-   **Cấu trúc URL:** Trang công khai tại `/products/[slug]`. Dashboard quản lý tại `/property-pages`.
 -   **Hiệu năng:** Trang render SSG/ISR, TTFB < 500ms.
 -   **SEO:**
     -   Trang công khai vào sitemap, được index.

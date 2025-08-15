@@ -35,8 +35,10 @@ Mục tiêu chính là xây dựng một hệ thống cho phép người dùng *
       -   Thiết kế component cho sidebar quản lý và tab trong từng property.
   2.  **Xây dựng UI Tạo Trang sản phẩm:**
       -   Giao diện cho phép người dùng **chọn một trong các template có sẵn**.
-      -   Form "tạo nhanh" chỉ nhập audience (đối tượng khách hàng mục tiêu).
-      -   Giao diện chỉnh sửa chi tiết cho phép tùy chỉnh nội dung của các section đã được định nghĩa trong template.
+      -   **Luồng tạo trang:**
+          1.  **Bước 1 (Tạo nhanh):** Tại trang `property-pages/add`, người dùng chọn template và nhập `audience` (đối tượng khách hàng mục tiêu).
+          2.  **Bước 2 (AI xử lý):** Sau khi gửi, hệ thống gọi AI để sinh nội dung.
+          3.  **Bước 3 (Chỉnh sửa & Hoàn thiện):** Người dùng được tự động chuyển hướng đến trang chỉnh sửa chi tiết (`property-pages/[id]/edit`). Tại đây, họ có thể xem lại nội dung do AI tạo, tùy chỉnh, và quyết định publish.
   3.  **Xây dựng UI Quản lý:**
       -   Component sidebar "Trang sản phẩm" để quản lý các trang **đã tạo**.
       -   Component tab "Trang sản phẩm" trong trang chi tiết property.
@@ -52,12 +54,19 @@ Mục tiêu chính là xây dựng một hệ thống cho phép người dùng *
       -   Tự động sinh metadata, canonical URL, và OG image.
   3.  **Tích hợp Style & Animation:**
       -   Áp dụng theme và animation cho các component section để tạo trải nghiệm ấn tượng.
+      -   **Thư viện sử dụng:** `Framer Motion`.
+      -   **Hiệu ứng cụ thể:** Tập trung vào các hiệu ứng tinh tế như fade-in-on-scroll cho các section và hiệu ứng hover cho các element tương tác.
 
 ### Giai đoạn 4: Hoàn thiện & Chuẩn bị Mở rộng
 - **Mục tiêu:** Xử lý các trường hợp ngoại lệ và đảm bảo kiến trúc sẵn sàng cho tương lai.
 - **Công việc:**
   1.  **Xử lý Edge Cases:**
-      -   Validate dữ liệu, xử lý lỗi từ AI, xử lý logic khi property bị xóa.
+      -   **Mục tiêu:** Đảm bảo ứng dụng hoạt động ổn định và cung cấp phản hồi hữu ích cho người dùng trong các tình huống không mong muốn.
+      -   **Các trường hợp cụ thể cần xử lý:**
+          -   **Lỗi AI:** AI trả về nội dung không hợp lệ, rỗng, hoặc không đúng định dạng. Hiển thị thông báo lỗi và cho phép người dùng thử lại.
+          -   **Dữ liệu đầu vào:** Người dùng nhập `audience` quá ngắn, quá dài, hoặc chứa nội dung không phù hợp. Validate và hướng dẫn người dùng.
+          -   **Xóa dữ liệu liên quan:** Xử lý logic khi một `property` bị xóa nhưng các `product page` liên quan vẫn tồn tại (ví dụ: hiển thị cảnh báo, cho phép gán lại, hoặc tự động xóa theo).
+          -   **Slug trùng lặp:** Đảm bảo `slug` là duy nhất. Nếu có khả năng trùng, tự động thêm hậu tố (ví dụ: `can-ho-cao-cap-2`).
   2.  **Hoàn thiện tính năng:**
       -   Bổ sung các tiện ích: copy link, xem analytics cơ bản.
   3.  **Chuẩn bị cho tương lai (Kiến trúc):**
@@ -105,8 +114,20 @@ Mỗi document sẽ đại diện cho một trang sản phẩm đã được t�
   "title": "string",    // do AI sinh ra
   "usp": "string",      // do AI sinh ra
   "content": {
-    "hero": { "..."},
-    "features": { "..." }
+    // Cấu trúc của object này sẽ tuân theo schema của templateId đã chọn.
+    // Ví dụ, nếu template có section "hero" với các field "title", "subtitle":
+    "hero": {
+      "title": "string",
+      "subtitle": "string",
+      "image": "string" // URL đến ảnh (được phục vụ qua proxy)
+    },
+    // Và section "features" với field "items":
+    "features": {
+      "items": [
+        { "text": "string", "icon": "string" },
+        { "text": "string", "icon": "string" }
+      ]
+    }
   },
   "createdAt": "Timestamp",
   "updatedAt": "Timestamp"
@@ -120,7 +141,7 @@ Mỗi document sẽ đại diện cho một trang sản phẩm đã được t�
   "id": "modern-apartment-01",
   "name": "Căn hộ hiện đại",
   "description": "Template cho căn hộ hiện đại, phù hợp gia đình trẻ.",
-  "thumbnail": "/product-assets/template-modern.png",
+  "thumbnail": "/templates/modern-apartment-01.png",
   "sections": [
     {
       "id": "hero",
@@ -144,6 +165,10 @@ Mỗi document sẽ đại diện cho một trang sản phẩm đã được t�
   ]
 }
 ```
+**Lưu ý về `thumbnail` của template:**
+- Ảnh thumbnail cho template là tài sản tĩnh của ứng dụng, không phải do người dùng tải lên.
+- Do đó, chúng được coi là một ngoại lệ và sẽ được lưu trữ trực tiếp trong thư mục `public/templates/` để truy cập công khai, giúp đơn giản hóa việc hiển thị trong giao diện chọn template.
+- Cơ chế proxy backend chỉ áp dụng cho tài sản số của người dùng (ảnh/video BĐS).
 
 ---
 
