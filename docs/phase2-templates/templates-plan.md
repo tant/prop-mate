@@ -1,12 +1,12 @@
-# Kế hoạch triển khai: Landing Page theo Template (MVP)
+# Kế hoạch triển khai: Trang sản phẩm theo Template (MVP)
 
-> Tài liệu này mô tả kế hoạch chi tiết để triển khai tính năng Landing Page theo Template, dựa trên các yêu cầu đã được định nghĩa trong PRD. **Trọng tâm của MVP là cung cấp một bộ template có sẵn (hardcoded) cho người dùng lựa chọn, không bao gồm chức năng quản trị template.**
+> Tài liệu này mô tả kế hoạch chi tiết để triển khai tính năng Trang sản phẩm theo Template, dựa trên các yêu cầu đã được định nghĩa trong PRD. **Trọng tâm của MVP là cung cấp một bộ template có sẵn (hardcoded) cho người dùng lựa chọn, không bao gồm chức năng quản trị template.**
 
 ---
 
 ## 1. Tổng quan & Mục tiêu
 
-Mục tiêu chính là xây dựng một hệ thống cho phép người dùng **chọn từ các mẫu có sẵn** để tạo, quản lý và xuất bản các landing page bất động sản một cách nhanh chóng. Các trang landing page phải có thiết kế ấn tượng, thu hút, tối ưu cho SEO và responsive.
+Mục tiêu chính là xây dựng một hệ thống cho phép người dùng **chọn từ các mẫu có sẵn** để tạo, quản lý và xuất bản các trang sản phẩm bất động sản một cách nhanh chóng. Các trang sản phẩm phải có thiết kế ấn tượng, thu hút, tối ưu cho SEO và responsive.
 
 ---
 
@@ -19,33 +19,33 @@ Mục tiêu chính là xây dựng một hệ thống cho phép người dùng *
       -   Thiết kế và định nghĩa schema cho 2-3 template **hardcoded** trong code.
       -   Mỗi schema quy định rõ các section, slot, và các trường dữ liệu.
   2.  **Thiết kế Data Contract:**
-      -   Tạo các interface/type trong TypeScript (sử dụng Zod để validation) cho `LandingPage`, `TemplateSchema`, `Section`.
+      -   Tạo các interface/type trong TypeScript (sử dụng Zod để validation) cho `ProductPage`, `TemplateSchema`, `Section`.
       -   Chuẩn hóa cấu trúc lưu trữ trên Firestore.
   3.  **Xây dựng Backend API (tRPC):**
-      -   API tạo landing page (sẽ tự động gán `userId` của người dùng đang đăng nhập).
-      -   APIs CRUD cho dữ liệu landing page của người dùng (lấy danh sách, chi tiết, xóa, cập nhật). **Quan trọng: Mọi API truy xuất hoặc thay đổi dữ liệu đều phải xác thực `userId` để đảm bảo chỉ chủ sở hữu mới có quyền truy cập.**
+      -   API tạo trang sản phẩm (tự động gán `userId` của người dùng đang đăng nhập).
+      -   APIs CRUD cho dữ liệu trang sản phẩm của người dùng (lấy danh sách, chi tiết, xóa, cập nhật). **Quan trọng: Mọi API truy xuất hoặc thay đổi dữ liệu đều phải xác thực `userId` để đảm bảo chỉ chủ sở hữu mới có quyền truy cập.**
   4.  **Tích hợp Google AI (Gemini):**
-      -   Xây dựng service gọi AI, xử lý prompt và parse JSON output theo schema của template được chọn.
+      -   Xây dựng service gọi AI, xử lý prompt (chỉ gồm audience và context property nếu có), AI sẽ tự động sinh title, USP và toàn bộ nội dung trang theo schema của template được chọn.
 
 ### Giai đoạn 2: Giao diện Người dùng (End-user UI)
 - **Mục tiêu:** Xây dựng giao diện cho phép người dùng **sử dụng** các template có sẵn.
 - **Công việc:**
   1.  **Thiết kế UI/UX:**
-      -   Phác thảo luồng người dùng: **chọn template**, điền thông tin, preview, và publish.
+      -   Phác thảo luồng người dùng: **chọn template**, nhập đối tượng khách hàng mục tiêu (audience), preview, và publish.
       -   Thiết kế component cho sidebar quản lý và tab trong từng property.
-  2.  **Xây dựng UI Tạo Landing Page:**
+  2.  **Xây dựng UI Tạo Trang sản phẩm:**
       -   Giao diện cho phép người dùng **chọn một trong các template có sẵn**.
-      -   Form "tạo nhanh" với 3 trường chính.
+      -   Form "tạo nhanh" chỉ nhập audience (đối tượng khách hàng mục tiêu).
       -   Giao diện chỉnh sửa chi tiết cho phép tùy chỉnh nội dung của các section đã được định nghĩa trong template.
   3.  **Xây dựng UI Quản lý:**
-      -   Component sidebar "Landing Pages" để quản lý các trang **đã tạo**.
-      -   Component tab "Landing Pages" trong trang chi tiết property.
+      -   Component sidebar "Trang sản phẩm" để quản lý các trang **đã tạo**.
+      -   Component tab "Trang sản phẩm" trong trang chi tiết property.
 
 ### Giai đoạn 3: Giao diện Public & Tối ưu (Public UI & Optimization)
-- **Mục tiêu:** Hiển thị landing page cho người dùng cuối và tối ưu hóa hiệu năng.
+- **Mục tiêu:** Hiển thị trang sản phẩm cho người dùng cuối và tối ưu hóa hiệu năng.
 - **Công việc:**
   1.  **Render Trang Public:**
-      -   Tạo route động `/p/[slug]` để render landing page từ dữ liệu Firestore.
+      -   Tạo route động `/p/[slug]` để render trang sản phẩm từ dữ liệu Firestore.
       -   Xây dựng các component React tương ứng với từng `section type` (ví dụ: Hero, Gallery, Features).
   2.  **Tối ưu Performance & SEO:**
       -   Áp dụng SSG/ISR để tối ưu tốc độ tải trang.
@@ -69,34 +69,34 @@ Mục tiêu chính là xây dựng một hệ thống cho phép người dùng *
 
 ### 3.1. Cấu trúc thư mục & Codebase
 -   **Constants & Types:**
-    -   `src/constants/landing-templates.ts`: Chứa schema hardcoded của các template.
-    -   `src/constants/landing-themes.ts`: (Tùy chọn) Định nghĩa các biến theme cho từng template.
-    -   `src/types/landing-page.ts`: Định nghĩa các type, interface liên quan.
+    -   `src/constants/product-templates.ts`: Chứa schema hardcoded của các template.
+    -   `src/constants/product-themes.ts`: (Tùy chọn) Định nghĩa các biến theme cho từng template.
+    -   `src/types/product-page.ts`: Định nghĩa các type, interface liên quan.
 -   **Backend (tRPC):**
-    -   `src/server/api/routers/landing-page.ts`: Chứa các procedures tRPC.
+    -   `src/server/api/routers/product-page.ts`: Chứa các procedures tRPC.
 -   **Frontend Components:**
-    -   `src/components/page-landing/`: Chứa các component chuyên biệt cho landing page (sections, forms, management UI).
-    -   `src/styles/landing/`: (Tùy chọn) Chứa các file CSS module hoặc style config.
+    -   `src/components/page-product/`: Chứa các component chuyên biệt cho trang sản phẩm (sections, forms, management UI).
+    -   `src/styles/product/`: (Tùy chọn) Chứa các file CSS module hoặc style config.
 -   **Public Page & Assets:**
-    -   `src/app/p/[slug]/page.tsx`: Route render landing page public.
-    -   `public/landing-assets/`: Chứa các hình ảnh, icon, video chung cho các template.
+    -   `src/app/p/[slug]/page.tsx`: Route render trang sản phẩm public.
+    -   `public/product-assets/`: Chứa các hình ảnh, icon, video chung cho các template.
 -   **Libraries & Helpers:**
     -   `src/lib/animation/`: (Tùy chọn) Chứa các helper hoặc config cho framer-motion.
 
 ### 3.2. Mô hình dữ liệu
 
-#### Firestore Collection: `landingPages`
-Mỗi document sẽ đại diện cho một landing page đã được tạo.
+#### Firestore Collection: `productPages`
+Mỗi document sẽ đại diện cho một trang sản phẩm đã được tạo.
 ```json
 {
-  "userId": "string", // ID của người dùng sở hữu landing page này
+  "userId": "string", // ID của người dùng sở hữu trang sản phẩm này
   "propertyId": "string",
   "templateId": "string",
   "slug": "string",
   "status": "draft" | "published" | "unlisted",
-  "title": "string",
-  "audience": "string",
-  "usp": "string",
+  "audience": "string", // input của user
+  "title": "string",    // do AI sinh ra
+  "usp": "string",      // do AI sinh ra
   "content": {
     "hero": { "..."},
     "features": { "..." }
@@ -107,13 +107,13 @@ Mỗi document sẽ đại diện cho một landing page đã được tạo.
 ```
 
 #### Ví dụ JSON Schema của một Template
-Đây là cấu trúc được định nghĩa trong `src/constants/landing-templates.ts`.
+Đây là cấu trúc được định nghĩa trong `src/constants/product-templates.ts`.
 ```json
 {
   "id": "modern-apartment-01",
   "name": "Căn hộ hiện đại",
   "description": "Template cho căn hộ hiện đại, phù hợp gia đình trẻ.",
-  "thumbnail": "/landing-assets/template-modern.png",
+  "thumbnail": "/product-assets/template-modern.png",
   "sections": [
     {
       "id": "hero",
@@ -143,16 +143,16 @@ Mỗi document sẽ đại diện cho một landing page đã được tạo.
 ## 4. Tiêu chí hoàn thành (Definition of Done)
 
 - [ ] **Chức năng:**
-  - [ ] Tạo được landing page qua luồng "siêu nhanh" (3 trường).
+  - [ ] Tạo được trang sản phẩm qua luồng "siêu nhanh" (chỉ nhập audience).
   - [ ] Chỉnh sửa được nội dung từng section.
-  - [ ] Publish/Unpublish được landing page.
+  - [ ] Publish/Unpublish được trang sản phẩm.
   - [ ] Quản lý tập trung qua sidebar và trong từng property.
   - [ ] Trang public (`/p/:slug`) render đúng nội dung và layout theo template.
 - [ ] **Phi chức năng:**
   - [ ] Trang public có điểm Lighthouse (Performance) trên 85.
   - [ ] Giao diện responsive trên mobile, tablet, và desktop.
   - [ ] Dữ liệu được validate cẩn thận ở cả client và server.
-  - [ ] **Logic phân quyền được áp dụng: Người dùng chỉ thấy và quản lý được landing page của chính mình.**
+  - [ ] **Logic phân quyền được áp dụng: Người dùng chỉ thấy và quản lý được trang sản phẩm của chính mình.**
   - [ ] Xử lý lỗi (từ AI, API) một cách tường minh cho người dùng.
 - [ ] **Tài liệu:**
   - [ ] Code được comment rõ ràng ở những phần logic phức tạp.

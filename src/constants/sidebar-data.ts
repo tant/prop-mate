@@ -5,6 +5,7 @@ import {
   IconBuildingMonument,
   IconLayoutKanban,
   IconBox,
+  IconHome,
 } from "@tabler/icons-react"
 
 const iconMap = {
@@ -14,6 +15,7 @@ const iconMap = {
   Landmark: IconBuildingMonument,
   FolderKanban: IconLayoutKanban,
   Boxes: IconBox,
+  Home: IconHome,
 } as const
 
 const navMainRaw = [
@@ -27,6 +29,11 @@ const navMainRaw = [
     title: "Bất động sản",
     url: "/properties",
     icon: "Building2",
+  },
+  {
+    title: "Trang sản phẩm",
+    url: "/property-pages",
+    icon: "Boxes",
   },
   {
     title: "Bản đồ",

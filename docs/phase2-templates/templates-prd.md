@@ -1,7 +1,7 @@
 # PRD: Trang Sản Phẩm (MVP)
 
-> **Document Purpose:** Tài liệu này mô tả mục tiêu, phạm vi, quy trình và tiêu chí nghiệm thu cho tính năng Trang Sản Phẩm (trước đây gọi là Landing Page).
-> **MVP Focus:** Bản phát hành đầu tiên cung cấp cho người dùng một tập các mẫu trang sản phẩm được định nghĩa sẵn. Quản trị template và đa ngôn ngữ nằm ngoài phạm vi MVP này. Giao diện và nội dung chỉ có tiếng Việt.
+> **Document Purpose:** Tài liệu này mô tả mục tiêu, phạm vi, quy trình và tiêu chí nghiệm thu cho tính năng Trang Sản Phẩm và tính năng tạo ra trang sản phẩm
+> **MVP Focus:** Bản phát hành đầu tiên cung cấp cho người dùng khả năng tạo ra các trang sản phẩm để chào bán, marketing một cách đơn giản, thuận tiện và dễ dàng từ các template đã định nghĩa sẵn trong hệ thống. Quản trị template và đa ngôn ngữ nằm ngoài phạm vi MVP này. Giao diện và nội dung chỉ có tiếng Việt.
 
 ---
 
@@ -17,8 +17,8 @@
 ## 2. Mục tiêu & Định hướng
 
 -   **Trao quyền cho người dùng:** Cho phép người dùng nhanh chóng tạo, quản lý và xuất bản nhiều trang sản phẩm đẹp mắt cho mỗi bất động sản.
--   **Marketing mục tiêu:** Cho phép tạo nhiều biến thể trang sản phẩm để nhắm đến các nhóm khách hàng khác nhau.
--   **Tối ưu quy trình:** Cung cấp 2 luồng tạo trang: AI siêu nhanh (3 trường) và chỉnh sửa thủ công chi tiết.
+-   **Marketing mục tiêu:** Cho phép tạo nhiều biến thể trang sản phẩm từ một bất động sản để nhắm đến các nhóm khách hàng khác nhau.
+-   **Tối ưu quy trình:** Cung cấp 2 luồng tạo trang: AI siêu nhanh (user chỉ nhập đối tượng khách hàng, AI tự sinh tiêu đề và USP) và chỉnh sửa thủ công chi tiết. Hai quy trình này nối tiếp nhau: tạo bằng AI và có thể hoặc không cần chỉnh sửa thủ công rồi public.
 -   **Đảm bảo chất lượng:** Tất cả trang sản phẩm sinh ra đều responsive, chuẩn SEO, dễ quản lý.
 
 ---
@@ -29,7 +29,7 @@
 
 -   **Template cứng:** 2-3 template định nghĩa sẵn, không thay đổi.
 -   **Hai luồng tạo trang:**
-    1.  **AI siêu nhanh:** Sinh toàn bộ trang sản phẩm chỉ từ 3 trường (Tiêu đề, Đối tượng, USP).
+    1.  **AI siêu nhanh:** User chỉ nhập đối tượng khách hàng mục tiêu (càng chi tiết càng tốt), AI sẽ tự động sinh tiêu đề (title) và USP phù hợp, sau đó sinh toàn bộ nội dung trang sản phẩm.
     2.  **Chỉnh sửa chi tiết:** Cho phép chỉnh sửa nội dung từng section sau khi AI sinh xong.
 -   **Quản lý tập trung:** Có mục "Trang sản phẩm" riêng ở sidebar để người dùng quản lý **các trang của mình**.
 -   **Quyền truy cập:** Trang sản phẩm có thể đặt là `Công khai` (tìm kiếm được) hoặc `Không công khai` (chỉ truy cập qua link trực tiếp).
@@ -48,8 +48,8 @@
 
 1.  **Khởi tạo:** Người dùng bấm "Tạo Trang sản phẩm mới" từ sidebar trung tâm hoặc từ trang chi tiết bất động sản.
 2.  **Chọn:** Người dùng chọn bất động sản liên quan (nếu chưa có context) và chọn template.
-3.  **Nhập liệu:** Người dùng nhập 3 trường: **Tiêu đề**, **Đối tượng**, **USP**.
-4.  **Sinh trang:** Hệ thống gọi AI (Gemini) sinh nội dung trang sản phẩm theo schema template. Chỉ sinh 1 lần.
+3.  **Nhập liệu:** Người dùng chỉ cần nhập đối tượng khách hàng mục tiêu (càng chi tiết càng tốt).
+4.  **Sinh trang:** Hệ thống gọi AI (Gemini) để tự động sinh tiêu đề (title), USP và toàn bộ nội dung trang sản phẩm dựa trên đối tượng khách hàng vừa nhập.
 5.  **Xem trước & quyết định:** Sau khi sinh, người dùng xem trước và chọn:
     a.  **Xuất bản ngay.**
     b.  **Chỉnh sửa thủ công** trước khi xuất bản.
@@ -76,7 +76,7 @@
 
 ### 5.2. Tích hợp AI (Gemini)
 
--   **Prompt:** Prompt gửi cho AI gồm 3 trường nhập, context BĐS (nếu có), hướng dẫn trả về JSON đúng schema template.
+-   **Prompt:** Prompt gửi cho AI chỉ gồm đối tượng khách hàng mục tiêu (càng chi tiết càng tốt) và context BĐS (nếu có). AI sẽ tự động sinh tiêu đề (title), USP và toàn bộ nội dung trang sản phẩm, trả về JSON đúng schema template.
 -   **Chỉ sinh 1 lần:** AI chỉ dùng cho lần tạo đầu. Muốn sinh lại phải tạo trang mới. Đơn giản hóa workflow và kỳ vọng người dùng.
 
 ### 5.3. Xuất bản & hiển thị
@@ -99,7 +99,7 @@
 
 ## 6. Tiêu chí nghiệm thu
 
--   Người dùng tạo thành công trang sản phẩm với luồng AI siêu nhanh (3 trường).
+-   Người dùng tạo thành công trang sản phẩm với luồng AI siêu nhanh (chỉ nhập đối tượng khách hàng mục tiêu, AI tự sinh title và USP).
 -   Người dùng xem và quản lý **chỉ các trang sản phẩm của mình** tại dashboard `/property-pages`.
 -   Hệ thống ngăn đúng việc truy cập hoặc quản lý trang sản phẩm của người khác.
 
