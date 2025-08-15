@@ -1,4 +1,3 @@
-
 # Project tech stack
 
 ## Core
@@ -23,7 +22,7 @@
 - **Zod** (schema validation)
 
 ## Backend/Cloud
-- **Firebase** & **Firebase Admin SDK** (database, auth, storage)
+- **Firebase** & **Firebase Admin SDK** (database, auth, storage - *lưu ý: storage dùng ở chế độ private, truy cập file qua backend proxy để bảo mật*)
 - **Google AI API** (gọi trực tiếp, không dùng Genkit)
 
 ## Dev Tools
@@ -44,13 +43,13 @@
 
 ```
 propmate/
-├── public/                  # Ảnh, icon, file tĩnh, assets
+├── public/                  # Chỉ chứa các file tĩnh chung của ứng dụng (logo, favicon). Toàn bộ tài sản số của người dùng (ảnh, video BĐS) được lưu trữ và bảo vệ, không đặt ở đây.
 │   └── page-home/           # Ảnh minh họa cho trang chủ
 ├── scripts/                 # Script tiện ích (reset Firestore, test firebase, ...)
 ├── src/
 │   ├── app/                 # Next.js app directory (routing, layout, pages)
-│   │   ├── (prop-mate-app)/ # App chính: layout, account, dashboard, properties
-│   │   ├── (public-pages)/  # Các trang public: about, contact, login, ...
+│   │   ├── (prop-mate-app)/ # App chính: layout, account, dashboard, properties, property-pages
+│   │   ├── (public-pages)/  # Các trang public: about, contact, login, products/[slug]
 │   │   ├── _trpc/           # tRPC client/provider cho app
 │   │   ├── api/             # API routes (login, logout, trpc)
 │   │   ├── favicon.ico
@@ -63,18 +62,18 @@ propmate/
 │   │   ├── page-home/
 │   │   ├── page-map/
 │   │   ├── page-properties/
-│   │   ├── page-story/
+│   │   ├── page-product/    # Components cho trang sản phẩm (sections, forms, renderer)
 │   │   ├── ui/              # UI nhỏ: button, card, input, ...
 │   │   └── ...              # Các component dùng chung
 │   ├── constants/           # Hằng số toàn dự án
 │   ├── hooks/               # Custom hook UI, logic
-│   ├── lib/                 # Tiện ích, config, firebase, genkit
+│   ├── lib/                 # Tiện ích, config, firebase
 │   │   ├── firebase/        # Firebase client & admin
 │   │   └── utils.ts
 │   ├── server/              # Business logic layer, backend service
-│   │   ├── api/             # tRPC root, routers, ...
+│   │   ├── api/             # tRPC root, routers (user, property, productPage, ...)
 │   │   └── auth/            # Xác thực phía server
-│   ├── types/               # Định nghĩa type/schema chung
+│   ├── types/               # Định nghĩa type/schema chung (user, property, productPage)
 ├── docs/                    # Tài liệu dự án, hướng dẫn, notes
 │   └── old-docs/            # Tài liệu cũ, lưu trữ
 ├── package.json
@@ -212,8 +211,10 @@ export const userRouter = router({
 // src/server/api/root.ts
 import { router } from './trpc'
 import { userRouter } from './routers/user'
+import { productPageRouter } from './routers/product-page' // ví dụ
 export const appRouter = router({
   user: userRouter,
+  productPage: productPageRouter,
   // ...other routers
 })
 ```

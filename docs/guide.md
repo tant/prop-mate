@@ -98,5 +98,5 @@
 - **Quy tắc:**
   - Không throw TRPCError ở tầng service.
   - Luôn catch và chuyển lỗi thành TRPCError ở router.
-  - Đặt message lỗi rõ ràng, dễ debug, không lộ thông tin nhạy cảm ra ngoài client.
+  - Đặt message lỗi rõ ràng, dễ debug, không lộ thông tin bảo mật ra ngoài client.
 

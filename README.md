@@ -1,4 +1,3 @@
-
 # PropMate: Real Estate Management App
 
 PropMate là ứng dụng hỗ trợ nhà môi giới bất động sản trong công tác tiếp thị bán hàng.
@@ -22,6 +21,8 @@ PropMate là ứng dụng hỗ trợ nhà môi giới bất động sản trong 
 
 - Quản lý tài sản, khách hàng, lịch hẹn trực quan
 - Tìm kiếm, lọc, xem chi tiết và bản đồ vị trí bất động sản
+- Tạo trang sản phẩm (landing page) chuyên nghiệp với sự hỗ trợ của AI để giới thiệu bất động sản.
+- Bảo mật tài sản số của người dùng (hình ảnh, video) với cơ chế proxy an toàn.
 - Đồng bộ dữ liệu real-time với Firebase
 - Đăng nhập, phân quyền, bảo mật dữ liệu
 - Hỗ trợ offline-first, tối ưu cho thiết bị di động
@@ -42,7 +43,7 @@ cp .env.sample .env.local # Điền thông tin Firebase vào file này
 
 ## 🔑 Cấu hình Firebase
 
-1. Làm theo hướng dẫn tại [`docs/make-firebase.md`](docs/make-firebase.md) để tạo project, lấy config, thiết lập rule bảo mật và Storage.
+1. Làm theo hướng dẫn tại [`docs/setup-firebase.md`](docs/setup-firebase.md) để tạo project, lấy config, thiết lập rule bảo mật và Storage.
 2. Lưu ý: Để sử dụng Storage, cần nâng cấp Firebase lên gói Blaze (Pay as you go).
 
 ---
@@ -81,7 +82,7 @@ Truy cập: http://localhost:3000
 
 ### Backend/Cloud
 - **Firebase** & **Firebase Admin SDK** (database, auth, storage)
-- **Google AI API** (gọi trực tiếp, không dùng Genkit)
+- **Google Gemini** (generative AI)
 
 ### Dev Tools
 - **ESLint**, **eslint-config-next**, **@biomejs/biome** (lint/format)

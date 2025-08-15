@@ -45,7 +45,7 @@ Mục tiêu chính là xây dựng một hệ thống cho phép người dùng *
 - **Mục tiêu:** Hiển thị trang sản phẩm cho người dùng cuối và tối ưu hóa hiệu năng.
 - **Công việc:**
   1.  **Render Trang Public:**
-      -   Tạo route động `/p/[slug]` để render trang sản phẩm từ dữ liệu Firestore.
+      -   Tạo route động `/products/[slug]` để render trang sản phẩm từ dữ liệu Firestore.
       -   Xây dựng các component React tương ứng với từng `section type` (ví dụ: Hero, Gallery, Features).
   2.  **Tối ưu Performance & SEO:**
       -   Áp dụng SSG/ISR để tối ưu tốc độ tải trang.
@@ -78,8 +78,15 @@ Mục tiêu chính là xây dựng một hệ thống cho phép người dùng *
     -   `src/components/page-product/`: Chứa các component chuyên biệt cho trang sản phẩm (sections, forms, management UI).
     -   `src/styles/product/`: (Tùy chọn) Chứa các file CSS module hoặc style config.
 -   **Public Page & Assets:**
-    -   `src/app/p/[slug]/page.tsx`: Route render trang sản phẩm public.
-    -   `public/product-assets/`: Chứa các hình ảnh, icon, video chung cho các template.
+    -   `src/app/(public-pages)/products/[slug]/page.tsx`: Route render trang sản phẩm public (URL: /products/[slug]).
+    -   `src/app/property-pages/page.tsx`: Trang dashboard quản lý tất cả trang sản phẩm của user.
+    -   `src/app/property-pages/add/page.tsx`: Trang tạo mới product page (trang sản phẩm).
+    -   **Lưu ý về assets sản phẩm:**
+        -   Ảnh, video, file sản phẩm **không lưu trong thư mục public/**.
+        -   Tất cả file sản phẩm được lưu ở Firebase Storage ở chế độ private.
+        -   Khi user cần truy cập file, frontend sẽ gọi API backend. Backend kiểm tra quyền, sau đó tải file từ Firebase Storage và stream về cho user (proxy backend).
+        -   Không bao giờ trả về link public hoặc signed URL cho file sản phẩm.
+        -   Có thể log, kiểm soát, và áp dụng các chính sách bảo mật, chống tải hàng loạt/chôm hàng.
 -   **Libraries & Helpers:**
     -   `src/lib/animation/`: (Tùy chọn) Chứa các helper hoặc config cho framer-motion.
 
@@ -147,7 +154,7 @@ Mỗi document sẽ đại diện cho một trang sản phẩm đã được t�
   - [ ] Chỉnh sửa được nội dung từng section.
   - [ ] Publish/Unpublish được trang sản phẩm.
   - [ ] Quản lý tập trung qua sidebar và trong từng property.
-  - [ ] Trang public (`/p/:slug`) render đúng nội dung và layout theo template.
+  - [ ] Trang public (`/products/:slug`) render đúng nội dung và layout theo template.
 - [ ] **Phi chức năng:**
   - [ ] Trang public có điểm Lighthouse (Performance) trên 85.
   - [ ] Giao diện responsive trên mobile, tablet, và desktop.

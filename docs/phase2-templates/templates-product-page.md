@@ -72,13 +72,14 @@ Thay vì code cứng một layout, chúng ta sẽ xây dựng một hệ thống
 
 -   **Mục tiêu:** Hoàn thiện luồng từ URL đến trang sản phẩm hoàn chỉnh.
 -   **Công việc:**
-    1.  Cập nhật trang `src/app/p/[slug]/page.tsx`.
+    1.  Cập nhật trang `src/app/(public-pages)/products/[slug]/page.tsx` (URL: /products/[slug]).
     2.  Trang này sẽ gọi API tRPC để lấy dữ liệu của một trang sản phẩm cụ thể.
     3.  Dữ liệu trả về sẽ chứa thông tin về `templateId` và `content` (dữ liệu cho từng section).
     4.  Trang sẽ truyền dữ liệu này vào component `ProductPageRenderer` để hiển thị trang.
     5.  Tích hợp các style và animation chung (ví dụ: `useScrollAnimation`) vào trang.
+    6.  **Lưu ý về asset:** Ảnh, video, file sản phẩm không lưu ở public, chỉ truy cập qua backend proxy, không trả link public hoặc signed URL.
 -   **File liên quan:**
-    -   **Cập nhật:** `src/app/p/[slug]/page.tsx`
+    -   **Cập nhật:** `src/app/(public-pages)/products/[slug]/page.tsx`
     -   **Tạo mới/Cập nhật:** `src/hooks/use-scroll-animation.ts`, `src/styles/product/animations.css`
 
 ---
