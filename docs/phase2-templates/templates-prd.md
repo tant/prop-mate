@@ -1,144 +1,109 @@
-# PRD: Landing Page theo Template cho từng Bất động sản (MVP)
+# PRD: Templated Landing Pages for Properties (MVP)
 
-> Tài liệu PRD này mô tả mục tiêu, phạm vi, luồng nghiệp vụ, yêu cầu chức năng/phi chức năng và tiêu chí chấp nhận cho tính năng Landing Page theo Template.
-
----
-
-## Định nghĩa Thuật ngữ
-
-Để đảm bảo sự nhất quán, chúng ta phân biệt rõ hai khái niệm sau:
-
--   **Template:** Là một **bản thiết kế (blueprint)** được định nghĩa sẵn trong hệ thống (hardcoded). Template quy định về cấu trúc layout, các loại section có thể có, và phong cách thiết kế chung. Template được **dùng chung** cho tất cả người dùng.
--   **Landing Page:** Là một **trang web cụ thể** được sinh ra (generate) *từ* một Template. Mỗi Landing Page sẽ chứa dữ liệu riêng của một bất động sản, được tạo và quản lý bởi một người dùng duy nhất. Landing Page là **tài sản riêng** của người dùng tạo ra nó và không thể bị truy cập hay quản lý bởi người dùng khác.
+> **Document Purpose:** This Product Requirements Document (PRD) outlines the goals, scope, workflows, and acceptance criteria for the Templated Landing Page feature.
+> **MVP Focus:** The initial release focuses on providing users with a set of hardcoded templates. Template administration and multi-language support are out of scope for this MVP. The application's UI and generated content will be exclusively in Vietnamese.
 
 ---
 
-## 1. Out of Scope (Không nằm trong phạm vi MVP)
-- Không hỗ trợ phân quyền, quản trị template, CRUD template.
-- Không có i18n/đa ngôn ngữ, chỉ tiếng Việt.
-- Không có versioning, rollback, regenerate landing page.
-- Không có password protection, không có analytics nâng cao.
-- Không có A/B testing, không có tích hợp bên thứ ba (CRM, email, v.v.).
-- Không có lịch sử chỉnh sửa, không có workflow duyệt/publish nhiều bước.
+## 1. Terminology
 
-## 2. Quản lý landing page tập trung qua sidebar (UX đề xuất)
-• Thêm nav item riêng ở sidebar (ví dụ: “Landing Pages”, “Trang chào bán”) để quản lý tất cả landing page đã tạo.
-• Tính năng: xem tổng quan, tìm kiếm, lọc, bulk action, analytics, truy cập nhanh về property hoặc edit landing page.
-• Vẫn giữ tab “Landing Pages” trong từng property để thao tác theo ngữ cảnh BĐS.
+To ensure clarity and consistency, the following terms are defined:
 
-## 3. Luồng tạo landing page siêu nhanh (3 trường)
-• User chỉ cần nhập: Tiêu đề/Địa chỉ, Đối tượng khách hàng (audience), USP (điểm nổi bật nhất).
-• AI chỉ generate 1 lần duy nhất toàn bộ nội dung landing page dựa trên 3 trường này + dữ liệu property (nếu có).
-• Sau khi AI generate xong, user có 3 lựa chọn:
-  - Dùng luôn (publish ngay)
-  - Chỉnh sửa thủ công rồi publish
-  - Xóa landing page này và tạo landing page mới để dùng AI lại từ đầu
-• Không hỗ trợ regenerate từng section hoặc toàn bộ landing page.
-• Prompt Gemini: “Hãy tạo nội dung marketing hấp dẫn cho landing page bất động sản với các thông tin: [title], [audience], [USP]. Nếu property có dữ liệu chi tiết (ảnh, giá, diện tích, tiện ích…), hãy tận dụng tối đa. Xuất ra JSON đúng schema template.”
-
-## 4. Mục tiêu
-• Cho phép user tạo, quản lý, xuất bản nhiều landing page cho mỗi BĐS, nhắm tới các nhóm audience khác nhau.
-• Tối ưu thao tác: có thể tạo nhanh chỉ với 3 trường hoặc chỉnh chi tiết từng section nếu muốn.
-• Đảm bảo landing page đẹp, responsive, SEO tốt, dễ quản lý tập trung.
-
-## 5. Phạm vi (MVP)
-• 2–3 template hardcoded, mỗi template định nghĩa section/slot rõ ràng (schema).
-• Tạo landing page bằng 2 luồng: “siêu nhanh” (3 trường) hoặc “chỉnh chi tiết” (edit section).
-• Access mode: Public/Unlisted .
-• Quản lý tập trung qua sidebar + tab trong property.
-
-### Enum đề xuất cho tone và audience
-- **Tone:** sang_trong, gan_gui, dau_tu, nang_dong, yen_binh, custom
-- **Audience:** gia_dinh_tre, nha_dau_tu, chuyen_gia, nguoi_lon_tuoi, doanh_nghiep, khach_nuoc_ngoai, custom
-> UI cho chọn nhanh enum, cho phép nhập custom. Prompt AI truyền cả enum lẫn mô tả tiếng Việt.
-
-## 6. Luồng người dùng (happy path)
-• Từ sidebar “Landing Pages” hoặc tab trong property → “Tạo mới”.
-• Chọn property (nếu từ sidebar), chọn template (hoặc mặc định).
-• Chọn luồng: “Tạo nhanh” (3 trường) hoặc “Chỉnh chi tiết”.
-• Nhập 3 trường (title, audience, USP) → Generate (AI chỉ sinh 1 lần) → Preview.
-• User chọn: publish ngay, chỉnh sửa thủ công rồi publish, hoặc xóa để tạo landing page mới (AI generate lại từ đầu).
-• Chọn access (Public/Unlisted), đặt slug (unique, không PII) → Publish.
-• Quản lý, tìm kiếm, lọc, bulk action từ sidebar hoặc property.
-
-## 7. Mô hình Template (hardcoded, schema rõ ràng)
-• Template = metadata (id, name, mô tả, thumbnail) + danh sách section/slot (schema, required/optional, kiểu dữ liệu).
-• AI sinh ra object {field: value} đúng schema, engine render thành landing page.
-• Có thể mở rộng template về sau (CRUD, version, DB).
-
-## 8. Dữ liệu và lưu trữ (Firestore)
-• Collection: landingPages
-  - propertyId, templateId, status: draft|published
-  - slug (unique, không chứa PII)
-  - tone (enum + custom), audience (enum + custom)
-  - access: public|unlisted
-  - sections: JSON nội dung theo template (đã validate)
-  - seo: title, description, ogImageUrl
-  - createdAt, updatedAt, publishedAt
-
-
-## 9. Tích hợp AI (Google AI API – Gemini)
-• Prompt gồm: snapshot property (nếu có), 3 trường nhập, enum tone/audience, yêu cầu output JSON đúng schema template.
-• Nếu thiếu dữ liệu property, AI sinh nội dung trung tính hoặc để trống.
-• Không hỗ trợ regenerate section hoặc toàn bộ landing page. Nếu muốn dùng AI lại, user phải xóa landing page này và tạo mới.
-• Cache chỉ áp dụng cho lần generate đầu tiên.
-
-## 10. Xuất bản & Render trang công khai
-• URL: /p/:slug (unique, không PII)
-• SSG/ISR (revalidate by tag/time)
-• Access: Public (index, vào sitemap nếu canonical), Unlisted (noindex, không vào sitemap)
-• SEO: metadata từ section, noindex đúng quy tắc
-• OG image: heroImage/gallery[0]
-
-## 11. Trải nghiệm chỉnh sửa (trong app)
-• Preview WYSIWYG theo template
-• Chỉnh nhanh text/bullets, reorder, chọn ảnh
-• Không có regenerate section hoặc toàn bộ
-• Gắn nhãn AI/manual
-• Quản lý nhiều biến thể theo audience, canonical
-
-## 12. Quy tắc slug và xuất bản
-• Slug: shortid tự sinh (ví dụ: /p/abc123xy), đảm bảo unique, không chứa PII, không lộ thông tin nhạy cảm.
-• Không chứa PII (số điện thoại, email...)
-• Kiểm tra trùng slug, tự sinh lại nếu cần
-• Publish: draft → published, cập nhật sitemap/ISR
-• Unpublish: chuyển về draft, URL trả 404/410
-
-## 13. Trường hợp biên & xử lý lỗi
-• Thiếu dữ liệu property: báo field cần bổ sung, phần optional có thể ẩn/placeholder
-• AI trả JSON lỗi: auto-fix nhẹ, nếu không được thì báo lỗi, user phải xóa và tạo mới để dùng AI lại
-• Đổi dữ liệu property sau publish: gợi ý tạo landing page mới nếu muốn cập nhật nội dung AI
-• Xoá property: landing page ẩn hoặc tombstone
-
-## 14. Yêu cầu phi chức năng
-• Publish/unpublish < 3s (cả revalidate), TTFB < 500ms khi đã ISR
-• Nếu AI lỗi, user vẫn tự điền thủ công và publish
-• Hợp đồng dữ liệu template rõ ràng, sẵn sàng tách DB, thêm admin
-• Accessibility: AA, keyboard, alt text ảnh
-
-## 15. Tiêu chí chấp nhận (Acceptance Criteria)
-• User tạo landing page với 3 trường hoặc chỉnh chi tiết
-• Tạo ≥2 biến thể audience cho 1 property, mỗi biến thể slug riêng, canonical đúng
-• Chọn access Public/Unlisted, trang Unlisted không vào sitemap, có noindex
-• Sửa section, preview, publish, copy link, bulk action
-• Trang public responsive, SEO/OG đúng, canonical/noindex hoạt động
-
-## 16. Lộ trình triển khai
-• Sprint 1: Template registry (hardcoded), schema, prompt, UI tạo nhanh, preview, lưu draft
-• Sprint 2: Publish, slug, SEO, sitemap, canonical, sidebar quản lý, bulk action
-• Sprint 3: OG image, unpublish, A/B test, analytics
-
-## 17. Nền tảng cho phần Admin sau này
-• Template CRUD, version, DB
-• Lịch sử chỉnh sửa, quyền publish/duyệt
-
-## Checklist xác nhận
-• Số lượng template MVP, style
-• Field property bắt buộc
-• Enum tone/audience, độ dài mô tả section
-• CTA chính
+-   **Template:** A system-defined, hardcoded **blueprint** that dictates the layout structure, available section types, and overall design style. Templates are **shared** and available to all users.
+-   **Landing Page:** A **specific, generated web page** created *from* a Template. Each Landing Page contains unique data for a single property and is created and managed by an individual user. A Landing Page is the **private asset** of its creator and cannot be accessed or managed by other users.
 
 ---
-Ghi chú: Ngôn ngữ luôn là tiếng Việt, không có locale/i18n trong MVP. Nếu cần chuyển sang template HTML + slot, chỉ cần cập nhật lại schema và data contract.
+
+## 2. Goals & Objectives
+
+-   **Empower Users:** Allow users to quickly create, manage, and publish multiple, visually appealing landing pages for each property.
+-   **Targeted Marketing:** Enable the creation of different landing page variations to target specific customer audiences.
+-   **Streamline Workflow:** Offer two creation flows: a "super-fast" 3-field AI generation and a detailed manual editing mode.
+-   **Ensure Quality:** Guarantee that all generated pages are responsive, SEO-friendly, and easily manageable.
+
+---
+
+## 3. Scope
+
+### 3.1. In Scope (MVP)
+
+-   **Hardcoded Templates:** 2-3 predefined templates with clear, unchangeable schemas.
+-   **Dual Creation Flows:**
+    1.  **Super-Fast AI Flow:** Generate a complete landing page from just 3 input fields (Title, Audience, USP).
+    2.  **Detailed Editing Flow:** Manually edit the content of each section after AI generation.
+-   **Centralized Management:** A dedicated "Landing Pages" section in the main sidebar for users to manage **their own** pages.
+-   **Access Control:** Landing pages can be set to `Public` (discoverable by search engines) or `Unlisted` (accessible only via direct link).
+-   **Vietnamese Language Only:** All UI and generated content will be in Vietnamese.
+
+### 3.2. Out of Scope (MVP)
+
+-   **No Template Administration:** No UI for creating, editing, or deleting templates (CRUD).
+-   **No Internationalization (i18n):** No support for multiple languages.
+-   **No Advanced Features:** No versioning, A/B testing, password protection, or third-party integrations (e.g., CRM, email marketing).
+-   **No Complex Workflows:** No multi-step approval/publishing workflows or edit history.
+
+---
+
+## 4. User Workflow (Happy Path)
+
+1.  **Initiate:** User clicks "Create New Landing Page" from the central sidebar or from within a specific property's page.
+2.  **Select:** User selects the associated property (if not already in context) and chooses one of the available templates.
+3.  **Input:** User provides three core inputs: a **Title**, the target **Audience**, and the key **Unique Selling Proposition (USP)**.
+4.  **Generate:** The system calls the AI (Gemini) to generate the full landing page content based on the user's input and the selected template's schema. This is a **one-time generation** process.
+5.  **Review & Decide:** After generation, the user previews the page and chooses one of three actions:
+    a.  **Publish Immediately.**
+    b.  **Edit Manually** before publishing.
+    c.  **Delete & Restart** to re-run the AI generation from scratch.
+6.  **Publish:** User configures the page's access (`Public`/`Unlisted`) and a unique `slug` is generated. The page goes live.
+7.  **Manage:** User can later find, filter, and manage their created landing page from the central management dashboard.
+
+---
+
+## 5. Technical & Functional Requirements
+
+### 5.1. Template & Data Model (Hardcoded)
+
+-   **Template Schema:** Each template is an object defined in the codebase, containing metadata (id, name, thumbnail) and a schema defining its sections, slots, and data types.
+-   **Data Storage (Firestore):** A `landingPages` collection will store the generated page data. Each document must include:
+    -   `userId`: The ID of the owner. **(Crucial for access control)**
+    -   `propertyId`: The associated property.
+    -   `templateId`: The ID of the blueprint used.
+    -   `status`: `draft` | `published` | `unlisted`.
+    -   `slug`: A unique, non-PII identifier for the URL.
+    -   `content`: A JSON object containing the page's content, validated against the template's schema.
+    -   `seo`: { `title`, `description`, `ogImageUrl` }.
+    -   Timestamps (`createdAt`, `updatedAt`).
+
+### 5.2. AI Integration (Gemini)
+
+-   **Prompt Engineering:** The prompt sent to the AI will include the user's three inputs, context from the associated property (if available), and a clear instruction to output a JSON object that strictly follows the template's schema.
+-   **One-Time Generation:** The AI is used only for the initial content creation. Re-generating content requires creating a new landing page. This simplifies the workflow and manages user expectations.
+
+### 5.3. Publishing & Rendering
+
+-   **URL Structure:** Public pages will be available at a clean URL, e.g., `/p/[slug]`.
+-   **Performance:** Pages will be rendered using SSG/ISR for optimal load times (TTFB < 500ms).
+-   **SEO:**
+    -   `Public` pages will be included in the sitemap and indexed.
+    -   `Unlisted` pages will have a `noindex` meta tag and be excluded from the sitemap.
+    -   The Open Graph (OG) image will default to the property's hero image.
+
+### 5.4. Non-Functional Requirements
+
+-   **Performance:** Publish/unpublish actions should complete in < 3 seconds.
+-   **Security:** All API endpoints for accessing or modifying landing page data **must** validate that the request is coming from the `userId` who owns the document.
+-   **Scalability:** The architecture should be modular, allowing for the potential addition of a template admin system in the future without a major refactor.
+-   **Accessibility:** All generated pages should meet WCAG AA standards.
+
+---
+
+## 6. Acceptance Criteria
+
+-   A user can successfully create a landing page using the 3-field "super-fast" flow.
+-   A user can edit the AI-generated content of each section before publishing.
+-   A user can view and manage **only their own** landing pages from the central dashboard.
+-   The `Public` vs. `Unlisted` access control correctly applies `noindex` tags and sitemap inclusion rules.
+-   The final public page is fully responsive across mobile, tablet, and desktop devices.
+-   The system correctly prevents a user from accessing or managing another user's landing pages.
 
 
