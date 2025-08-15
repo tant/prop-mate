@@ -1,3 +1,6 @@
+# Ignore Gemini and chatmodes
+.gemini
+.github/chatmodes
 # qwen, gemni, serena
 .qwen/
 .gemni/
