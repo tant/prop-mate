@@ -38,39 +38,26 @@
 
 ---
 
-### 3. Quản lý landing page tập trung
-> Là một nhà môi giới, tôi muốn xem, tìm kiếm, lọc, và thao tác hàng loạt với các landing page đã tạo từ sidebar để dễ dàng quản lý và theo dõi hiệu quả.
+### 3. Quản lý landing page của cá nhân
+> Là một nhà môi giới, tôi muốn xem, tìm kiếm, lọc, và thao tác hàng loạt với các landing page **do mình tạo ra** từ một khu vực quản lý tập trung để dễ dàng theo dõi và kiểm soát công việc.
 
-**Mô tả chi tiết:** Tất cả landing page được quản lý tập trung tại sidebar. Người dùng có thể xem danh sách, tìm kiếm theo từ khóa, lọc theo trạng thái (draft/published), thao tác hàng loạt như xóa, publish, unpublish... giúp tiết kiệm thời gian và kiểm soát tốt hơn.
+**Mô tả chi tiết:** Tất cả landing page **của người dùng** được quản lý tập trung tại một mục riêng trên sidebar. Người dùng có thể xem danh sách các trang **của mình**, tìm kiếm theo từ khóa, lọc theo trạng thái (draft/published), và thực hiện các thao tác hàng loạt như xóa, publish, unpublish...
 
 **Flow nghiệp vụ:**
 1. Người dùng truy cập sidebar "Landing Pages".
-2. Xem danh sách landing page, tìm kiếm, lọc theo trạng thái, property, audience...
-3. Chọn nhiều landing page để thao tác bulk (xóa, publish, unpublish).
+2. Hệ thống hiển thị danh sách **chỉ các landing page do người dùng đó tạo ra**.
+3. Người dùng tìm kiếm, lọc trên danh sách trang của mình.
+4. Chọn một hoặc nhiều landing page để thao tác bulk (xóa, publish, unpublish).
 
 **Acceptance Criteria:**
-- Có thể xem danh sách, tìm kiếm, lọc landing page.
-- Có thể thao tác hàng loạt (bulk action) với nhiều landing page.
+- Có thể xem danh sách **chỉ các landing page do mình tạo ra**.
+- Không thể thấy hoặc truy cập landing page của người dùng khác từ giao diện quản lý.
+- Có thể tìm kiếm, lọc trên danh sách landing page **của mình**.
+- Có thể thao tác bulk (xóa, publish, unpublish) trên các landing page **của mình**.
 
 ---
 
-### 4. Quản lý landing page theo từng bất động sản
-> Là một nhà môi giới, tôi muốn xem và quản lý các landing page của từng bất động sản ngay trong trang chi tiết property để thuận tiện thao tác theo ngữ cảnh.
-
-**Mô tả chi tiết:** Trong trang chi tiết của mỗi bất động sản, người dùng có thể xem, tạo mới hoặc chỉnh sửa các landing page liên quan đến property đó. Điều này giúp thao tác theo ngữ cảnh, dễ theo dõi và cập nhật nội dung phù hợp với từng tài sản.
-
-**Flow nghiệp vụ:**
-1. Người dùng vào trang chi tiết property.
-2. Tab "Landing Pages" hiển thị danh sách landing page của property đó.
-3. Có thể tạo mới, chỉnh sửa, xóa, publish/unpublish landing page ngay tại đây.
-
-**Acceptance Criteria:**
-- Có thể xem danh sách landing page theo từng property.
-- Có thể thao tác đầy đủ (tạo, sửa, xóa, publish) trong tab property.
-
----
-
-### 5. Chọn template và audience/tone
+### 4. Chọn template khi tạo landing page
 > Là một nhà môi giới, tôi muốn chọn template, audience và tone (enum hoặc custom) khi tạo landing page để phù hợp với từng chiến dịch marketing.
 
 **Mô tả chi tiết:** Khi tạo landing page, người dùng được chọn mẫu giao diện (template), đối tượng khách hàng (audience) và tone (giọng điệu) phù hợp (có thể chọn enum hoặc nhập custom). Điều này giúp cá nhân hóa nội dung, tăng hiệu quả marketing và phù hợp với từng chiến dịch cụ thể.
@@ -85,7 +72,7 @@
 
 ---
 
-### 6. Preview & xuất bản landing page
+### 5. Preview & xuất bản landing page
 > Là một nhà môi giới, tôi muốn xem trước landing page theo đúng template và xuất bản (public/unlisted) với slug tự sinh, đảm bảo không lộ thông tin nhạy cảm.
 
 **Mô tả chi tiết:** Sau khi hoàn thiện nội dung, người dùng có thể xem trước landing page đúng theo template, kiểm tra lại toàn bộ thông tin trước khi xuất bản. Slug được sinh tự động, đảm bảo không lộ thông tin nhạy cảm, có thể chọn chế độ public hoặc unlisted.
@@ -102,7 +89,7 @@
 
 ---
 
-### 7. Copy link & chia sẻ landing page
+### 6. Copy link & chia sẻ landing page
 > Là một nhà môi giới, tôi muốn copy link landing page đã xuất bản để gửi cho khách hàng hoặc chia sẻ trên các kênh marketing.
 
 **Mô tả chi tiết:** Sau khi xuất bản, hệ thống cung cấp link landing page để người dùng dễ dàng copy và chia sẻ qua email, mạng xã hội, tin nhắn... giúp tăng khả năng tiếp cận khách hàng tiềm năng.
@@ -118,7 +105,7 @@
 
 ---
 
-### 8. Xóa hoặc unpublish landing page
+### 7. Xóa hoặc unpublish landing page
 > Là một nhà môi giới, tôi muốn xóa hoặc unpublish landing page khi không còn sử dụng để đảm bảo chỉ những trang phù hợp mới được công khai.
 
 **Mô tả chi tiết:** Người dùng có thể xóa vĩnh viễn hoặc chuyển landing page về trạng thái nháp (unpublish) khi không còn sử dụng, đảm bảo chỉ những trang phù hợp, còn giá trị mới được công khai tới khách hàng.
@@ -133,7 +120,7 @@
 
 ---
 
-### 9. Xử lý lỗi AI & nhập tay
+### 8. Xử lý lỗi AI & nhập tay
 > Là một nhà môi giới, tôi muốn được thông báo khi AI sinh nội dung lỗi và có thể tự nhập tay để vẫn xuất bản được landing page.
 
 **Mô tả chi tiết:** Nếu AI sinh nội dung lỗi, thiếu hoặc không đúng schema, hệ thống sẽ thông báo rõ ràng và cho phép người dùng tự nhập tay hoặc chỉnh sửa lại để vẫn có thể xuất bản landing page mà không bị gián đoạn công việc.
@@ -149,7 +136,7 @@
 
 ---
 
-### 10. Đảm bảo SEO & responsive
+### 9. Đảm bảo SEO & responsive
 > Là một nhà môi giới, tôi muốn landing page được tối ưu SEO, hiển thị tốt trên mọi thiết bị để tăng hiệu quả tiếp cận khách hàng.
 
 **Mô tả chi tiết:** Landing page được tối ưu các yếu tố SEO (title, description, canonical, noindex...), hiển thị tốt trên mọi thiết bị (desktop, mobile, tablet), giúp tăng hiệu quả tiếp cận khách hàng và nâng cao thứ hạng tìm kiếm trên Google.
@@ -164,7 +151,7 @@
 
 ---
 
-### 12. Tùy chỉnh đường dẫn (slug)
+### 11. Tùy chỉnh đường dẫn (slug)
 > Là một nhà môi giới, tôi muốn có thể tùy chỉnh đường dẫn (slug) cho landing page của mình (ví dụ: /p/biet-thu-vinhomes) để tối ưu SEO và dễ nhớ, bên cạnh việc sử dụng slug tự động.
 
 **Mô tả chi tiết:** Ngoài slug tự động, người dùng có thể tùy chỉnh đường dẫn landing page để tối ưu SEO, dễ nhớ, thuận tiện cho việc chia sẻ và tăng nhận diện thương hiệu cá nhân hoặc dự án.
@@ -179,7 +166,7 @@
 
 ---
 
-### 13. Tự động lưu bản nháp
+### 12. Tự động lưu bản nháp
 > Là một nhà môi giới, tôi muốn các thay đổi của mình trên landing page được tự động lưu thành bản nháp để không bị mất công việc khi tôi bận hoặc vô tình đóng trình duyệt.
 
 **Mô tả chi tiết:** Mọi thay đổi trên landing page sẽ được tự động lưu thành bản nháp, giúp người dùng không bị mất dữ liệu khi bận việc khác, mất kết nối hoặc vô tình đóng trình duyệt.

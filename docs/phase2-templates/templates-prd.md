@@ -1,6 +1,17 @@
 # PRD: Landing Page theo Template cho từng Bất động sản (MVP)
 
-> Tài liệu PRD này mô tả mục tiêu, phạm vi, luồng nghiệp vụ, yêu cầu chức năng/phi chức năng và tiêu chí chấp nhận cho tính năng Landing Page theo Template. Ở giai đoạn MVP, bỏ qua phân quyền và quản trị template; template được hardcode nhưng kiến trúc mở để bổ sung admin sau. Ngôn ngữ hiển thị cố định là tiếng Việt.
+> Tài liệu PRD này mô tả mục tiêu, phạm vi, luồng nghiệp vụ, yêu cầu chức năng/phi chức năng và tiêu chí chấp nhận cho tính năng Landing Page theo Template.
+
+---
+
+## Định nghĩa Thuật ngữ
+
+Để đảm bảo sự nhất quán, chúng ta phân biệt rõ hai khái niệm sau:
+
+-   **Template:** Là một **bản thiết kế (blueprint)** được định nghĩa sẵn trong hệ thống (hardcoded). Template quy định về cấu trúc layout, các loại section có thể có, và phong cách thiết kế chung. Template được **dùng chung** cho tất cả người dùng.
+-   **Landing Page:** Là một **trang web cụ thể** được sinh ra (generate) *từ* một Template. Mỗi Landing Page sẽ chứa dữ liệu riêng của một bất động sản, được tạo và quản lý bởi một người dùng duy nhất. Landing Page là **tài sản riêng** của người dùng tạo ra nó và không thể bị truy cập hay quản lý bởi người dùng khác.
+
+---
 
 ## 1. Out of Scope (Không nằm trong phạm vi MVP)
 - Không hỗ trợ phân quyền, quản trị template, CRUD template.
