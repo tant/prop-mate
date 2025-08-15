@@ -16,7 +16,7 @@ Mục tiêu chính là xây dựng một hệ thống cho phép người dùng *
 - **Mục tiêu:** Xây dựng lõi hệ thống, định nghĩa cấu trúc dữ liệu và API.
 - **Công việc:**
   1.  **Định nghĩa Template Cố định:**
-      -   Thiết kế và định nghĩa schema cho 2-3 template **hardcoded** trong code.
+      -   Thiết kế và định nghĩa schema cho 2 template **hardcoded** trong code.
       -   Mỗi schema quy định rõ các section, slot, và các trường dữ liệu.
   2.  **Thiết kế Data Contract:**
       -   Tạo các interface/type trong TypeScript (sử dụng Zod để validation) cho `ProductPage`, `TemplateSchema`, `Section`.
