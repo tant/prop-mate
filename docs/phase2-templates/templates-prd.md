@@ -1,109 +1,106 @@
-# PRD: Templated Landing Pages for Properties (MVP)
+# PRD: Trang Sản Phẩm (MVP)
 
-> **Document Purpose:** This Product Requirements Document (PRD) outlines the goals, scope, workflows, and acceptance criteria for the Templated Landing Page feature.
-> **MVP Focus:** The initial release focuses on providing users with a set of hardcoded templates. Template administration and multi-language support are out of scope for this MVP. The application's UI and generated content will be exclusively in Vietnamese.
-
----
-
-## 1. Terminology
-
-To ensure clarity and consistency, the following terms are defined:
-
--   **Template:** A system-defined, hardcoded **blueprint** that dictates the layout structure, available section types, and overall design style. Templates are **shared** and available to all users.
--   **Landing Page:** A **specific, generated web page** created *from* a Template. Each Landing Page contains unique data for a single property and is created and managed by an individual user. A Landing Page is the **private asset** of its creator and cannot be accessed or managed by other users.
+> **Document Purpose:** Tài liệu này mô tả mục tiêu, phạm vi, quy trình và tiêu chí nghiệm thu cho tính năng Trang Sản Phẩm (trước đây gọi là Landing Page).
+> **MVP Focus:** Bản phát hành đầu tiên cung cấp cho người dùng một tập các mẫu trang sản phẩm được định nghĩa sẵn. Quản trị template và đa ngôn ngữ nằm ngoài phạm vi MVP này. Giao diện và nội dung chỉ có tiếng Việt.
 
 ---
 
-## 2. Goals & Objectives
+## 1. Thuật ngữ
 
--   **Empower Users:** Allow users to quickly create, manage, and publish multiple, visually appealing landing pages for each property.
--   **Targeted Marketing:** Enable the creation of different landing page variations to target specific customer audiences.
--   **Streamline Workflow:** Offer two creation flows: a "super-fast" 3-field AI generation and a detailed manual editing mode.
--   **Ensure Quality:** Guarantee that all generated pages are responsive, SEO-friendly, and easily manageable.
+Để đảm bảo rõ ràng và nhất quán, các thuật ngữ sau được định nghĩa:
 
----
-
-## 3. Scope
-
-### 3.1. In Scope (MVP)
-
--   **Hardcoded Templates:** 2-3 predefined templates with clear, unchangeable schemas.
--   **Dual Creation Flows:**
-    1.  **Super-Fast AI Flow:** Generate a complete landing page from just 3 input fields (Title, Audience, USP).
-    2.  **Detailed Editing Flow:** Manually edit the content of each section after AI generation.
--   **Centralized Management:** A dedicated "Landing Pages" section in the main sidebar for users to manage **their own** pages.
--   **Access Control:** Landing pages can be set to `Public` (discoverable by search engines) or `Unlisted` (accessible only via direct link).
--   **Vietnamese Language Only:** All UI and generated content will be in Vietnamese.
-
-### 3.2. Out of Scope (MVP)
-
--   **No Template Administration:** No UI for creating, editing, or deleting templates (CRUD).
--   **No Internationalization (i18n):** No support for multiple languages.
--   **No Advanced Features:** No versioning, A/B testing, password protection, or third-party integrations (e.g., CRM, email marketing).
--   **No Complex Workflows:** No multi-step approval/publishing workflows or edit history.
+-   **Template:** Một **bản thiết kế** hệ thống định nghĩa bố cục, các loại section và phong cách tổng thể. Template là **dùng chung** cho tất cả người dùng.
+-   **Trang sản phẩm:** Một **trang web cụ thể, được sinh ra** từ Template. Mỗi Trang sản phẩm chứa dữ liệu riêng cho một bất động sản và do người dùng tạo/quản lý. Trang sản phẩm là **tài sản riêng tư** của người tạo, không ai khác có thể truy cập hoặc quản lý.
 
 ---
 
-## 4. User Workflow (Happy Path)
+## 2. Mục tiêu & Định hướng
 
-1.  **Initiate:** User clicks "Create New Landing Page" from the central sidebar or from within a specific property's page.
-2.  **Select:** User selects the associated property (if not already in context) and chooses one of the available templates.
-3.  **Input:** User provides three core inputs: a **Title**, the target **Audience**, and the key **Unique Selling Proposition (USP)**.
-4.  **Generate:** The system calls the AI (Gemini) to generate the full landing page content based on the user's input and the selected template's schema. This is a **one-time generation** process.
-5.  **Review & Decide:** After generation, the user previews the page and chooses one of three actions:
-    a.  **Publish Immediately.**
-    b.  **Edit Manually** before publishing.
-    c.  **Delete & Restart** to re-run the AI generation from scratch.
-6.  **Publish:** User configures the page's access (`Public`/`Unlisted`) and a unique `slug` is generated. The page goes live.
-7.  **Manage:** User can later find, filter, and manage their created landing page from the central management dashboard.
+-   **Trao quyền cho người dùng:** Cho phép người dùng nhanh chóng tạo, quản lý và xuất bản nhiều trang sản phẩm đẹp mắt cho mỗi bất động sản.
+-   **Marketing mục tiêu:** Cho phép tạo nhiều biến thể trang sản phẩm để nhắm đến các nhóm khách hàng khác nhau.
+-   **Tối ưu quy trình:** Cung cấp 2 luồng tạo trang: AI siêu nhanh (3 trường) và chỉnh sửa thủ công chi tiết.
+-   **Đảm bảo chất lượng:** Tất cả trang sản phẩm sinh ra đều responsive, chuẩn SEO, dễ quản lý.
 
 ---
 
-## 5. Technical & Functional Requirements
+## 3. Phạm vi
 
-### 5.1. Template & Data Model (Hardcoded)
+### 3.1. Trong phạm vi (MVP)
 
--   **Template Schema:** Each template is an object defined in the codebase, containing metadata (id, name, thumbnail) and a schema defining its sections, slots, and data types.
--   **Data Storage (Firestore):** A `landingPages` collection will store the generated page data. Each document must include:
-    -   `userId`: The ID of the owner. **(Crucial for access control)**
-    -   `propertyId`: The associated property.
-    -   `templateId`: The ID of the blueprint used.
+-   **Template cứng:** 2-3 template định nghĩa sẵn, không thay đổi.
+-   **Hai luồng tạo trang:**
+    1.  **AI siêu nhanh:** Sinh toàn bộ trang sản phẩm chỉ từ 3 trường (Tiêu đề, Đối tượng, USP).
+    2.  **Chỉnh sửa chi tiết:** Cho phép chỉnh sửa nội dung từng section sau khi AI sinh xong.
+-   **Quản lý tập trung:** Có mục "Trang sản phẩm" riêng ở sidebar để người dùng quản lý **các trang của mình**.
+-   **Quyền truy cập:** Trang sản phẩm có thể đặt là `Công khai` (tìm kiếm được) hoặc `Không công khai` (chỉ truy cập qua link trực tiếp).
+-   **Chỉ tiếng Việt:** Giao diện và nội dung chỉ có tiếng Việt.
+
+### 3.2. Ngoài phạm vi (MVP)
+
+-   **Không quản trị template:** Không có UI tạo/sửa/xóa template.
+-   **Không đa ngôn ngữ:** Không hỗ trợ nhiều ngôn ngữ.
+-   **Không tính năng nâng cao:** Không versioning, A/B testing, bảo vệ mật khẩu, tích hợp bên thứ ba.
+-   **Không quy trình phức tạp:** Không workflow phê duyệt nhiều bước, không lưu lịch sử chỉnh sửa.
+
+---
+
+## 4. Quy trình người dùng (Happy Path)
+
+1.  **Khởi tạo:** Người dùng bấm "Tạo Trang sản phẩm mới" từ sidebar trung tâm hoặc từ trang chi tiết bất động sản.
+2.  **Chọn:** Người dùng chọn bất động sản liên quan (nếu chưa có context) và chọn template.
+3.  **Nhập liệu:** Người dùng nhập 3 trường: **Tiêu đề**, **Đối tượng**, **USP**.
+4.  **Sinh trang:** Hệ thống gọi AI (Gemini) sinh nội dung trang sản phẩm theo schema template. Chỉ sinh 1 lần.
+5.  **Xem trước & quyết định:** Sau khi sinh, người dùng xem trước và chọn:
+    a.  **Xuất bản ngay.**
+    b.  **Chỉnh sửa thủ công** trước khi xuất bản.
+    c.  **Xóa & làm lại** để sinh lại bằng AI.
+6.  **Xuất bản:** Người dùng cấu hình quyền truy cập (`Công khai`/`Không công khai`) và hệ thống sinh ra `slug` duy nhất. Trang được public tại `/p/[slug]`.
+7.  **Quản lý:** Người dùng có thể tìm, lọc, quản lý các trang sản phẩm đã tạo tại dashboard quản lý tập trung (URL: `/property-pages`).
+
+---
+
+## 5. Yêu cầu kỹ thuật & chức năng
+
+### 5.1. Template & Data Model (Cứng)
+
+-   **Schema template:** Mỗi template là một object định nghĩa trong code, gồm metadata (id, name, thumbnail) và schema các section, slot, kiểu dữ liệu.
+-   **Lưu trữ (Firestore):** Collection `propertyPages` lưu dữ liệu trang sản phẩm. Mỗi document gồm:
+    -   `userId`: ID chủ sở hữu. **(Quan trọng cho kiểm soát truy cập)**
+    -   `propertyId`: BĐS liên quan.
+    -   `templateId`: ID template sử dụng.
     -   `status`: `draft` | `published` | `unlisted`.
-    -   `slug`: A unique, non-PII identifier for the URL.
-    -   `content`: A JSON object containing the page's content, validated against the template's schema.
+    -   `slug`: Định danh duy nhất cho URL.
+    -   `content`: JSON nội dung trang, kiểm tra theo schema template.
     -   `seo`: { `title`, `description`, `ogImageUrl` }.
     -   Timestamps (`createdAt`, `updatedAt`).
 
-### 5.2. AI Integration (Gemini)
+### 5.2. Tích hợp AI (Gemini)
 
--   **Prompt Engineering:** The prompt sent to the AI will include the user's three inputs, context from the associated property (if available), and a clear instruction to output a JSON object that strictly follows the template's schema.
--   **One-Time Generation:** The AI is used only for the initial content creation. Re-generating content requires creating a new landing page. This simplifies the workflow and manages user expectations.
+-   **Prompt:** Prompt gửi cho AI gồm 3 trường nhập, context BĐS (nếu có), hướng dẫn trả về JSON đúng schema template.
+-   **Chỉ sinh 1 lần:** AI chỉ dùng cho lần tạo đầu. Muốn sinh lại phải tạo trang mới. Đơn giản hóa workflow và kỳ vọng người dùng.
 
-### 5.3. Publishing & Rendering
+### 5.3. Xuất bản & hiển thị
 
--   **URL Structure:** Public pages will be available at a clean URL, e.g., `/p/[slug]`.
--   **Performance:** Pages will be rendered using SSG/ISR for optimal load times (TTFB < 500ms).
+-   **Cấu trúc URL:** Trang công khai tại `/p/[slug]`. Dashboard quản lý tại `/property-pages`.
+-   **Hiệu năng:** Trang render SSG/ISR, TTFB < 500ms.
 -   **SEO:**
-    -   `Public` pages will be included in the sitemap and indexed.
-    -   `Unlisted` pages will have a `noindex` meta tag and be excluded from the sitemap.
-    -   The Open Graph (OG) image will default to the property's hero image.
+    -   Trang công khai vào sitemap, được index.
+    -   Trang không công khai có `noindex`, không vào sitemap.
+    -   Ảnh OG mặc định là ảnh hero của BĐS.
 
-### 5.4. Non-Functional Requirements
+### 5.4. Yêu cầu phi chức năng
 
--   **Performance:** Publish/unpublish actions should complete in < 3 seconds.
--   **Security:** All API endpoints for accessing or modifying landing page data **must** validate that the request is coming from the `userId` who owns the document.
--   **Scalability:** The architecture should be modular, allowing for the potential addition of a template admin system in the future without a major refactor.
--   **Accessibility:** All generated pages should meet WCAG AA standards.
+-   **Hiệu năng:** Xuất bản/hủy xuất bản < 3 giây.
+-   **Bảo mật:** API chỉ cho phép truy cập/sửa dữ liệu nếu đúng `userId` chủ sở hữu.
+-   **Mở rộng:** Kiến trúc module, dễ thêm hệ thống quản trị template sau này.
+-   **Truy cập:** Trang sinh ra đạt chuẩn WCAG AA.
 
 ---
 
-## 6. Acceptance Criteria
+## 6. Tiêu chí nghiệm thu
 
--   A user can successfully create a landing page using the 3-field "super-fast" flow.
--   A user can edit the AI-generated content of each section before publishing.
--   A user can view and manage **only their own** landing pages from the central dashboard.
--   The `Public` vs. `Unlisted` access control correctly applies `noindex` tags and sitemap inclusion rules.
--   The final public page is fully responsive across mobile, tablet, and desktop devices.
--   The system correctly prevents a user from accessing or managing another user's landing pages.
+-   Người dùng tạo thành công trang sản phẩm với luồng AI siêu nhanh (3 trường).
+-   Người dùng xem và quản lý **chỉ các trang sản phẩm của mình** tại dashboard `/property-pages`.
+-   Hệ thống ngăn đúng việc truy cập hoặc quản lý trang sản phẩm của người khác.
 
 
