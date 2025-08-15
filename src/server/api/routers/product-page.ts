@@ -43,7 +43,7 @@ export const productPageRouter = createTRPCRouter({
     }))
     .output(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const userId = ctx.session.user.id; // Lấy userId từ session (người dùng đã đăng nhập)
+      const userId = ctx.user.uid; // Lấy userId từ user (người dùng đã đăng nhập)
       
       // 1. Gọi AI service để tạo nội dung
       const { title, usp, content } = await generateProductPageContent(input.templateId, input.audience);
@@ -53,12 +53,12 @@ export const productPageRouter = createTRPCRouter({
       const slug = await generateUniqueSlug(baseSlug);
       
       // 3. Tạo object dữ liệu ProductPage
-      const newProductPageData: z.input<typeof productPageCreateInputSchema> = {
+      const newProductPageData = {
         userId,
         propertyId: input.propertyId,
         templateId: input.templateId,
         slug,
-        status: 'draft',
+        status: 'draft' as const,
         audience: input.audience,
         title,
         usp,
@@ -79,7 +79,7 @@ export const productPageRouter = createTRPCRouter({
     .input(z.object({ id: z.string() }))
     .output(productPageSchema) // Trả về schema của ProductPage
     .query(async ({ ctx, input }) => {
-      const userId = ctx.session.user.id; // Lấy userId từ session
+      const userId = ctx.user.uid; // Lấy userId từ user
       
       // 1. Lấy document từ Firestore theo `id`
       const doc = await adminDb.collection('productPages').doc(input.id).get();

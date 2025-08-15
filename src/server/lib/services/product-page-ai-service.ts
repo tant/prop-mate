@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { getProductPageTemplateById } from '@/constants/product-templates';
 import { callGeminiStructured } from '@/lib/gemini';
-import { env } from '@/env'; // Giả định env sẽ được cấu hình sau
+// Truy cập trực tiếp process.env thay vì import từ '@/env'
 
 // --- Schema tạm thời cho content ---
 // Trong tương lai, có thể tạo schema này một cách động dựa trên template schema.
@@ -61,12 +61,18 @@ export async function generateProductPageContent(templateId: string, audience: s
   const { systemPrompt, userPrompt } = buildPrompts(templateId, audience);
 
   // 3. Gọi AI service
+  // Kiểm tra biến môi trường
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error("GEMINI_API_KEY chưa được cấu hình trong biến môi trường.");
+  }
+
   let contentData: z.infer<typeof genericContentSchema>;
   try {
     contentData = await callGeminiStructured(
       systemPrompt,
       userPrompt,
-      env.GEMINI_API_KEY, // Lấy từ env
+      apiKey, // Lấy từ process.env
       genericContentSchema
     );
   } catch (error) {

@@ -8,11 +8,13 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { api } from "@/app/_trpc/client";
-import { PropertyForm } from "@/components/page-properties/property-form";
+import { PropertyForm, type PropertyCreateInput } from "@/components/page-properties/property-form";
+import { PropertyProductPagesList } from "@/components/page-product/PropertyProductPagesList";
 import { Button } from "@/components/ui/button";
 
 
@@ -27,8 +29,9 @@ export default function PropertyDetailPage() {
   const [loading, setLoading] = useState(false);
   const updateProperty = api.property.update.useMutation();
 
-  // Lấy trạng thái editMode từ query param
+  // Lấy trạng thái editMode và tab từ query param
   const editMode = useMemo(() => searchParams.get('editmode') === 'true', [searchParams]);
+  const activeTab = useMemo(() => searchParams.get('tab') || 'details', [searchParams]);
 
   // Hàm chuyển đổi query param
   const setEditMode = (value: boolean) => {
@@ -43,12 +46,28 @@ export default function PropertyDetailPage() {
     router.replace(url, { scroll: false });
   };
 
+  const setActiveTab = (value: string) => {
+    const sp = new URLSearchParams(Array.from(searchParams.entries()));
+    sp.set('tab', value);
+    // Reset editMode khi chuyển tab
+    sp.delete('editmode');
+    const query = sp.toString();
+    const url = query ? `?${query}` : '.';
+    router.replace(url, { scroll: false });
+  };
+
   const handleSave = () => {
     if (formRef.current) {
       formRef.current.requestSubmit();
     } else {
       console.warn('formRef.current is null');
     }
+  };
+
+  const handleSubmit = (data: PropertyCreateInput) => {
+    // TODO: Gửi dữ liệu để cập nhật property
+    console.log("Dữ liệu submit:", data);
+    alert("Dữ liệu đã được submit (cần implement API)");
   };
 
   if (isLoading) return (
@@ -102,7 +121,7 @@ export default function PropertyDetailPage() {
             />
             <h1 className="text-lg font-semibold">Thông tin bất động sản</h1>
             <div className="flex items-center gap-2 ml-auto">
-              {!editMode && (
+              {!editMode && activeTab === 'details' && (
                 <>
                   <Button
                     type="button"
@@ -120,7 +139,7 @@ export default function PropertyDetailPage() {
                   </Button>
                 </>
               )}
-              {editMode && (
+              {editMode && activeTab === 'details' && (
                 <>
                   <Button
                     type="button"
@@ -143,27 +162,27 @@ export default function PropertyDetailPage() {
             </div>
           </div>
         </header>
-        <div className={`flex flex-1 flex-col p-4 transition-opacity duration-300 ${editMode ? 'opacity-100' : 'opacity-80'} animate-fade`}>
-          <PropertyForm
-            initialValues={property}
-            formRef={formRef}
-            loading={loading}
-            onSubmit={async (data) => {
-              setLoading(true);
-              try {
-                await updateProperty.mutateAsync({ id: propertyId, data });
-                toast.success("Cập nhật thành công!");
-                if (editMode) setEditMode(false);
-                refetch();
-              } catch (err) {
-                toast.error((err as Error)?.message || "Cập nhật thất bại");
-              } finally {
-                setLoading(false);
-              }
-            }}
-            disabled={!editMode}
-            mode="edit"
-          />
+        <div className="flex flex-1 flex-col p-4">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList>
+              <TabsTrigger value="details">Chi tiết</TabsTrigger>
+              <TabsTrigger value="product-pages">Trang sản phẩm</TabsTrigger>
+            </TabsList>
+          </Tabs>
+          <div className={`transition-opacity duration-300 ${editMode ? 'opacity-100' : 'opacity-80'} animate-fade mt-4`}>
+            {activeTab === 'details' && property && (
+              <PropertyForm
+                initialValues={property}
+                formRef={formRef}
+                loading={loading}
+                disabled={!editMode}
+                onSubmit={handleSubmit}
+              />
+            )}
+            {activeTab === 'product-pages' && property && (
+              <PropertyProductPagesList propertyId={property.id} />
+            )}
+          </div>
         </div>
       </SidebarInset>
     </SidebarProvider>

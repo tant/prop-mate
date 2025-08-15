@@ -9,9 +9,10 @@ import {
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { ProductPagesList } from "@/components/page-product/ProductPagesList"
+import { useParams } from "next/navigation"
 
-export default function ProductPagesDashboardPage() {
+export default function EditProductPage() {
+  const params = useParams<{ id: string }>();
   
   return (
     <SidebarProvider>
@@ -24,20 +25,25 @@ export default function ProductPagesDashboardPage() {
               orientation="vertical"
               className="mr-2 data-[orientation=vertical]:h-4"
             />
-            <h1 className="text-lg font-semibold">Các trang sản phẩm của bạn</h1>
+            <h1 className="text-lg font-semibold">Chỉnh Sửa Trang Sản Phẩm</h1>
           </div>
         </header>
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-bold">Danh sách Trang Sản Phẩm</h2>
-                <Button asChild>
-                  <Link href="/property-pages/add">Tạo Trang Mới</Link>
-                </Button>
+                <h2 className="text-xl font-bold">ID Trang: {params.id}</h2>
+                <div className="space-x-2">
+                  <Button asChild variant="outline">
+                    <Link href="/property-pages">Quay lại</Link>
+                  </Button>
+                  <Button>Lưu</Button>
+                </div>
               </div>
-              {/* Nội dung danh sách trang sản phẩm */}
-              <ProductPagesList />
+              {/* Nội dung chỉnh sửa chi tiết trang sản phẩm sẽ được thêm ở đây */}
+              <div className="border rounded-lg p-4 text-center text-gray-500">
+                Form chỉnh sửa chi tiết nội dung trang sản phẩm sẽ hiển thị ở đây.
+              </div>
             </div>
           </div>
         </div>
