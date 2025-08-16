@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '@/server/api/trpc';
 import { adminDb } from '@/lib/firebase/admin';
 import { PRODUCT_PAGE_TEMPLATES } from '@/constants/product-templates';
-import { productPageSchema, productPageUpdateInputSchema } from '@/types/product-page';
+import { productPageSchema, productPageUpdateInputSchema, productPageCreateInputSchema } from '@/types/product-page';
 
 export const productPageRouter = createTRPCRouter({
   // Lấy danh sách template
@@ -56,6 +56,28 @@ export const productPageRouter = createTRPCRouter({
       }
     }),
 
+  // Lấy thông tin chi tiết của một trang sản phẩm theo ID
+  getById: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .output(productPageSchema)
+    .query(async ({ input }) => {
+      console.log('[getById] input:', input);
+      const docRef = adminDb.collection('productPages').doc(input.id);
+      const doc = await docRef.get();
+      if (!doc.exists) {
+        console.warn(`[getById] Không tìm thấy trang sản phẩm với id: ${input.id}`);
+        throw new Error('Trang sản phẩm không tồn tại');
+      }
+      const productPageData = doc.data();
+      const productPage = {
+        id: doc.id,
+        ...productPageData,
+        createdAt: productPageData?.createdAt?.toDate?.() ?? productPageData?.createdAt,
+        updatedAt: productPageData?.updatedAt?.toDate?.() ?? productPageData?.updatedAt,
+      };
+      console.log('[getById] productPage:', productPage);
+      return productPageSchema.parse(productPage);
+    }),
   // Lấy thông tin chi tiết của một trang sản phẩm theo Slug (cho public page)
   getBySlug: publicProcedure
     .input(z.object({ slug: z.string() }))
@@ -124,5 +146,32 @@ export const productPageRouter = createTRPCRouter({
       };
       await docRef.update(updateData);
       return { success: true };
+    }),
+
+  // Tạo mới một trang sản phẩm
+  create: protectedProcedure
+    .input(productPageCreateInputSchema)
+    .output(productPageSchema)
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.user.uid;
+      const now = new Date();
+      // Sinh slug đơn giản từ title hoặc audience (có thể cải tiến sau)
+      const slug = (input.title || input.audience || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+      const docRef = await adminDb.collection('productPages').add({
+        ...input,
+        userId,
+        slug,
+        status: 'draft',
+        createdAt: now,
+        updatedAt: now,
+      });
+      const doc = await docRef.get();
+      const data = doc.data();
+      return productPageSchema.parse({
+        id: doc.id,
+        ...data,
+        createdAt: data?.createdAt?.toDate?.() ?? data?.createdAt,
+        updatedAt: data?.updatedAt?.toDate?.() ?? data?.updatedAt,
+      });
     }),
 });

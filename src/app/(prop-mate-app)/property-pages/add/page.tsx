@@ -14,6 +14,7 @@ import { TemplateSelector } from "@/components/page-product/TemplateSelector"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { useState } from "react"
+import { api } from "@/app/_trpc/client"
 import type { ProductPageTemplate } from "@/constants/product-templates"
 
 
@@ -28,7 +29,9 @@ export default function AddProductPage() {
     setSelectedTemplate(template);
   };
 
-  const handleSubmit = () => {
+  const createProductPage = api.productPage.create.useMutation();
+
+  const handleSubmit = async () => {
     if (!selectedTemplate) {
       alert("Vui lòng chọn một template.");
       return;
@@ -37,11 +40,30 @@ export default function AddProductPage() {
       alert("Vui lòng nhập đối tượng khách hàng mục tiêu.");
       return;
     }
-    // TODO: Gọi API để tạo trang sản phẩm
-    console.log("Tạo trang với template:", selectedTemplate.id, "và audience:", audience);
-    alert(`Sẽ tạo trang với template: ${selectedTemplate.name} và audience: ${audience}`);
-    // Chuyển hướng sang trang edit sau khi tạo
-    // router.push(`/property-pages/${newPageId}/edit`);
+    if (!propertyId) {
+      alert("Thiếu propertyId, không thể tạo trang.");
+      return;
+    }
+    try {
+      const result = await createProductPage.mutateAsync({
+        propertyId,
+        templateId: selectedTemplate.id,
+        audience,
+        status: "draft",
+        slug: "", // để backend tự sinh
+        title: "", // placeholder
+        usp: "", // placeholder
+        content: {},
+      });
+      if (result?.id) {
+        router.push(`/property-pages/${result.id}/edit`);
+      } else {
+        alert("Tạo trang thất bại. Vui lòng thử lại.");
+      }
+    } catch (err) {
+      const message = (err instanceof Error) ? err.message : String(err);
+      alert("Lỗi khi tạo trang: " + message);
+    }
   };
 
   return (
@@ -58,7 +80,7 @@ export default function AddProductPage() {
             <h1 className="text-lg font-semibold">Tạo Trang Sản Phẩm Mới</h1>
           </div>
         </header>
-        <div className="flex flex-1 flex-col p-4">
+  <div className="flex flex-1 flex-col p-4 md:p-8">
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
               <div className="flex justify-between items-center">
@@ -97,7 +119,7 @@ export default function AddProductPage() {
                         className="mt-1"
                       />
                     </div>
-                    <Button onClick={handleSubmit}>Tạo nhanh với AI</Button>
+                    <Button onClick={handleSubmit}>Tạo trang sản phẩm</Button>
                   </div>
                 )}
               </div>
