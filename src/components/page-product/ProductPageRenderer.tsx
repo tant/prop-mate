@@ -1,7 +1,7 @@
 // src/components/page-product/ProductPageRenderer.tsx
 'use client';
 
-import React, { useState } from 'react';
+// ...existing code...
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { type ProductPage } from '@/types/product-page';
@@ -40,6 +40,7 @@ export function ProductPageRenderer({ productPage }: ProductPageRendererProps) {
   if (!template) {
     return <div>Template không hợp lệ</div>;
   }
+      // Removed unused imports
 
   // Tạm thời hardcode mapping section type đến component
   // Trong tương lai, có thể dùng một object mapping hoặc registry pattern

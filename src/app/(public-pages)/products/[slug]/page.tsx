@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ProductPageRenderer } from '@/components/page-product/ProductPageRenderer';
-import { type ProductPage } from '@/types/product-page';
 import { getProductPageBySlug } from '@/lib/product-page';
 
 // Cấu hình ISR: Regenerate page mỗi 1 giờ

@@ -33,7 +33,7 @@ export default function ProductPagesDashboardPage() {
               <div className="flex justify-between items-center">
                 <h2 className="text-xl font-bold">Danh sách Trang Sản Phẩm</h2>
                 <Button asChild>
-                  <Link href="/property-pages/add">Tạo Trang Mới</Link>
+                  <Link href="/property-pages/add">Thêm Trang</Link>
                 </Button>
               </div>
               {/* Nội dung danh sách trang sản phẩm */}

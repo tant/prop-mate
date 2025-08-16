@@ -1,5 +1,5 @@
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+// ...existing code...
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { toast } from 'sonner';
@@ -10,7 +10,7 @@ export function PropertyProductPagesList({ propertyId }: { propertyId: string })
   const { data: productPages, isLoading, isError, error } = api.productPage.getByUser.useQuery(undefined);
 
   const handleCopyLink = (slug: string) => {
-    const url = `${window.location.origin}/products/${slug}`;
+  const url = `${window.location.origin}/products/${slug}`;
     navigator.clipboard.writeText(url).then(() => {
       toast.success("Đã copy link vào clipboard");
     }).catch(err => {
@@ -25,7 +25,7 @@ export function PropertyProductPagesList({ propertyId }: { propertyId: string })
       toast.success('Đã xóa trang sản phẩm');
     },
     onError: (err) => {
-      toast.error('Lỗi khi xóa: ' + (err?.message || ''));
+  toast.error(`Lỗi khi xóa: ${err?.message || ''}`);
     },
   });
 

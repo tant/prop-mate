@@ -1,14 +1,13 @@
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+// ...existing code...
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { api } from '@/app/_trpc/client';
-import { useRouter } from 'next/navigation';
 import { Trash2 } from 'lucide-react';
 
 export function ProductPagesList() {
-  const router = useRouter();
+  // ...existing code...
   const { data: productPages, isLoading, isError, error } = api.productPage.getByUser.useQuery();
   const deleteProductPage = api.productPage.delete.useMutation();
 

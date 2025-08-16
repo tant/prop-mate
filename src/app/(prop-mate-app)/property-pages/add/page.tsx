@@ -62,7 +62,7 @@ export default function AddProductPage() {
       }
     } catch (err) {
       const message = (err instanceof Error) ? err.message : String(err);
-      alert("Lỗi khi tạo trang: " + message);
+  alert(`Lỗi khi tạo trang: ${message}`);
     }
   };
 

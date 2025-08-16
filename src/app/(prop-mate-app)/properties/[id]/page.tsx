@@ -11,7 +11,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { useMemo, useRef, useState } from "react";
-import { toast } from "sonner";
+// ...existing code...
 import { api } from "@/app/_trpc/client";
 import { PropertyForm, type PropertyCreateInput } from "@/components/page-properties/property-form";
 import { PropertyProductPagesList } from "@/components/page-product/PropertyProductPagesList";
@@ -25,10 +25,10 @@ export default function PropertyDetailPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const propertyId = params?.id as string;
-  const { data: property, isLoading, error, refetch } = api.property.getById.useQuery(propertyId, { enabled: !!propertyId });
+  const { data: property, isLoading, error } = api.property.getById.useQuery(propertyId, { enabled: !!propertyId });
   const formRef = useRef<HTMLFormElement | null>(null);
-  const [loading, setLoading] = useState(false);
-  const updateProperty = api.property.update.useMutation();
+  // ...existing code...
+  // ...existing code...
 
   // Lấy trạng thái editMode và tab từ query param
   const editMode = useMemo(() => searchParams.get('editmode') === 'true', [searchParams]);
@@ -150,15 +150,15 @@ export default function PropertyDetailPage() {
                     type="button"
                     className="bg-primary text-white px-3 py-1 rounded hover:bg-primary/90 transition-colors text-sm"
                     onClick={handleSave}
-                    disabled={loading}
+                    disabled={isLoading}
                   >
-                    {loading ? 'Đang lưu...' : 'Lưu'}
+                    {isLoading ? 'Đang lưu...' : 'Lưu'}
                   </Button>
                   <Button
                     type="button"
                     className="bg-muted text-gray-700 px-3 py-1 rounded hover:bg-gray-200 transition-colors text-sm"
                     onClick={() => setEditMode(false)}
-                    disabled={loading}
+                    disabled={isLoading}
                   >
                     Hủy
                   </Button>
@@ -173,7 +173,7 @@ export default function PropertyDetailPage() {
               <PropertyForm
                 initialValues={property}
                 formRef={formRef}
-                loading={loading}
+                loading={isLoading}
                 disabled={!editMode}
                 onSubmit={handleSubmit}
               />

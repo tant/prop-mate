@@ -1,8 +1,8 @@
-import React from 'react';
+// ...existing code...
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PRODUCT_PAGE_TEMPLATES, type ProductPageTemplate } from '@/constants/product-templates';
-import Image from 'next/image';
+// ...existing code...
 
 interface TemplateSelectorProps {
   onSelectTemplate: (template: ProductPageTemplate) => void;
