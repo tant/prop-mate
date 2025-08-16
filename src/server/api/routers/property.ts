@@ -185,16 +185,52 @@ export const propertyRouter = createTRPCRouter({
         console.error('[property.update] No data to update');
         throw new TRPCError({ code: "BAD_REQUEST", message: "No data to update" });
       }
+      
       const docRef = propertiesCollection.doc(id);
       const now = admin.firestore.Timestamp.now();
+      
       // Deep remove undefined fields from data
       const cleanData = deepRemoveUndefined({ ...data, updatedAt: now });
+      
       try {
         await docRef.update(cleanData);
       } catch (err) {
         console.error('[property.update] Firestore update error:', err);
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Firestore update failed", cause: err });
       }
+      
+      // Nếu status được cập nhật thành INACTIVE, unlist tất cả các trang sản phẩm liên quan
+      if (data.status === 'INACTIVE') {
+        try {
+          // Tìm tất cả các trang sản phẩm liên quan đến property này
+          const productPagesSnapshot = await adminDb
+            .collection('productPages')
+            .where('propertyId', '==', id)
+            .get();
+          
+          // Cập nhật status của các trang sản phẩm thành 'unlisted'
+          const batch = adminDb.batch();
+          productPagesSnapshot.forEach((doc) => {
+            // Chỉ unlist những trang đang published hoặc draft
+            // Nếu trang đã unlisted thì không cần làm gì
+            const pageData = doc.data();
+            if (pageData.status !== 'unlisted') {
+              batch.update(doc.ref, { status: 'unlisted', updatedAt: now });
+            }
+          });
+          
+          // Thực hiện batch update
+          if (!productPagesSnapshot.empty) {
+            await batch.commit();
+            console.log(`[property.update] Unlisted ${productPagesSnapshot.size} product pages for property ${id}`);
+          }
+        } catch (err) {
+          console.error('[property.update] Error unlisting product pages:', err);
+          // Không throw error ở đây để không làm fail việc update property
+          // Có thể log error hoặc gửi notification cho admin
+        }
+      }
+      
       const updatedDoc = await docRef.get();
       if (!updatedDoc.exists) {
         console.error('[property.update] Updated doc not found:', id);

@@ -8,16 +8,21 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
-import Link from "next/link"
+// ...existing code...
+import { useRouter, useSearchParams } from "next/navigation"
 import { TemplateSelector } from "@/components/page-product/TemplateSelector"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { useState } from "react"
-import { type ProductPageTemplate } from "@/constants/product-templates"
+import type { ProductPageTemplate } from "@/constants/product-templates"
+
 
 export default function AddProductPage() {
   const [selectedTemplate, setSelectedTemplate] = useState<ProductPageTemplate | null>(null);
   const [audience, setAudience] = useState("");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const propertyId = searchParams.get('propertyId');
 
   const handleSelectTemplate = (template: ProductPageTemplate) => {
     setSelectedTemplate(template);
@@ -32,14 +37,13 @@ export default function AddProductPage() {
       alert("Vui lòng nhập đối tượng khách hàng mục tiêu.");
       return;
     }
-    
     // TODO: Gọi API để tạo trang sản phẩm
     console.log("Tạo trang với template:", selectedTemplate.id, "và audience:", audience);
     alert(`Sẽ tạo trang với template: ${selectedTemplate.name} và audience: ${audience}`);
     // Chuyển hướng sang trang edit sau khi tạo
     // router.push(`/property-pages/${newPageId}/edit`);
   };
-  
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -54,16 +58,24 @@ export default function AddProductPage() {
             <h1 className="text-lg font-semibold">Tạo Trang Sản Phẩm Mới</h1>
           </div>
         </header>
-        <div className="flex flex-1 flex-col">
+        <div className="flex flex-1 flex-col p-4">
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
               <div className="flex justify-between items-center">
                 <h2 className="text-xl font-bold">Chọn Template & Nhập Audience</h2>
-                <Button asChild variant="outline">
-                  <Link href="/property-pages">Quay lại</Link>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    if (propertyId) {
+                      router.push(`/properties/${propertyId}`);
+                    } else {
+                      router.push('/property-pages');
+                    }
+                  }}
+                >
+                  Quay lại
                 </Button>
               </div>
-              
               <div className="space-y-6">
                 <div>
                   <h3 className="text-lg font-medium mb-2">1. Chọn Template</h3>
@@ -72,7 +84,6 @@ export default function AddProductPage() {
                     selectedTemplateId={selectedTemplate?.id} 
                   />
                 </div>
-                
                 {selectedTemplate && (
                   <div className="space-y-4">
                     <h3 className="text-lg font-medium">2. Nhập Đối Tượng Khách Hàng Mục Tiêu</h3>

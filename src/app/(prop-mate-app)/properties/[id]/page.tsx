@@ -8,7 +8,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -16,6 +16,7 @@ import { api } from "@/app/_trpc/client";
 import { PropertyForm, type PropertyCreateInput } from "@/components/page-properties/property-form";
 import { PropertyProductPagesList } from "@/components/page-product/PropertyProductPagesList";
 import { Button } from "@/components/ui/button";
+import { Pencil } from 'lucide-react';
 
 
 export default function PropertyDetailPage() {
@@ -32,6 +33,8 @@ export default function PropertyDetailPage() {
   // Lấy trạng thái editMode và tab từ query param
   const editMode = useMemo(() => searchParams.get('editmode') === 'true', [searchParams]);
   const activeTab = useMemo(() => searchParams.get('tab') || 'details', [searchParams]);
+  // State cho checkbox
+  const [showProductPages, setShowProductPages] = useState(activeTab === 'product-pages');
 
   // Hàm chuyển đổi query param
   const setEditMode = (value: boolean) => {
@@ -46,9 +49,15 @@ export default function PropertyDetailPage() {
     router.replace(url, { scroll: false });
   };
 
-  const setActiveTab = (value: string) => {
+  // Khi đổi checkbox, cập nhật query param tab
+  const handleToggleProductPages = (checked: boolean) => {
+    setShowProductPages(checked);
     const sp = new URLSearchParams(Array.from(searchParams.entries()));
-    sp.set('tab', value);
+    if (checked) {
+      sp.set('tab', 'product-pages');
+    } else {
+      sp.set('tab', 'details');
+    }
     // Reset editMode khi chuyển tab
     sp.delete('editmode');
     const query = sp.toString();
@@ -120,24 +129,20 @@ export default function PropertyDetailPage() {
               className="mr-2 data-[orientation=vertical]:h-4"
             />
             <h1 className="text-lg font-semibold">Thông tin bất động sản</h1>
+            <div className="flex items-center ml-6">
+              <Checkbox id="show-product-pages" checked={showProductPages} onCheckedChange={handleToggleProductPages} />
+              <label htmlFor="show-product-pages" className="ml-2 select-none cursor-pointer text-sm">Xem các trang sản phẩm</label>
+            </div>
             <div className="flex items-center gap-2 ml-auto">
               {!editMode && activeTab === 'details' && (
-                <>
-                  <Button
-                    type="button"
-                    className="bg-secondary text-gray-700 px-3 py-1 rounded hover:bg-gray-200 transition-colors text-sm"
-                    onClick={() => setEditMode(true)}
-                  >
-                    Sửa
-                  </Button>
-                  <Button
-                    type="button"
-                    className="bg-muted text-gray-700 px-3 py-1 rounded hover:bg-gray-200 transition-colors text-sm"
-                    onClick={() => window.history.back()}
-                  >
-                    Quay lại
-                  </Button>
-                </>
+                <Button
+                  type="button"
+                  className="bg-secondary text-gray-700 px-3 py-1 rounded hover:bg-gray-200 transition-colors text-sm flex items-center gap-1"
+                  onClick={() => setEditMode(true)}
+                >
+                  <Pencil className="w-4 h-4" />
+                  Sửa
+                </Button>
               )}
               {editMode && activeTab === 'details' && (
                 <>
@@ -163,14 +168,8 @@ export default function PropertyDetailPage() {
           </div>
         </header>
         <div className="flex flex-1 flex-col p-4">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList>
-              <TabsTrigger value="details">Chi tiết</TabsTrigger>
-              <TabsTrigger value="product-pages">Trang sản phẩm</TabsTrigger>
-            </TabsList>
-          </Tabs>
           <div className={`transition-opacity duration-300 ${editMode ? 'opacity-100' : 'opacity-80'} animate-fade mt-4`}>
-            {activeTab === 'details' && property && (
+            {!showProductPages && property && (
               <PropertyForm
                 initialValues={property}
                 formRef={formRef}
@@ -179,7 +178,7 @@ export default function PropertyDetailPage() {
                 onSubmit={handleSubmit}
               />
             )}
-            {activeTab === 'product-pages' && property && (
+            {showProductPages && property && (
               <PropertyProductPagesList propertyId={property.id} />
             )}
           </div>

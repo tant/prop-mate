@@ -3,7 +3,7 @@ import { z } from "zod";
 // Các enum dùng cho property
 export const propertyTypeEnum = z.enum(["APARTMENT", "HOUSE", "LAND", "VILLA", "OFFICE"]);
 export const listingTypeEnum = z.enum(["sale", "rent"]);
-export const statusEnum = z.enum(["DRAFT", "AVAILABLE", "PENDING", "SOLD", "RENTED"]);
+export const statusEnum = z.enum(["DRAFT", "AVAILABLE", "PENDING", "SOLD", "RENTED", "INACTIVE"]);
 export const interiorStatusEnum = z.enum(["FURNISHED", "UNFURNISHED", "PARTIALLY_FURNISHED"]);
 export const legalStatusEnum = z.enum(["PINK_BOOK", "RED_BOOK", "SALE_CONTRACT"]);
 export const currentStatusEnum = z.enum(["VACANT", "OCCUPIED", "RENTED_OUT"]);

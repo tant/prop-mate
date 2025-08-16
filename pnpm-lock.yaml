@@ -98,6 +98,9 @@ importers:
       firebase-admin:
         specifier: ^13.4.0
         version: 13.4.0
+      framer-motion:
+        specifier: ^12.23.12
+        version: 12.23.12(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       leaflet:
         specifier: ^1.9.4
         version: 1.9.4

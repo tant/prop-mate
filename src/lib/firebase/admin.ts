@@ -31,6 +31,9 @@ const adminDb = admin.firestore();
 const adminStorage = admin.storage();
 const adminAppCheck = admin.appCheck ? admin.appCheck() : undefined; // App Check support (Firebase Admin SDK v11+)
 
+// Export để sử dụng ở các module khác
+export { adminAuth, adminDb, adminStorage, adminAppCheck, admin };
+
 /**
  * Xác thực App Check token (hỗ trợ replay protection):
  *
@@ -80,6 +83,4 @@ export async function verifyAppCheckToken(token: string, options?: { consume?: b
  * 7. Genkit:
  *    // TODO: Bổ sung hướng dẫn khi tích hợp Genkit
  */
-
-export { adminAuth, adminDb, adminStorage, adminAppCheck, admin };
 
