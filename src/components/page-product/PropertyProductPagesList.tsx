@@ -19,8 +19,24 @@ export function PropertyProductPagesList({ propertyId }: { propertyId: string })
     });
   };
 
+  // Mutation xóa product page
+  const deleteMutation = api.productPage.delete.useMutation({
+    onSuccess: () => {
+      toast.success('Đã xóa trang sản phẩm');
+    },
+    onError: (err) => {
+      toast.error('Lỗi khi xóa: ' + (err?.message || ''));
+    },
+  });
+
   // Lọc productPages theo propertyId
   const filteredPages = (productPages || []).filter(page => page.propertyId === propertyId);
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm('Bạn có chắc chắn muốn xóa trang này?')) {
+      await deleteMutation.mutateAsync({ id });
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -41,10 +57,10 @@ export function PropertyProductPagesList({ propertyId }: { propertyId: string })
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filteredPages.map((page) => (
-            <Card key={page.id}>
-              <CardHeader>
-                <CardTitle className="text-md">{page.title}</CardTitle>
-                <CardDescription>
+            <Card key={page.id} className="hover:shadow-lg transition">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-md truncate max-w-[70%]" title={page.title}>{page.title}</CardTitle>
                   <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
                     page.status === 'published' 
                       ? 'bg-green-100 text-green-800' 
@@ -54,19 +70,40 @@ export function PropertyProductPagesList({ propertyId }: { propertyId: string })
                   }`}>
                     {page.status}
                   </span>
-                </CardDescription>
+                </div>
+                <div className="flex justify-end mt-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleCopyLink(page.slug)}
+                    disabled={page.status === 'draft'}
+                    title={page.status === 'draft' ? 'Chỉ copy link khi đã xuất bản' : 'Copy link sản phẩm'}
+                  >
+                    Copy Link
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between mb-2">
                   <span className="text-xs text-gray-500">
                     Tạo ngày: {page.createdAt && (new Date(page.createdAt).toLocaleDateString())}
                   </span>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="outline" onClick={() => handleCopyLink(page.slug)}>
-                      Copy Link
-                    </Button>
-                    <Link href={`/property-pages/${page.id}/edit`}>Chỉnh sửa</Link>
-                  </div>
+                </div>
+                <div className="flex gap-2 justify-end">
+                  <Link
+                    href={`/property-pages/${page.id}/edit`}
+                    className="inline-flex items-center px-3 py-1.5 rounded-md bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition"
+                  >
+                    Chỉnh sửa
+                  </Link>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => handleDelete(page.id)}
+                    disabled={deleteMutation.status === 'pending'}
+                  >
+                    Xóa
+                  </Button>
                 </div>
               </CardContent>
             </Card>
