@@ -12,7 +12,7 @@ import Link from "next/link"
 import { useParams } from "next/navigation"
 import { api } from "@/app/_trpc/client"
 import { useState, useEffect } from "react"
-import { type ProductPage } from "@/types/product-page"
+import type { ProductPage } from "@/types/product-page"
 import { getProductPageTemplateById } from "@/constants/product-templates"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -75,11 +75,11 @@ export default function EditProductPage() {
 
   // Hàm lưu bản nháp
   const handleSaveDraft = () => {
-    if (!formData) return;
+    if (!formData || !formData.id) return;
     
     // Gọi API update với status = 'draft'
     updateProductPage.mutate({
-      id: formData.id!,
+      id: formData.id,
       data: {
         ...formData,
         status: 'draft',
@@ -89,11 +89,11 @@ export default function EditProductPage() {
 
   // Hàm publish
   const handlePublish = () => {
-    if (!formData) return;
+    if (!formData || !formData.id) return;
     
     // Gọi API update với status = 'published'
     updateProductPage.mutate({
-      id: formData.id!,
+      id: formData.id,
       data: {
         ...formData,
         status: 'published',
@@ -103,11 +103,11 @@ export default function EditProductPage() {
 
   // Hàm unpublish
   const handleUnpublish = () => {
-    if (!formData) return;
+    if (!formData || !formData.id) return;
     
     // Gọi API update với status = 'draft'
     updateProductPage.mutate({
-      id: formData.id!,
+      id: formData.id,
       data: {
         ...formData,
         status: 'draft',
@@ -126,7 +126,7 @@ export default function EditProductPage() {
   if (error) {
     return (
       <div className="flex items-center justify-center h-full">
-        <div className="text-red-500">Lỗi: {error.message}</div>
+  <div className="text-destructive">Lỗi: {error.message}</div>
       </div>
     );
   }
@@ -243,10 +243,10 @@ export default function EditProductPage() {
                   <div className="mt-1">
                     <span className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${
                       productPage.status === 'published' 
-                        ? 'bg-green-100 text-green-800' 
+                        ? 'bg-success/10 text-success' 
                         : productPage.status === 'draft' 
-                          ? 'bg-yellow-100 text-yellow-800' 
-                          : 'bg-gray-100 text-gray-800'
+                          ? 'bg-warning/10 text-warning' 
+                          : 'bg-muted text-foreground'
                     }`}>
                       {productPage.status === 'published' ? 'Đã xuất bản' : productPage.status === 'draft' ? 'Bản nháp' : 'Không công khai'}
                     </span>
@@ -300,29 +300,33 @@ export default function EditProductPage() {
                               <div key={field.key}>
                                 <Label htmlFor={`${section.id}-${field.key}`}>{field.label}</Label>
                                 <div className="mt-1 space-y-2">
-                                  {items.map((item: string, index: number) => (
-                                    <div key={index} className="flex items-center gap-2">
-                                      <Input
-                                        value={item}
-                                        onChange={(e) => {
-                                          const newItems = [...items];
-                                          newItems[index] = e.target.value;
-                                          handleInputChange(section.id, field.key, newItems);
-                                        }}
-                                      />
-                                      <Button
-                                        type="button"
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => {
-                                          const newItems = items.filter((_: string, i: number) => i !== index);
-                                          handleInputChange(section.id, field.key, newItems);
-                                        }}
-                                      >
-                                        Xóa
-                                      </Button>
-                                    </div>
-                                  ))}
+                                  {items.map((item: string, index: number) => {
+                                    // Use item value as key if unique, else fallback to item+index
+                                    const key = typeof item === 'string' && item.length > 0 ? `${item}-${index}` : `item-${index}`;
+                                    return (
+                                      <div key={key} className="flex items-center gap-2">
+                                        <Input
+                                          value={item}
+                                          onChange={(e) => {
+                                            const newItems = [...items];
+                                            newItems[index] = e.target.value;
+                                            handleInputChange(section.id, field.key, newItems);
+                                          }}
+                                        />
+                                        <Button
+                                          type="button"
+                                          variant="outline"
+                                          size="sm"
+                                          onClick={() => {
+                                            const newItems = items.filter((_: string, i: number) => i !== index);
+                                            handleInputChange(section.id, field.key, newItems);
+                                          }}
+                                        >
+                                          Xóa
+                                        </Button>
+                                      </div>
+                                    );
+                                  })}
                                   <Button
                                     type="button"
                                     variant="outline"

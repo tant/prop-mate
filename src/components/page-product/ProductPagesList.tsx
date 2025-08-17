@@ -47,7 +47,7 @@ export function ProductPagesList() {
   if (isError) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-red-500">Lỗi khi tải danh sách trang: {error.message}</div>
+        <div className="text-destructive">Lỗi khi tải danh sách trang: {error.message}</div>
       </div>
     );
   }
@@ -55,7 +55,7 @@ export function ProductPagesList() {
   return (
     <div className="space-y-4">
       {productPages && productPages.length === 0 ? (
-        <div className="border rounded-lg p-4 text-center text-gray-500">
+        <div className="border rounded-lg p-4 text-center text-muted-foreground">
           Bạn chưa có trang sản phẩm nào. <Link href="/property-pages/add" className="text-primary hover:underline">Tạo ngay</Link>
         </div>
       ) : (
@@ -70,10 +70,10 @@ export function ProductPagesList() {
                 <div className="flex justify-between items-center mb-2">
                   <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
                     page.status === 'published' 
-                      ? 'bg-green-100 text-green-800' 
+                      ? 'bg-success/10 text-success' 
                       : page.status === 'draft'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-gray-100 text-gray-800'
+                        ? 'bg-warning/10 text-warning'
+                        : 'bg-muted text-foreground'
                   }`}>
                     {page.status === 'published' ? 'Đã xuất bản' : page.status === 'draft' ? 'Bản nháp' : 'Không công khai'}
                   </span>
@@ -87,7 +87,7 @@ export function ProductPagesList() {
                 </div>
                 <div className="flex justify-between items-center">
                   <div className="space-x-2">
-                    <Button asChild variant="outline" size="sm">
+                    <Button asChild size="sm">
                       <Link href={`/property-pages/${page.id}/edit`}>Chỉnh sửa</Link>
                     </Button>
                     <Button 
@@ -100,7 +100,7 @@ export function ProductPagesList() {
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-muted-foreground">
                     Tạo ngày: {new Date(page.createdAt).toLocaleDateString('vi-VN')}
                   </span>
                 </div>

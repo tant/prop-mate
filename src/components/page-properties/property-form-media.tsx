@@ -290,11 +290,11 @@ export function PropertyFormMedia({ form }: PropertyFormMediaProps) {
                   </div>
                   <div className="flex items-center gap-2">
                     {/* Ẩn input tên và input URL, chỉ hiện nút xóa */}
-                    <button type="button" onClick={() => removeDoc(d.id)} className="text-red-600 hover:underline text-sm" disabled={d.status === "uploading"}>Xóa</button>
+                    <button type="button" onClick={() => removeDoc(d.id)} className="text-destructive hover:underline text-sm" disabled={d.status === "uploading"}>Xóa</button>
                   </div>
                 </div>
                 {d.status === "uploading" && <ProgressBar value={d.progress} />}
-                {d.status === "error" && <div className="text-xs text-red-600">Upload thất bại. Thử lại.</div>}
+                {d.status === "error" && <div className="text-xs text-destructive">Upload thất bại. Thử lại.</div>}
               </li>
             ))}
           </ul>
@@ -370,7 +370,7 @@ export function PropertyFormMedia({ form }: PropertyFormMediaProps) {
               </div>
             )}
             <div className="mt-2 flex gap-2">
-              <button type="button" onClick={() => { setVideoSrc(undefined); setVideoProgress(0); setVideoStatus("pending"); }} className="text-red-600 hover:underline text-sm">Xóa</button>
+              <button type="button" onClick={() => { setVideoSrc(undefined); setVideoProgress(0); setVideoStatus("pending"); }} className="text-destructive hover:underline text-sm">Xóa</button>
             </div>
           </div>
         )}

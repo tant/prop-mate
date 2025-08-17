@@ -10,6 +10,7 @@ import {
 import { useRouter } from "next/navigation"
 import { CreatePropertyFormWrapper } from "@/components/page-properties/property-form"
 import { useState } from "react"
+import { Button } from "@/components/ui/button"
 
 export default function CreatePropertyPage() {
   const router = useRouter()
@@ -34,20 +35,12 @@ export default function CreatePropertyPage() {
             />
             <h1 className="text-lg font-semibold">Thêm bất động sản</h1>
             <div className="flex items-center gap-2 ml-auto">
-              <button
-                type="button"
-                className="bg-primary text-white px-3 py-1 rounded hover:bg-primary/90 transition-colors text-sm"
-                onClick={handleSave}
-              >
+              <Button type="button" size="sm" onClick={handleSave}>
                 Lưu
-              </button>
-              <button
-                type="button"
-                className="bg-muted text-gray-700 px-3 py-1 rounded hover:bg-gray-200 transition-colors text-sm"
-                onClick={() => router.back()}
-              >
-                Hủy
-              </button>
+              </Button>
+              <Button type="button" size="sm" variant="secondary" onClick={() => router.back()}>
+                Huỷ
+              </Button>
             </div>
           </div>
         </header>

@@ -105,10 +105,10 @@ export default function PropertySeedPage() {
           </Button>
           {/* Không hiện preview, chỉ hiện kết quả cuối cùng */}
           {result && (
-            <div className="mt-4 text-green-600 font-medium">{result}</div>
+            <div className="mt-4 text-success font-medium">{result}</div>
           )}
           {error && (
-            <div className="mt-4 text-red-600">{error}</div>
+            <div className="mt-4 text-destructive">{error}</div>
           )}
         </form>
       </Card>

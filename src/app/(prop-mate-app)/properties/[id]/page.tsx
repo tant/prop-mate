@@ -100,10 +100,10 @@ export default function PropertyDetailPage() {
   );
   if (error) return (
     <div className="flex flex-1 flex-col items-center justify-center p-4">
-      <div className="text-red-500 text-center">
+  <div className="text-destructive text-center">
         <div className="text-xl font-semibold mb-2">Lỗi</div>
         <div className="mb-4">{error.message}</div>
-        <Button onClick={() => router.refresh()}>Thử lại</Button>
+  <Button onClick={() => router.refresh()}>Thử lại</Button>
       </div>
     </div>
   );
@@ -112,7 +112,7 @@ export default function PropertyDetailPage() {
       <div className="text-gray-500 text-center">
         <div className="text-xl font-semibold mb-2">Không tìm thấy</div>
         <div className="mb-4">Không tìm thấy bất động sản này.</div>
-        <Button onClick={() => router.push("/properties")}>Quay lại danh sách</Button>
+  <Button onClick={() => router.push("/properties")}>Quay lại danh sách</Button>
       </div>
     </div>
   );
@@ -137,7 +137,9 @@ export default function PropertyDetailPage() {
               {!editMode && activeTab === 'details' && (
                 <Button
                   type="button"
-                  className="bg-secondary text-gray-700 px-3 py-1 rounded hover:bg-gray-200 transition-colors text-sm flex items-center gap-1"
+                  variant="secondary"
+                  size="sm"
+                  className="flex items-center gap-1"
                   onClick={() => setEditMode(true)}
                 >
                   <Pencil className="w-4 h-4" />
@@ -148,7 +150,7 @@ export default function PropertyDetailPage() {
                 <>
                   <Button
                     type="button"
-                    className="bg-primary text-white px-3 py-1 rounded hover:bg-primary/90 transition-colors text-sm"
+                    size="sm"
                     onClick={handleSave}
                     disabled={isLoading}
                   >
@@ -156,7 +158,8 @@ export default function PropertyDetailPage() {
                   </Button>
                   <Button
                     type="button"
-                    className="bg-muted text-gray-700 px-3 py-1 rounded hover:bg-gray-200 transition-colors text-sm"
+                    variant="secondary"
+                    size="sm"
                     onClick={() => setEditMode(false)}
                     disabled={isLoading}
                   >

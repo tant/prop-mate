@@ -102,7 +102,6 @@ export default function DashboardPage() {
               </div>
               <Button
                 size="sm"
-                className="bg-primary text-white rounded hover:bg-primary/90 transition-colors"
                 onClick={() => router.push("/properties/add")}
               >
                 <Plus className="h-4 w-4" />
@@ -118,9 +117,9 @@ export default function DashboardPage() {
               ))}
             </div>
           )}
-          {error && <div className="p-4 text-red-500">Lỗi: {error.message}</div>}
+          {error && <div className="p-4 text-destructive">Lỗi: {error.message}</div>}
           {!isLoadingInitial && allProperties.length === 0 && (
-            <div className="p-4 text-gray-500">
+            <div className="p-4 text-muted-foreground">
               {debouncedSearchTerm 
                 ? "Không tìm thấy bất động sản phù hợp." 
                 : "Bạn chưa có bất động sản nào."}
@@ -152,7 +151,7 @@ export default function DashboardPage() {
                     )}
                   </div>
                 ) : (
-                  <div className="text-gray-500">Đã tải tất cả bất động sản</div>
+                  <div className="text-muted-foreground">Đã tải tất cả bất động sản</div>
                 )}
               </div>
             </>

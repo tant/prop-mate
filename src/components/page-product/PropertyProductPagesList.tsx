@@ -49,9 +49,9 @@ export function PropertyProductPagesList({ propertyId }: { propertyId: string })
       {isLoading ? (
         <div className="text-center text-gray-500">Đang tải...</div>
       ) : isError ? (
-        <div className="text-center text-red-500">Lỗi: {error?.message}</div>
+        <div className="text-center text-destructive">Lỗi: {error?.message}</div>
       ) : filteredPages.length === 0 ? (
-        <div className="border rounded-lg p-4 text-center text-gray-500">
+        <div className="border rounded-lg p-4 text-center text-muted-foreground">
           Chưa có trang sản phẩm nào cho bất động sản này.
         </div>
       ) : (
@@ -63,10 +63,10 @@ export function PropertyProductPagesList({ propertyId }: { propertyId: string })
                   <CardTitle className="text-md truncate max-w-[70%]" title={page.title}>{page.title}</CardTitle>
                   <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
                     page.status === 'published' 
-                      ? 'bg-green-100 text-green-800' 
+                      ? 'bg-success/10 text-success' 
                       : page.status === 'draft'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-gray-100 text-gray-800'
+                        ? 'bg-warning/10 text-warning'
+                        : 'bg-muted text-foreground'
                   }`}>
                     {page.status}
                   </span>
@@ -85,17 +85,14 @@ export function PropertyProductPagesList({ propertyId }: { propertyId: string })
               </CardHeader>
               <CardContent>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-muted-foreground">
                     Tạo ngày: {page.createdAt && (new Date(page.createdAt).toLocaleDateString())}
                   </span>
                 </div>
                 <div className="flex gap-2 justify-end">
-                  <Link
-                    href={`/property-pages/${page.id}/edit`}
-                    className="inline-flex items-center px-3 py-1.5 rounded-md bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition"
-                  >
-                    Chỉnh sửa
-                  </Link>
+                  <Button asChild size="sm">
+                    <Link href={`/property-pages/${page.id}/edit`}>Chỉnh sửa</Link>
+                  </Button>
                   <Button
                     size="sm"
                     variant="destructive"

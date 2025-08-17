@@ -73,7 +73,7 @@ export function PropertyCard({ property, onView, onEdit, onDelete }: PropertyCar
                 <Image
                   src={img}
                   alt={property.memorableName}
-                  className="h-full w-full object-contain rounded bg-gray-100 cursor-pointer"
+                  className="h-full w-full object-contain rounded bg-muted cursor-pointer"
                   onClick={() => handleImgClick(img)}
                   tabIndex={0}
                   onKeyDown={(e) => handleImgKeyDown(img, e)}
@@ -89,7 +89,7 @@ export function PropertyCard({ property, onView, onEdit, onDelete }: PropertyCar
           {lat && lng ? (
             <PropertyMiniMap lat={lat} lng={lng} />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-xs text-gray-400 bg-gray-50 rounded">
+            <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground bg-muted rounded">
               Không có vị trí
             </div>
           )}
@@ -99,7 +99,7 @@ export function PropertyCard({ property, onView, onEdit, onDelete }: PropertyCar
         <div className="text-muted-foreground">
           {property.location?.fullAddress}
         </div>
-        <div className="flex gap-4 text-xs text-gray-500">
+  <div className="flex gap-4 text-xs text-muted-foreground">
           <span>Diện tích: {property.area} m²</span>
           <span>PN: {property.bedrooms ?? '-'} phòng ngủ</span>
           <span>WC: {property.bathrooms ?? '-'} nhà tắm</span>

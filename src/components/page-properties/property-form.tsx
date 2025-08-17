@@ -17,6 +17,7 @@ import { PropertyFormLocation } from "./property-form-location";
 import { PropertyFormDetails } from "./property-form-details";
 import { PropertyFormMore } from "./property-form-more";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { Button } from "@/components/ui/button";
 
 // Utility: remove all undefined fields (deep)
 function removeUndefined<T>(obj: T): T {
@@ -200,24 +201,21 @@ export function PropertyForm(props: PropertyFormProps) {
         {/* Card 6: Hình ảnh & tài liệu */}
         <PropertyFormMedia form={form} />
         <div className="md:col-span-2 flex justify-end gap-2 mt-4">
-          <button
+          <Button
             type="submit"
-            className={
-              "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2"+
-              (shake ? " animate-shake" : "")
-            }
+            className={shake ? "animate-shake" : undefined}
             disabled={props.loading}
           >
             {props.loading ? 'Đang lưu...' : 'Lưu'}
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
-            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-muted text-gray-700 shadow-xs hover:bg-gray-200 h-9 px-4 py-2"
+            variant="secondary"
             onClick={handleCancel}
             disabled={props.loading}
           >
-            Hủy
-          </button>
+            Huỷ
+          </Button>
         </div>
       </form>
       {showDialog && (
@@ -228,24 +226,24 @@ export function PropertyForm(props: PropertyFormProps) {
                 ? "Bạn có chắc muốn hủy tạo bất động sản?" 
                 : "Bạn có chắc muốn hủy chỉnh sửa?"}
             </div>
-            <div className="mb-4 text-gray-600">
+            <div className="mb-4 text-muted-foreground">
               Dữ liệu đang nhập sẽ bị mất.
             </div>
             <div className="flex justify-end gap-2">
-              <button
+              <Button
                 type="button"
-                className="px-4 py-2 rounded bg-muted text-gray-700 hover:bg-gray-200"
+                variant="secondary"
                 onClick={handleDialogCancel}
               >
                 Tiếp tục nhập
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
-                className="px-4 py-2 rounded bg-destructive text-white hover:bg-destructive/90"
+                variant="destructive"
                 onClick={handleDialogConfirm}
               >
-                Hủy bỏ
-              </button>
+                Huỷ bỏ
+              </Button>
             </div>
           </div>
         </div>

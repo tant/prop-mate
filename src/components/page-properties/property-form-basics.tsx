@@ -126,7 +126,7 @@ export function PropertyFormBasics({ form, hasError }: PropertyFormBasicsProps) 
               <FormItem>
                 <div className="flex items-center gap-2">
                   <FormLabel className="mb-0 whitespace-nowrap">
-                    Tên gợi nhớ <span className="text-red-500">*</span>
+                    Tên gợi nhớ <span className="text-destructive">*</span>
                   </FormLabel>
                   <FormControl>
                     <Input placeholder="VD: Căn hộ Sunrise City" {...field} />
@@ -147,7 +147,7 @@ export function PropertyFormBasics({ form, hasError }: PropertyFormBasicsProps) 
                 <FormItem>
                   <div className="flex items-center gap-2">
                     <FormLabel className="mb-0 whitespace-nowrap">
-                      Diện tích <span className="text-red-500">*</span>
+                      Diện tích <span className="text-destructive">*</span>
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -172,7 +172,7 @@ export function PropertyFormBasics({ form, hasError }: PropertyFormBasicsProps) 
                 <FormItem>
                   <div className="flex items-center gap-2">
                     <FormLabel className="mb-0 whitespace-nowrap">
-                      Giá <span className="text-red-500">*</span>
+                      Giá <span className="text-destructive">*</span>
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -199,7 +199,7 @@ export function PropertyFormBasics({ form, hasError }: PropertyFormBasicsProps) 
               <FormItem>
                 <div className="flex items-center gap-2">
                   <FormLabel className="mb-0 whitespace-nowrap">
-                    Địa chỉ <span className="text-red-500">*</span>
+                    Địa chỉ <span className="text-destructive">*</span>
                   </FormLabel>
                   <FormControl>
                     <Textarea placeholder="Nhập địa chỉ đầy đủ" {...field} />

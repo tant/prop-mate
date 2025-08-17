@@ -11,6 +11,8 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { api } from "@/app/_trpc/client";
 import { formatDate } from "@/lib/utils";
 import { userUpdateSchema } from "@/types/user.schema";
@@ -113,8 +115,8 @@ export default function AccountPage() {
       <div>
         <span className="font-semibold">{label}:</span>{" "}
         {editMode ? (
-          <input
-            className="border rounded px-2 py-1 w-40"
+          <Input
+            className="w-40"
             name={name}
             value={value || ""}
             onChange={onChange}
@@ -212,7 +214,7 @@ export default function AccountPage() {
                       <InfoRow label="Tên" value={form.firstName} name="firstName" editMode={editMode} onChange={handleChange} placeholder="Tên" />
                       <InfoRow label="Số điện thoại" value={form.phoneNumber} name="phoneNumber" editMode={editMode} onChange={handleChange} placeholder="Số điện thoại" />
                       <InfoRow label="Địa chỉ" value={form.address} name="address" editMode={editMode} onChange={handleChange} placeholder="Địa chỉ" />
-                      <div><span className="font-semibold">Xác thực SĐT:</span> {user.phoneVerified ? <span className="text-green-600">Đã xác thực</span> : <span className="text-muted-foreground">Chưa xác thực</span>}</div>
+                      <div><span className="font-semibold">Xác thực SĐT:</span> {user.phoneVerified ? <span className="text-success">Đã xác thực</span> : <span className="text-muted-foreground">Chưa xác thực</span>}</div>
                     </div>
                   </div>
                   <div>
@@ -253,25 +255,24 @@ export default function AccountPage() {
                   )}
                   {editMode ? (
                     <div className="col-span-full flex gap-2 mt-4">
-                      <button type="submit" className="px-4 py-2 rounded bg-primary text-white" disabled={updateUser.status === 'pending'}>
+                      <Button type="submit" disabled={updateUser.status === 'pending'}>
                         {updateUser.status === 'pending' ? "Đang lưu..." : "Lưu"}
-                      </button>
-                      <button type="button" className="px-4 py-2 rounded bg-muted" onClick={() => setEditMode(false)} disabled={updateUser.status === 'pending'}>
+                      </Button>
+                      <Button type="button" variant="secondary" onClick={() => setEditMode(false)} disabled={updateUser.status === 'pending'}>
                         Huỷ
-                      </button>
+                      </Button>
                     </div>
                   ) : (
                     <div className="col-span-full flex gap-2 mt-4">
-                      <button
+                      <Button
                         type="button"
-                        className="px-4 py-2 rounded bg-primary text-white"
                         onClick={e => {
                           e.preventDefault();
                           setEditMode(true);
                         }}
                       >
                         Cập nhật
-                      </button>
+                      </Button>
                     </div>
                   )}
                 </form>

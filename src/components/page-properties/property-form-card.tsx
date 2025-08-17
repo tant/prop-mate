@@ -18,7 +18,7 @@ export function PropertyFormCard({ title, collapsible = true, triggerAriaLabel =
     return (
       <Card>
         <CardHeader>
-          <CardTitle className={hasError ? "text-red-500" : undefined}>{title}</CardTitle>
+          <CardTitle className={hasError ? "text-destructive" : undefined}>{title}</CardTitle>
         </CardHeader>
         <Separator className="my-0" />
         {children}
@@ -31,9 +31,9 @@ export function PropertyFormCard({ title, collapsible = true, triggerAriaLabel =
     <Collapsible defaultOpen={hasError || defaultOpen}>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className={hasError ? "text-red-500" : undefined}>{title}</CardTitle>
+          <CardTitle className={hasError ? "text-destructive" : undefined}>{title}</CardTitle>
           <CollapsibleTrigger asChild>
-            <button type="button" className="text-blue-600 p-1 rounded-full hover:bg-blue-50 transition" aria-label={triggerAriaLabel}>
+            <button type="button" className="text-primary p-1 rounded-full hover:bg-primary/10 transition" aria-label={triggerAriaLabel}>
               <ChevronDown size={20} />
             </button>
           </CollapsibleTrigger>
