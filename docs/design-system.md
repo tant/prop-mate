@@ -17,7 +17,7 @@
 
 ## 2. Typography
 
-- **Font:** Inter, sans-serif
+- **Font:** Inter, sans-serif (mặc định toàn app). Đã cấu hình qua `next/font/google` + Tailwind. Sử dụng class `font-sans` cho mọi text; không cần (và không dùng) class `font-inter` riêng.
 - **Font sizes:**
   - Heading 1: 2rem (32px) / bold
   - Heading 2: 1.5rem (24px) / bold

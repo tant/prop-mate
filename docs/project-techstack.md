@@ -9,12 +9,18 @@
 - **Tailwind CSS 4** (utility-first CSS)
 - **Radix UI** (UI primitives: Avatar, Dialog, Dropdown, Tooltip...)
 - **shadcn/ui** (UI kit)
+- **Fonts: Inter** (qua next/font/google). Tailwind `font-sans` được map sang Inter, áp dụng toàn cục.
 - **lucide-react**, **@tabler/icons-react** (icon sets)
 - **Swiper** (carousel/slider)
 - **Recharts** (charts)
 - **Leaflet**, **react-leaflet** (interactive maps)
 - **@dnd-kit** (drag & drop)
 - **vaul** (UI components)
+
+### Ghi chú về Fonts
+- Font chính thức: Inter. Được import bằng `next/font/google` và gán vào CSS variable `--font-inter` trong `src/app/layout.tsx`.
+- Trong `globals.css`, `--font-sans` và `--default-font-family` đã trỏ về `--font-inter` để toàn app dùng Inter mặc định.
+- Quy ước sử dụng: dùng class `font-sans` cho mọi text mặc định; không dùng class tuỳ biến `font-inter`.
 
 ## State & Data
 - **TanStack Query (React Query)** (server state)
