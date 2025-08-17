@@ -48,9 +48,12 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'pnpm dev',
+    command: 'pnpm start',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
+    stdout: 'pipe', // log stdout
+    stderr: 'pipe', // log stderr
+    // Playwright sẽ tự động log ra terminal
   },
 });
