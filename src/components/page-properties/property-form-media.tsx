@@ -18,8 +18,8 @@ interface PropertyFormMediaProps {
 }
 
 type UploadStatus = "pending" | "uploading" | "success" | "error";
-type ImageItem = { id: string; name: string; src: string; downloadUrl?: string; progress: number; status: UploadStatus };
-type DocItem = { id: string; name: string; url?: string; progress: number; status: UploadStatus; error?: string };
+type ImageItem = { id: string; name: string; src: string; downloadUrl?: string; storagePath?: string; progress: number; status: UploadStatus };
+type DocItem = { id: string; name: string; url?: string; storagePath?: string; progress: number; status: UploadStatus; error?: string };
 
 function randomId(prefix = "id") {
   return `${prefix}_${Math.random().toString(36).slice(2, 9)}_${Date.now().toString(36)}`;
@@ -35,14 +35,35 @@ function ProgressBar({ value }: { value: number }) {
 }
 
 // Xóa file trên Firebase Storage
-async function removeFileFromFirebase(url?: string) {
-  if (!url) return;
+async function removeFileFromFirebaseByPath(storagePath?: string) {
+  if (!storagePath) return;
   try {
-    const storageRef = ref(storage, url.replace(/^https?:\/\/[^/]+\//, ""));
+    const storageRef = ref(storage, storagePath);
     await deleteObject(storageRef);
-  } catch {
-    // Có thể log lỗi nếu cần
+  } catch (err) {
+    // swallow; optionally log
+    console.error('Failed to delete storage object at', storagePath, err);
   }
+}
+
+// Best-effort: try delete by download URL if no storagePath is available
+async function removeFileFromFirebase(urlOrPath?: string) {
+  if (!urlOrPath) return;
+  // If it looks like a storage path (no protocol and contains '/'), use it
+  if (!/^https?:\/\//.test(urlOrPath)) {
+    return removeFileFromFirebaseByPath(urlOrPath);
+  }
+  try {
+    // Try to extract the object path from the download URL (v0/b/{bucket}/o/{encodedPath})
+    const m = urlOrPath.match(/\/o\/([^?]+)/);
+    if (m?.[1]) {
+      const decoded = decodeURIComponent(m[1]);
+      return removeFileFromFirebaseByPath(decoded);
+    }
+  } catch {
+    // fall through
+  }
+  // Last resort: no-op
 }
 
 export function PropertyFormMedia({ form, editable }: PropertyFormMediaProps) {
@@ -92,12 +113,12 @@ export function PropertyFormMedia({ form, editable }: PropertyFormMediaProps) {
 
   // Images gallery (imageUrls)
   const [images, setImages] = useState<ImageItem[]>(() =>
-    (form.getValues("imageUrls") ?? []).map((url) => ({ id: randomId("img"), name: url.split("/").pop() || "image", src: url, downloadUrl: url, progress: 100, status: "success" as UploadStatus }))
+    (form.getValues("imageUrls") ?? []).map((url) => ({ id: randomId("img"), name: url.split("/").pop() || "image", src: url, downloadUrl: url, storagePath: undefined, progress: 100, status: "success" as UploadStatus }))
   );
 
   // Documents
   const [documents, setDocuments] = useState<DocItem[]>(() =>
-    (form.getValues("documents") ?? []).map((d) => ({ id: randomId("doc"), name: d.name, url: d.url, progress: 100, status: "success" as UploadStatus }))
+    (form.getValues("documents") ?? []).map((d) => ({ id: randomId("doc"), name: d.name, url: d.url, storagePath: undefined, progress: 100, status: "success" as UploadStatus }))
   );
 
   // 360 image
@@ -131,12 +152,12 @@ export function PropertyFormMedia({ form, editable }: PropertyFormMediaProps) {
 
   // Drop handlers
   // Firebase upload helper
-  const uploadWithProgress = useCallback(async (file: File, folder: string, onProgress: (pct: number) => void): Promise<string> => {
+  const uploadWithProgress = useCallback(async (file: File, folder: string, onProgress: (pct: number) => void): Promise<{ url: string; path: string }> => {
     const safeName = `${Date.now()}-${file.name}`.replace(/\s+/g, "-");
     const path = `${folder}/${safeName}`;
     const storageRef = ref(storage, path);
     const task = uploadBytesResumable(storageRef, file);
-    return new Promise<string>((resolve, reject) => {
+  return new Promise<{ url: string; path: string }>((resolve, reject) => {
       task.on(
         "state_changed",
         (snap) => {
@@ -147,8 +168,9 @@ export function PropertyFormMedia({ form, editable }: PropertyFormMediaProps) {
         async () => {
           try {
             const url = await getDownloadURL(task.snapshot.ref);
+            const fullPath = task.snapshot.ref.fullPath;
             onProgress(100);
-            resolve(url);
+            resolve({ url, path: fullPath });
           } catch (e) {
             reject(e);
           }
@@ -164,11 +186,11 @@ export function PropertyFormMedia({ form, editable }: PropertyFormMediaProps) {
       // Start uploads with limited concurrency
       const tasks = newItems.map((item, idx) => async () => {
         const file = acceptedFiles[idx];
-        try {
-          const url = await uploadWithProgress(file, "properties/images", (p) => {
+          try {
+          const result = await uploadWithProgress(file, "properties/images", (p) => {
             setImages((prev) => prev.map((it) => (it.id === item.id ? { ...it, progress: p, status: "uploading" } : it)));
           });
-          setImages((prev) => prev.map((it) => (it.id === item.id ? { ...it, downloadUrl: url, src: url, progress: 100, status: "success" } : it)));
+          setImages((prev) => prev.map((it) => (it.id === item.id ? { ...it, downloadUrl: result.url, storagePath: result.path, src: result.url, progress: 100, status: "success" } : it)));
         } catch {
           setImages((prev) => prev.map((it) => (it.id === item.id ? { ...it, status: "error" } : it)));
         }
@@ -185,11 +207,11 @@ export function PropertyFormMedia({ form, editable }: PropertyFormMediaProps) {
       setDocuments((prev) => [...prev, ...newDocs]);
       const tasks = newDocs.map((item, idx) => async () => {
         const file = acceptedFiles[idx];
-        try {
-          const url = await uploadWithProgress(file, "properties/documents", (p) => {
+          try {
+          const result = await uploadWithProgress(file, "properties/documents", (p) => {
             setDocuments((prev) => prev.map((d) => (d.id === item.id ? { ...d, progress: p, status: "uploading" } : d)));
           });
-          setDocuments((prev) => prev.map((d) => (d.id === item.id ? { ...d, url, progress: 100, status: "success" } : d)));
+          setDocuments((prev) => prev.map((d) => (d.id === item.id ? { ...d, url: result.url, storagePath: result.path, progress: 100, status: "success" } : d)));
         } catch (err: unknown) {
           const msg = err instanceof Error ? err.message : "Upload failed";
           setDocuments((prev) => prev.map((d) => (d.id === item.id ? { ...d, status: "error", error: msg } : d)));
@@ -209,9 +231,9 @@ export function PropertyFormMedia({ form, editable }: PropertyFormMediaProps) {
       setImage360Src(preview);
       setImage360Progress(0);
       setImage360Status("uploading");
-      uploadWithProgress(file, "properties/360", setImage360Progress)
-        .then((url) => {
-          setImage360Src(url);
+        uploadWithProgress(file, "properties/360", setImage360Progress)
+        .then((result) => {
+          setImage360Src(result.url);
           setImage360Status("success");
         })
         .catch(() => setImage360Status("error"));
@@ -228,8 +250,8 @@ export function PropertyFormMedia({ form, editable }: PropertyFormMediaProps) {
       setVideoProgress(0);
       setVideoStatus("uploading");
       uploadWithProgress(file, "properties/videos", setVideoProgress)
-        .then((url) => {
-          setVideoSrc(url);
+        .then((result) => {
+          setVideoSrc(result.url);
           setVideoStatus("success");
         })
         .catch(() => setVideoStatus("error"));
@@ -270,16 +292,25 @@ export function PropertyFormMedia({ form, editable }: PropertyFormMediaProps) {
     if (!editable) return;
     const ok = window.confirm("Bạn có chắc muốn xóa ảnh này?");
     if (!ok) return;
+    const removed = images.find((it) => it.id === id);
     setImages((prev) => prev.filter((it) => it.id !== id));
+    // If the image was already uploaded to storage, try to remove it there as well
+    if (removed) {
+      const pathOrUrl = removed.storagePath ?? removed.downloadUrl;
+      if (pathOrUrl && !pathOrUrl.startsWith('blob:')) {
+        void removeFileFromFirebase(pathOrUrl);
+      }
+    }
   };
   const removeDoc = async (id: string) => {
     if (!editable) return;
     const ok = window.confirm("Xóa tài liệu này?");
     if (!ok) return;
-    setDocuments((prev) => prev.filter((d) => d.id !== id));
     const removed = documents.find((d) => d.id === id);
-    if (removed?.url) {
-      await removeFileFromFirebase(removed.url);
+    setDocuments((prev) => prev.filter((d) => d.id !== id));
+    const pathOrUrl = removed?.storagePath ?? removed?.url;
+    if (pathOrUrl) {
+      await removeFileFromFirebase(pathOrUrl);
     }
   };
 

@@ -42,7 +42,9 @@ function highlight(text: string | undefined, term?: string) {
 export function PropertyCard({ property, onView, onEdit, onDelete, highlightTerm }: PropertyCardProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalImg, setModalImg] = useState<string | null>(null);
-  const images = property.imageUrls?.length ? property.imageUrls : ["/no-image.png"];
+  // Filter out any falsy/invalid image URLs
+  const images = (property.imageUrls?.filter((img) => typeof img === 'string' && !!img) ?? []);
+  const safeImages = images.length > 0 ? images : ["/no-image.png"];
 
   const handleImgClick = (img: string) => {
     setModalImg(img);
@@ -102,7 +104,7 @@ export function PropertyCard({ property, onView, onEdit, onDelete, highlightTerm
             slidesPerView={1}
             style={{ height: "100%", width: "100%" }}
           >
-            {images.map((img, idx) => (
+            {safeImages.map((img, idx) => (
               <SwiperSlide key={typeof img === 'string' ? img : idx}>
                 <Image
                   src={img}
