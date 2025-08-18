@@ -15,25 +15,28 @@ import { useCurrentUser } from "@/hooks/use-current-user"
 import { api } from "@/app/_trpc/client"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Search, Plus, Loader2 } from "lucide-react"
+import { Search, Plus, Loader2, X } from "lucide-react"
 import { useInView } from "react-intersection-observer"
 
 const PAGE_SIZE = 20;
+const DEBOUNCE_MS = 500; // Debounce delay for search; tuned for smoother UX and IME typing
 
-export default function DashboardPage() {
+export default function PropertiesPage() {
   const router = useRouter();
   const user = useCurrentUser();
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [isComposing, setIsComposing] = useState(false); // IME composition guard
   
   // Debounce search term
   useEffect(() => {
+    if (isComposing) return; // don't debounce while composing IME input
     const timer = setTimeout(() => {
-      setDebouncedSearchTerm(searchTerm);
-    }, 300);
+      setDebouncedSearchTerm(searchTerm.trim());
+    }, DEBOUNCE_MS);
     
     return () => clearTimeout(timer);
-  }, [searchTerm]);
+  }, [searchTerm, isComposing]);
   
   const propertiesQuery = api.property.getMyPropertiesPaginated.useInfiniteQuery(
     {
@@ -48,31 +51,30 @@ export default function DashboardPage() {
   
   const { ref, inView } = useInView();
   
-  // Reset pagination when search term changes
-  useEffect(() => {
-    propertiesQuery.refetch();
-    // Linter yêu cầu thêm refetch vào dependency array, nhưng refetch là stable function từ React Query nên sẽ không đổi giữa các render.
-    // Nếu linter vẫn cảnh báo, có thể disable dòng dưới:
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [propertiesQuery.refetch]);
+  // React Query automatically refetches when the query key changes (debouncedSearchTerm),
+  // so we don't need a separate effect to reset pagination.
   
-  // Load more when in view
+  // Load more when in view (stable deps)
+  const { hasNextPage, isFetching, fetchNextPage } = propertiesQuery;
   useEffect(() => {
-    if (inView && propertiesQuery.hasNextPage && !propertiesQuery.isFetching) {
-      propertiesQuery.fetchNextPage();
+    if (inView && hasNextPage && !isFetching) {
+      fetchNextPage();
     }
-  }, [inView, propertiesQuery]);
+  }, [inView, hasNextPage, isFetching, fetchNextPage]);
   
-  // Flatten pages into a single array
-  const allProperties = useMemo(() => {
-    return propertiesQuery.data?.pages.flatMap(page => page.properties) ?? [];
-  }, [propertiesQuery.data]);
+  // Flatten pages to a local display state to avoid flicker during search fetches
+  const flattened = useMemo(() => propertiesQuery.data?.pages.flatMap(page => page.properties) ?? [], [propertiesQuery.data]);
+  const [displayProperties, setDisplayProperties] = useState<typeof flattened>([]);
+  useEffect(() => {
+    setDisplayProperties(flattened);
+  }, [flattened]);
   
-  // Check if we're still loading initial data
-  const isLoadingInitial = propertiesQuery.isLoading;
+  // Initial load only shows skeleton when there is no cached data
+  const isLoadingInitial = propertiesQuery.isLoading && !propertiesQuery.data;
   
   // Check if we're fetching more data
-  const isFetchingMore = propertiesQuery.isFetching && propertiesQuery.data;
+  const isFetchingMore = propertiesQuery.isFetching && !!propertiesQuery.data;
+  const isSearching = propertiesQuery.isFetching && !!propertiesQuery.data && debouncedSearchTerm !== undefined;
   
   // Check if there's an error
   const error = propertiesQuery.error;
@@ -98,7 +100,28 @@ export default function DashboardPage() {
                   className="pl-8 pr-4 py-1 text-sm w-64"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
+                  onCompositionStart={() => setIsComposing(true)}
+                  onCompositionEnd={() => setIsComposing(false)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Escape') {
+                      e.preventDefault();
+                      setSearchTerm("");
+                    }
+                  }}
                 />
+                {!!searchTerm && (
+                  <button
+                    type="button"
+                    aria-label="Xóa tìm kiếm"
+                    onClick={() => setSearchTerm("")}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                )}
+                {isSearching && (
+                  <Loader2 className="absolute right-7 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-gray-500" />
+                )}
               </div>
               <Button
                 size="sm"
@@ -118,22 +141,23 @@ export default function DashboardPage() {
             </div>
           )}
           {error && <div className="p-4 text-destructive">Lỗi: {error.message}</div>}
-          {!isLoadingInitial && allProperties.length === 0 && (
+      {!isLoadingInitial && displayProperties.length === 0 && (
             <div className="p-4 text-muted-foreground">
               {debouncedSearchTerm 
                 ? "Không tìm thấy bất động sản phù hợp." 
                 : "Bạn chưa có bất động sản nào."}
             </div>
           )}
-          {!isLoadingInitial && allProperties.length > 0 && (
+      {!isLoadingInitial && displayProperties.length > 0 && (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
-                {allProperties.map((property: import("@/types/property").Property) => (
+        {displayProperties.map((property: import("@/types/property").Property) => (
                   <PropertyCard
                     key={property.id}
                     property={property}
+          highlightTerm={searchTerm}
                     onView={() => router.push(`/properties/${property.id}`)}
-                    onEdit={() => router.push(`/properties/${property.id}`)} // We'll handle edit mode in the detail page
+                    onEdit={() => router.push(`/properties/${property.id}?editmode=true`)}
                     onDelete={undefined} // tuỳ chỉnh nếu có chức năng xoá/lưu trữ
                   />
                 ))}

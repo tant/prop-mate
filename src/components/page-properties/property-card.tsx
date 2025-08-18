@@ -17,9 +17,29 @@ export interface PropertyCardProps {
   onView: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
+  highlightTerm?: string;
 }
 
-export function PropertyCard({ property, onView, onEdit, onDelete }: PropertyCardProps) {
+function highlight(text: string | undefined, term?: string) {
+  if (!text) return null;
+  if (!term) return text;
+  const safe = term.trim();
+  if (!safe) return text;
+  const regex = new RegExp(`(${safe.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, 'gi');
+  const parts = text.split(regex);
+  return parts.map((part, i) => {
+    const key = `${part}-${i}`;
+    return regex.test(part) ? (
+      <mark key={`m-${key}`} className="bg-yellow-200 text-black rounded px-0.5">
+        {part}
+      </mark>
+    ) : (
+      <span key={`t-${key}`}>{part}</span>
+    );
+  });
+}
+
+export function PropertyCard({ property, onView, onEdit, onDelete, highlightTerm }: PropertyCardProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalImg, setModalImg] = useState<string | null>(null);
   const images = property.imageUrls?.length ? property.imageUrls : ["/no-image.png"];
@@ -43,7 +63,7 @@ export function PropertyCard({ property, onView, onEdit, onDelete }: PropertyCar
   return (
     <Card className="p-4 flex flex-col gap-2 shadow hover:shadow-lg transition" data-testid="property-card">
       <CardHeader>
-        <CardDescription>{property.memorableName}</CardDescription>
+        <CardDescription>{highlight(property.memorableName, highlightTerm)}</CardDescription>
         <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
           {property.price && typeof property.price.value === "number" ?
             `${(property.price.value / 1_000_000).toLocaleString('vi-VN', { maximumFractionDigits: 2 })} triệu`
@@ -97,7 +117,7 @@ export function PropertyCard({ property, onView, onEdit, onDelete }: PropertyCar
       </CardContent>
       <CardFooter className="flex-col items-start gap-1.5 text-sm">
         <div className="text-muted-foreground">
-          {property.location?.fullAddress}
+          {highlight(property.location?.fullAddress, highlightTerm)}
         </div>
   <div className="flex gap-4 text-xs text-muted-foreground">
           <span>Diện tích: {property.area} m²</span>
