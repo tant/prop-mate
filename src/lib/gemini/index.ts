@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import type { ZodTypeAny, infer as ZodInfer } from 'zod';
 
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
@@ -82,12 +82,12 @@ export async function callGeminiWithSystemPrompt(systemPrompt: string, userPromp
  * @param schema - Schema Zod để validate kết quả JSON.
  * @returns Dữ liệu JSON đã được parse và validate.
  */
-export async function callGeminiStructured<T extends z.ZodTypeAny>(
+export async function callGeminiStructured<T extends ZodTypeAny>(
   systemPrompt: string,
   userPrompt: string,
   apiKey: string,
   schema: T
-): Promise<z.infer<T>> {
+): Promise<ZodInfer<T>> {
   // Bổ sung hướng dẫn về JSON vào systemPrompt nếu chưa có
   const jsonSystemPrompt = `${systemPrompt}
 
