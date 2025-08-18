@@ -110,7 +110,6 @@ export function PropertyForm(props: PropertyFormProps) {
     if (form.formState.isSubmitted) {
       // no-op: previously logged validation errors for debugging
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.formState.isSubmitted]);
 
 
