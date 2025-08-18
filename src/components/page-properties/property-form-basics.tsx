@@ -9,9 +9,10 @@ import type { PropertyCreateInput } from "./property-form";
 interface PropertyFormBasicsProps {
   form: UseFormReturn<PropertyCreateInput>;
   hasError?: boolean;
+  editable?: boolean;
 }
 
-export function PropertyFormBasics({ form, hasError }: PropertyFormBasicsProps) {
+export function PropertyFormBasics({ form, hasError, editable = true }: PropertyFormBasicsProps) {
   return (
     <PropertyFormCard title="Thông tin cơ bản" collapsible={false} hasError={!!hasError}>
       <div className="px-6">
@@ -22,8 +23,8 @@ export function PropertyFormBasics({ form, hasError }: PropertyFormBasicsProps) 
               <FormItem>
                 <div className="flex items-center gap-2">
                   <FormControl>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger>
+                    <Select onValueChange={field.onChange} value={field.value} disabled={!editable}>
+                      <SelectTrigger disabled={!editable}>
                         <SelectValue placeholder="Chọn trạng thái" />
                       </SelectTrigger>
                       <SelectContent>
@@ -45,8 +46,8 @@ export function PropertyFormBasics({ form, hasError }: PropertyFormBasicsProps) 
               <FormItem>
                 <div className="flex items-center gap-2">
                   <FormControl>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger>
+                    <Select onValueChange={field.onChange} value={field.value} disabled={!editable}>
+                      <SelectTrigger disabled={!editable}>
                         <SelectValue placeholder="Chọn loại hình" />
                       </SelectTrigger>
                       <SelectContent>
@@ -71,8 +72,8 @@ export function PropertyFormBasics({ form, hasError }: PropertyFormBasicsProps) 
                 <FormItem>
                   <div className="flex items-center gap-2">
                     <FormControl>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <SelectTrigger>
+                      <Select onValueChange={field.onChange} value={field.value} disabled={!editable}>
+                        <SelectTrigger disabled={!editable}>
                           <SelectValue placeholder="Chọn loại BĐS" />
                         </SelectTrigger>
                         <SelectContent>
@@ -98,8 +99,8 @@ export function PropertyFormBasics({ form, hasError }: PropertyFormBasicsProps) 
                 <FormItem>
                   <div className="flex items-center gap-2">
                     <FormControl>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <SelectTrigger>
+                      <Select onValueChange={field.onChange} value={field.value} disabled={!editable}>
+                        <SelectTrigger disabled={!editable}>
                           <SelectValue placeholder="Pháp lý" />
                         </SelectTrigger>
                         <SelectContent>
@@ -129,7 +130,7 @@ export function PropertyFormBasics({ form, hasError }: PropertyFormBasicsProps) 
                     Tên gợi nhớ <span className="text-destructive">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input placeholder="VD: Căn hộ Sunrise City" {...field} />
+                    <Input placeholder="VD: Căn hộ Sunrise City" {...field} disabled={!editable} />
                   </FormControl>
                 </div>
                 <FormMessage />
@@ -156,6 +157,7 @@ export function PropertyFormBasics({ form, hasError }: PropertyFormBasicsProps) 
                         step={1}
                         value={field.value ?? ''}
                         onChange={e => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
+                        disabled={!editable}
                       />
                     </FormControl>
                   </div>
@@ -181,6 +183,7 @@ export function PropertyFormBasics({ form, hasError }: PropertyFormBasicsProps) 
                         step={1000000}
                         value={field.value ?? ''}
                         onChange={e => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
+                        disabled={!editable}
                       />
                     </FormControl>
                   </div>
@@ -202,7 +205,7 @@ export function PropertyFormBasics({ form, hasError }: PropertyFormBasicsProps) 
                     Địa chỉ <span className="text-destructive">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Nhập địa chỉ đầy đủ" {...field} />
+                    <Textarea placeholder="Nhập địa chỉ đầy đủ" {...field} disabled={!editable} />
                   </FormControl>
                 </div>
                 <FormMessage />

@@ -14,9 +14,10 @@ import { PropertyFormCard } from "./property-form-card";
     interface PropertyFormMoreProps {
       form: UseFormReturn<PropertyCreateInput>;
       hasError?: boolean;
+      editable?: boolean;
     }
 
-    export function PropertyFormMore({ form, hasError }: PropertyFormMoreProps) {
+    export function PropertyFormMore({ form, hasError, editable = true }: PropertyFormMoreProps) {
       return (
         <PropertyFormCard title="Bổ sung" hasError={!!hasError}>
           <div className="px-6">
@@ -29,6 +30,7 @@ import { PropertyFormCard } from "./property-form-card";
                       type="date"
                       {...field}
                       value={field.value ? (typeof field.value === "string" ? field.value : field.value.toISOString().slice(0, 10)) : ""}
+                      disabled={!editable}
                     />
                   </FormControl>
                   <FormMessage />
@@ -38,8 +40,8 @@ import { PropertyFormCard } from "./property-form-card";
                 <FormItem>
                   <FormLabel>Tình trạng hiện tại</FormLabel>
                   <FormControl>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger>
+                    <Select onValueChange={field.onChange} value={field.value} disabled={!editable}>
+                      <SelectTrigger disabled={!editable}>
                         <SelectValue placeholder="Chọn tình trạng" />
                       </SelectTrigger>
                       <SelectContent>
@@ -62,6 +64,7 @@ import { PropertyFormCard } from "./property-form-card";
                       placeholder="Giá/m²"
                       value={field.value ?? ''}
                       onChange={e => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
+                      disabled={!editable}
                     />
                   </FormControl>
                   <FormMessage />

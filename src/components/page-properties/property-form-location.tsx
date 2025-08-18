@@ -11,9 +11,10 @@ const LocationPickerMap = dynamic(() => import("./LocationPickerMap.client"), { 
 interface PropertyFormLocationProps {
   form: UseFormReturn<PropertyCreateInput>;
   hasError?: boolean;
+  editable?: boolean;
 }
 
-export function PropertyFormLocation({ form, hasError }: PropertyFormLocationProps) {
+export function PropertyFormLocation({ form, hasError, editable = true }: PropertyFormLocationProps) {
   return (
     <PropertyFormCard title="Vị trí" hasError={!!hasError}>
       <div className="px-6">
@@ -22,7 +23,7 @@ export function PropertyFormLocation({ form, hasError }: PropertyFormLocationPro
             <FormItem>
               <FormLabel>Thành phố</FormLabel>
               <FormControl>
-                <Input placeholder="Thành phố" {...field} />
+                <Input placeholder="Thành phố" {...field} disabled={!editable} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -31,7 +32,7 @@ export function PropertyFormLocation({ form, hasError }: PropertyFormLocationPro
             <FormItem>
               <FormLabel>Quận/Huyện</FormLabel>
               <FormControl>
-                <Input placeholder="Quận/Huyện" {...field} />
+                <Input placeholder="Quận/Huyện" {...field} disabled={!editable} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -40,7 +41,7 @@ export function PropertyFormLocation({ form, hasError }: PropertyFormLocationPro
             <FormItem>
               <FormLabel>Phường/Xã</FormLabel>
               <FormControl>
-                <Input placeholder="Phường/Xã" {...field} />
+                <Input placeholder="Phường/Xã" {...field} disabled={!editable} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -49,7 +50,7 @@ export function PropertyFormLocation({ form, hasError }: PropertyFormLocationPro
             <FormItem>
               <FormLabel>Đường</FormLabel>
               <FormControl>
-                <Input placeholder="Đường" {...field} />
+                <Input placeholder="Đường" {...field} disabled={!editable} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -61,10 +62,15 @@ export function PropertyFormLocation({ form, hasError }: PropertyFormLocationPro
           <LocationPickerMap
             lat={form.watch("location.gps.lat")}
             lng={form.watch("location.gps.lng")}
-            onChange={(lat: number, lng: number) => {
-              form.setValue("location.gps.lat", lat);
-              form.setValue("location.gps.lng", lng);
-            }}
+            onChange={
+              editable
+                ? (lat: number, lng: number) => {
+                    form.setValue("location.gps.lat", lat);
+                    form.setValue("location.gps.lng", lng);
+                  }
+                : () => {}
+            }
+            editable={editable}
           />
         </div>
       </div>

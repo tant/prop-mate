@@ -14,6 +14,7 @@ import { getDownloadURL, ref, uploadBytesResumable, deleteObject } from "firebas
 
 interface PropertyFormMediaProps {
   form: UseFormReturn<PropertyCreateInput>;
+  editable?: boolean;
 }
 
 type UploadStatus = "pending" | "uploading" | "success" | "error";

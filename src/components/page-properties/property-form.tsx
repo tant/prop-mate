@@ -134,8 +134,8 @@ export function PropertyForm(props: PropertyFormProps) {
     }
   }, []);
 
-  // Dialog state
-  const [showDialog, setShowDialog] = useState(false);
+  // Dialog state (tạm thời không dùng)
+  // const [showDialog, setShowDialog] = useState(false);
   // const router = useRouter(); // Unused
 
   // Kiểm tra có dữ liệu nhập dở dang không (trừ optionFields)
@@ -148,37 +148,27 @@ export function PropertyForm(props: PropertyFormProps) {
   }, [form.formState.dirtyFields]);
 
   const handleCancel = () => {
-    // If in edit mode and form is dirty, show confirmation dialog
-    if (props.mode === "edit" && hasDirtyNonOption) {
-      setShowDialog(true);
+    console.log('handleCancel called, props.mode =', props.mode);
+    // Không còn dialog xác nhận, chỉ thực hiện thoát edit mode ngay lập tức
+    if (props.mode === "edit") {
+      const sp = new URLSearchParams(window.location.search);
+      sp.delete('editmode');
+      const query = sp.toString();
+      const url = query ? `${window.location.pathname}?${query}` : window.location.pathname;
+      router.replace(url, { scroll: false });
       return;
     }
-    
-    // If in create mode and form has any values, show confirmation dialog
-    if (props.mode === "create" && hasDirtyNonOption) {
-      setShowDialog(true);
-      return;
-    }
-    
-    // Otherwise, just go back
     if (props.mode === "create") {
       router.push("/properties");
-    } else {
-      window.history.back();
     }
   };
 
-  const handleDialogConfirm = () => {
-    setShowDialog(false);
-    window.history.back();
-  };
 
-  const handleDialogCancel = () => {
-    setShowDialog(false);
-  };
 
   // Remove the useEffect that was checking formRef as it's no longer needed
 
+  // Determine mode for child forms
+  const childMode = props.disabled ? undefined : (props.mode || 'edit');
   return (
     <Form {...form}>
       <form
@@ -189,65 +179,38 @@ export function PropertyForm(props: PropertyFormProps) {
         className="grid grid-cols-1 md:grid-cols-2 gap-6"
       >
         {/* Card 1: Thông tin cơ bản */}
-        <PropertyFormBasics form={form} />
+        <PropertyFormBasics form={form} editable={childMode === "edit" || childMode === "create"} />
         {/* Card 2: Thông tin liên hệ */}
-        <PropertyFormContact form={form} />
+        <PropertyFormContact form={form} editable={childMode === "edit" || childMode === "create"} />
         {/* Card 3: Vị trí */}
-        <PropertyFormLocation form={form} />
+        <PropertyFormLocation form={form} editable={childMode === "edit" || childMode === "create"} />
         {/* Card 4: Chi tiết nhà/đất */}
-        <PropertyFormDetails form={form} />
+        <PropertyFormDetails form={form} editable={childMode === "edit" || childMode === "create"} />
         {/* Card 5: Bổ sung */}
-        <PropertyFormMore form={form} />
+        <PropertyFormMore form={form} editable={childMode === "edit" || childMode === "create"} />
         {/* Card 6: Hình ảnh & tài liệu */}
-        <PropertyFormMedia form={form} />
-        <div className="md:col-span-2 flex justify-end gap-2 mt-4">
-          <Button
-            type="submit"
-            className={shake ? "animate-shake" : undefined}
-            disabled={props.loading}
-          >
-            {props.loading ? 'Đang lưu...' : 'Lưu'}
-          </Button>
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={handleCancel}
-            disabled={props.loading}
-          >
-            Huỷ
-          </Button>
-        </div>
-      </form>
-      {showDialog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-          <div className="bg-white rounded shadow-lg p-6 min-w-[320px] max-w-[90vw]">
-            <div className="mb-4 text-base font-medium">
-              {props.mode === "create" 
-                ? "Bạn có chắc muốn hủy tạo bất động sản?" 
-                : "Bạn có chắc muốn hủy chỉnh sửa?"}
-            </div>
-            <div className="mb-4 text-muted-foreground">
-              Dữ liệu đang nhập sẽ bị mất.
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={handleDialogCancel}
-              >
-                Tiếp tục nhập
-              </Button>
-              <Button
-                type="button"
-                variant="destructive"
-                onClick={handleDialogConfirm}
-              >
-                Huỷ bỏ
-              </Button>
-            </div>
+        <PropertyFormMedia form={form} editable={childMode === "edit" || childMode === "create"} />
+        {(childMode === "edit" || childMode === "create") && (
+          <div className="md:col-span-2 flex justify-end gap-2 mt-4">
+            <Button
+              type="submit"
+              className={shake ? "animate-shake" : undefined}
+              disabled={props.loading}
+            >
+              {props.loading ? 'Đang lưu...' : 'Lưu'}
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={handleCancel}
+              disabled={props.loading}
+            >
+              Huỷ
+            </Button>
           </div>
-        </div>
-      )}
+        )}
+      </form>
+
     </Form>
   );
 }

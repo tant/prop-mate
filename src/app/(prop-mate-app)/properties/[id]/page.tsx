@@ -13,6 +13,7 @@ import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { useMemo, useRef, useState } from "react";
 // ...existing code...
 import { api } from "@/app/_trpc/client";
+import { toast } from "sonner";
 import { PropertyForm, type PropertyCreateInput } from "@/components/page-properties/property-form";
 import { PropertyProductPagesList } from "@/components/page-product/PropertyProductPagesList";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,23 @@ import { Pencil } from 'lucide-react';
 
 
 export default function PropertyDetailPage() {
+  // ...existing code...
+  const updateProperty = api.property.update.useMutation({
+    onSuccess: () => {
+      toast.success("Cập nhật thành công!");
+  // Chuyển về view mode bằng cách xóa query param editmode, giữ nguyên pathname
+  const sp = new URLSearchParams(Array.from(searchParams.entries()));
+  sp.delete('editmode');
+  const query = sp.toString();
+  const url = query ? `${window.location.pathname}?${query}` : window.location.pathname;
+  toast.success("Cập nhật thành công!");
+  router.replace(url, { scroll: false });
+  setTimeout(() => router.refresh(), 100);
+    },
+    onError: (err) => {
+      toast.error(err.message || "Cập nhật thất bại");
+    },
+  });
 
   const params = useParams();
   const searchParams = useSearchParams();
@@ -74,9 +92,10 @@ export default function PropertyDetailPage() {
   };
 
   const handleSubmit = (data: PropertyCreateInput) => {
-    // TODO: Gửi dữ liệu để cập nhật property
-    console.log("Dữ liệu submit:", data);
-    alert("Dữ liệu đã được submit (cần implement API)");
+    if (!propertyId) return;
+    // Loại bỏ các field không cần thiết nếu muốn
+    const cleaned = { ...data };
+    updateProperty.mutate({ id: propertyId, data: cleaned });
   };
 
   if (isLoading) return (
@@ -116,6 +135,15 @@ export default function PropertyDetailPage() {
       </div>
     </div>
   );
+
+  // Nút Hủy: chỉ xóa query param editmode, giữ nguyên trang hiện tại
+  const handleCancelEditMode = () => {
+    const sp = new URLSearchParams(Array.from(searchParams.entries()));
+    sp.delete('editmode');
+    const query = sp.toString();
+    const url = query ? `${window.location.pathname}?${query}` : window.location.pathname;
+    router.replace(url, { scroll: false });
+  };
 
   return (
     <SidebarProvider>
@@ -160,7 +188,7 @@ export default function PropertyDetailPage() {
                     type="button"
                     variant="secondary"
                     size="sm"
-                    onClick={() => setEditMode(false)}
+                    onClick={handleCancelEditMode}
                     disabled={isLoading}
                   >
                     Hủy

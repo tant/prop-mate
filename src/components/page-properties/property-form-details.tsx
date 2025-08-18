@@ -8,9 +8,10 @@ import type { PropertyCreateInput } from "./property-form";
 interface PropertyFormDetailsProps {
   form: UseFormReturn<PropertyCreateInput>;
     hasError?: boolean; // Ensure hasError is destructured correctly
+  editable?: boolean;
 }
 
-export function PropertyFormDetails({ form, hasError }: PropertyFormDetailsProps) {
+export function PropertyFormDetails({ form, hasError, editable = true }: PropertyFormDetailsProps) {
   return (
     <PropertyFormCard title="Chi tiết nhà/đất" hasError={!!hasError}>
       <div className="px-6">
@@ -19,13 +20,7 @@ export function PropertyFormDetails({ form, hasError }: PropertyFormDetailsProps
             <FormItem>
               <FormLabel>Mặt tiền (m)</FormLabel>
               <FormControl>
-                <Input
-                  type="number"
-                  step="any"
-                  placeholder="Mặt tiền"
-                  value={field.value ?? ''}
-                  onChange={e => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
-                />
+                <Input {...field} type="number" step="any" placeholder="Mặt tiền" disabled={!editable} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -34,7 +29,7 @@ export function PropertyFormDetails({ form, hasError }: PropertyFormDetailsProps
             <FormItem>
               <FormLabel>Hướng</FormLabel>
               <FormControl>
-                <Input placeholder="Hướng" {...field} />
+                <Input {...field} placeholder="Hướng" disabled={!editable} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -43,12 +38,7 @@ export function PropertyFormDetails({ form, hasError }: PropertyFormDetailsProps
             <FormItem>
               <FormLabel>Tầng</FormLabel>
               <FormControl>
-                <Input
-                  type="number"
-                  placeholder="Tầng"
-                  value={field.value ?? ''}
-                  onChange={e => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
-                />
+                <Input {...field} type="number" placeholder="Tầng" disabled={!editable} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -57,12 +47,7 @@ export function PropertyFormDetails({ form, hasError }: PropertyFormDetailsProps
             <FormItem>
               <FormLabel>Tổng số tầng</FormLabel>
               <FormControl>
-                <Input
-                  type="number"
-                  placeholder="Tổng số tầng"
-                  value={field.value ?? ''}
-                  onChange={e => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
-                />
+                <Input {...field} type="number" placeholder="Tổng số tầng" disabled={!editable} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -71,12 +56,7 @@ export function PropertyFormDetails({ form, hasError }: PropertyFormDetailsProps
             <FormItem>
               <FormLabel>Số căn/tầng</FormLabel>
               <FormControl>
-                <Input
-                  type="number"
-                  placeholder="Số căn/tầng"
-                  value={field.value ?? ''}
-                  onChange={e => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
-                />
+                <Input {...field} type="number" placeholder="Số căn/tầng" disabled={!editable} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -85,12 +65,7 @@ export function PropertyFormDetails({ form, hasError }: PropertyFormDetailsProps
             <FormItem>
               <FormLabel>Phòng ngủ</FormLabel>
               <FormControl>
-                <Input
-                  type="number"
-                  placeholder="Phòng ngủ"
-                  value={field.value ?? ''}
-                  onChange={e => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
-                />
+                <Input {...field} type="number" placeholder="Phòng ngủ" disabled={!editable} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -99,12 +74,7 @@ export function PropertyFormDetails({ form, hasError }: PropertyFormDetailsProps
             <FormItem>
               <FormLabel>Phòng tắm</FormLabel>
               <FormControl>
-                <Input
-                  type="number"
-                  placeholder="Phòng tắm"
-                  value={field.value ?? ''}
-                  onChange={e => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
-                />
+                <Input {...field} type="number" placeholder="Phòng tắm" disabled={!editable} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -131,7 +101,7 @@ export function PropertyFormDetails({ form, hasError }: PropertyFormDetailsProps
             <FormItem>
               <FormLabel>Tiện ích</FormLabel>
               <FormControl>
-                <Input placeholder="Nhập tiện ích, cách nhau dấu phẩy" {...field} />
+                <Input {...field} placeholder="Nhập tiện ích, cách nhau dấu phẩy" disabled={!editable} />
               </FormControl>
               <FormMessage />
             </FormItem>
