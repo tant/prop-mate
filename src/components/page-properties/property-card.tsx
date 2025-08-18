@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Property } from "@/types/property";
 import dynamic from "next/dynamic";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
@@ -60,14 +60,28 @@ export function PropertyCard({ property, onView, onEdit, onDelete, highlightTerm
     }
   };
 
+  const formattedPrice = useMemo(() => {
+    const val = property.price?.value;
+    if (typeof val !== "number") return null;
+    const millions = val / 1_000_000; // VND -> triệu
+    if (millions >= 1000) {
+      const billions = millions / 1000; // -> tỷ
+      return `${billions.toLocaleString('vi-VN', { maximumFractionDigits: 2 })} tỷ`;
+    }
+    return `${millions.toLocaleString('vi-VN', { maximumFractionDigits: 2 })} triệu`;
+  }, [property.price?.value]);
+
   return (
     <Card className="p-4 flex flex-col gap-2 shadow hover:shadow-lg transition" data-testid="property-card">
       <CardHeader>
-        <CardDescription>{highlight(property.memorableName, highlightTerm)}</CardDescription>
+        <CardDescription
+          className="h-10 overflow-hidden"
+          style={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}
+        >
+          {highlight(property.memorableName, highlightTerm)}
+        </CardDescription>
         <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-          {property.price && typeof property.price.value === "number" ?
-            `${(property.price.value / 1_000_000).toLocaleString('vi-VN', { maximumFractionDigits: 2 })} triệu`
-            : '—'}
+          {formattedPrice ?? '—'}
           {property.legalStatus && (
             <Badge variant="outline" className="ml-2">
               {property.legalStatus}
@@ -116,7 +130,10 @@ export function PropertyCard({ property, onView, onEdit, onDelete, highlightTerm
         </div>
       </CardContent>
       <CardFooter className="flex-col items-start gap-1.5 text-sm">
-        <div className="text-muted-foreground">
+        <div
+          className="text-muted-foreground h-10 overflow-hidden"
+          style={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}
+        >
           {highlight(property.location?.fullAddress, highlightTerm)}
         </div>
   <div className="flex gap-4 text-xs text-muted-foreground">
