@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { useState } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { propertyCreateSchema } from "@/types/property.schema";
@@ -108,11 +107,11 @@ export function PropertyForm(props: PropertyFormProps) {
   }, [initialValues, form, form.reset]);
 
   React.useEffect(() => {
-    // Debug: log validation errors on submit
     if (form.formState.isSubmitted) {
-      console.debug('Form errors:', form.formState.errors);
+      // no-op: previously logged validation errors for debugging
     }
-  }, [form.formState.isSubmitted, form.formState.errors, form]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.formState.isSubmitted]);
 
 
   // Shake animation for save button on error
@@ -120,7 +119,6 @@ export function PropertyForm(props: PropertyFormProps) {
 
   // Scroll to first error field and shake button
   const handleError = React.useCallback((errors: Record<string, unknown>) => {
-    console.warn('Form validation errors:', errors);
     const keys = Object.keys(errors);
     if (keys.length > 0) {
       const firstErrorKey = keys[0];
@@ -139,16 +137,15 @@ export function PropertyForm(props: PropertyFormProps) {
   // const router = useRouter(); // Unused
 
   // Kiểm tra có dữ liệu nhập dở dang không (trừ optionFields)
-  const hasDirtyNonOption = React.useMemo(() => {
-    const optionFields = [
-      "propertyType", "listingType", "status", "legalStatus", "imageUrls"
-    ];
-    const dirty = form.formState.dirtyFields;
-    return Object.keys(dirty).some((k) => !optionFields.includes(k));
-  }, [form.formState.dirtyFields]);
+  // const hasDirtyNonOption = React.useMemo(() => {
+  //   const optionFields = [
+  //     "propertyType", "listingType", "status", "legalStatus", "imageUrls"
+  //   ];
+  //   const dirty = form.formState.dirtyFields;
+  //   return Object.keys(dirty).some((k) => !optionFields.includes(k));
+  // }, [form.formState.dirtyFields]);
 
   const handleCancel = () => {
-    console.log('handleCancel called, props.mode =', props.mode);
     // Không còn dialog xác nhận, chỉ thực hiện thoát edit mode ngay lập tức
     if (props.mode === "edit") {
       const sp = new URLSearchParams(window.location.search);
@@ -218,8 +215,7 @@ export function PropertyForm(props: PropertyFormProps) {
 export function CreatePropertyFormWrapper({ formRef }: { formRef?: React.Ref<HTMLFormElement> }) {
   const router = useRouter();
   const createProperty = api.property.create.useMutation({
-    onSuccess: async (data) => {
-      console.debug('Property created successfully:', data);
+  onSuccess: async () => {
       toast.success("Tạo bất động sản thành công!");
       await new Promise((res) => setTimeout(res, 1000));
       router.push("/properties");
@@ -239,9 +235,8 @@ export function CreatePropertyFormWrapper({ formRef }: { formRef?: React.Ref<HTM
           alert("Bạn cần đăng nhập để tạo bất động sản.");
           return;
         }
-        const cleaned = removeUndefined(data);
-        console.debug('Submit property data:', cleaned);
-        createProperty.mutate(cleaned);
+  const cleaned = removeUndefined(data);
+  createProperty.mutate(cleaned);
       }}
       loading={createProperty.isPending}
       formRef={formRef}

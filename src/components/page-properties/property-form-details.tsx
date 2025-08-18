@@ -20,7 +20,21 @@ export function PropertyFormDetails({ form, hasError, editable = true }: Propert
             <FormItem>
               <FormLabel>Mặt tiền (m)</FormLabel>
               <FormControl>
-                <Input {...field} type="number" step="any" placeholder="Mặt tiền" disabled={!editable} />
+                <Input
+                  type="number"
+                  inputMode="decimal"
+                  step="any"
+                  placeholder="Mặt tiền"
+                  disabled={!editable}
+                  value={field.value ?? ''}
+                  onChange={(e) => {
+                    if (!editable) return;
+                    const v = e.target.value;
+                    if (v === '') return field.onChange(undefined);
+                    const num = parseFloat(v);
+                    field.onChange(Number.isNaN(num) ? undefined : num);
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -29,7 +43,17 @@ export function PropertyFormDetails({ form, hasError, editable = true }: Propert
             <FormItem>
               <FormLabel>Hướng</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Hướng" disabled={!editable} />
+                <Input
+                  placeholder="Hướng"
+                  disabled={!editable}
+                  value={field.value ?? ''}
+                  onChange={(e) => editable && field.onChange(e.target.value)}
+                  onBlur={(e) => {
+                    if (!editable) return;
+                    const v = e.target.value.trim();
+                    if (v !== field.value) field.onChange(v);
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -38,7 +62,20 @@ export function PropertyFormDetails({ form, hasError, editable = true }: Propert
             <FormItem>
               <FormLabel>Tầng</FormLabel>
               <FormControl>
-                <Input {...field} type="number" placeholder="Tầng" disabled={!editable} />
+                <Input
+                  type="number"
+                  inputMode="numeric"
+                  placeholder="Tầng"
+                  disabled={!editable}
+                  value={field.value ?? ''}
+                  onChange={(e) => {
+                    if (!editable) return;
+                    const v = e.target.value;
+                    if (v === '') return field.onChange(undefined);
+                    const num = parseInt(v, 10);
+                    field.onChange(Number.isNaN(num) ? undefined : num);
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -47,7 +84,20 @@ export function PropertyFormDetails({ form, hasError, editable = true }: Propert
             <FormItem>
               <FormLabel>Tổng số tầng</FormLabel>
               <FormControl>
-                <Input {...field} type="number" placeholder="Tổng số tầng" disabled={!editable} />
+                <Input
+                  type="number"
+                  inputMode="numeric"
+                  placeholder="Tổng số tầng"
+                  disabled={!editable}
+                  value={field.value ?? ''}
+                  onChange={(e) => {
+                    if (!editable) return;
+                    const v = e.target.value;
+                    if (v === '') return field.onChange(undefined);
+                    const num = parseInt(v, 10);
+                    field.onChange(Number.isNaN(num) ? undefined : num);
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -56,7 +106,20 @@ export function PropertyFormDetails({ form, hasError, editable = true }: Propert
             <FormItem>
               <FormLabel>Số căn/tầng</FormLabel>
               <FormControl>
-                <Input {...field} type="number" placeholder="Số căn/tầng" disabled={!editable} />
+                <Input
+                  type="number"
+                  inputMode="numeric"
+                  placeholder="Số căn/tầng"
+                  disabled={!editable}
+                  value={field.value ?? ''}
+                  onChange={(e) => {
+                    if (!editable) return;
+                    const v = e.target.value;
+                    if (v === '') return field.onChange(undefined);
+                    const num = parseInt(v, 10);
+                    field.onChange(Number.isNaN(num) ? undefined : num);
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -65,7 +128,20 @@ export function PropertyFormDetails({ form, hasError, editable = true }: Propert
             <FormItem>
               <FormLabel>Phòng ngủ</FormLabel>
               <FormControl>
-                <Input {...field} type="number" placeholder="Phòng ngủ" disabled={!editable} />
+                <Input
+                  type="number"
+                  inputMode="numeric"
+                  placeholder="Phòng ngủ"
+                  disabled={!editable}
+                  value={field.value ?? ''}
+                  onChange={(e) => {
+                    if (!editable) return;
+                    const v = e.target.value;
+                    if (v === '') return field.onChange(undefined);
+                    const num = parseInt(v, 10);
+                    field.onChange(Number.isNaN(num) ? undefined : num);
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -74,7 +150,20 @@ export function PropertyFormDetails({ form, hasError, editable = true }: Propert
             <FormItem>
               <FormLabel>Phòng tắm</FormLabel>
               <FormControl>
-                <Input {...field} type="number" placeholder="Phòng tắm" disabled={!editable} />
+                <Input
+                  type="number"
+                  inputMode="numeric"
+                  placeholder="Phòng tắm"
+                  disabled={!editable}
+                  value={field.value ?? ''}
+                  onChange={(e) => {
+                    if (!editable) return;
+                    const v = e.target.value;
+                    if (v === '') return field.onChange(undefined);
+                    const num = parseInt(v, 10);
+                    field.onChange(Number.isNaN(num) ? undefined : num);
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -83,8 +172,8 @@ export function PropertyFormDetails({ form, hasError, editable = true }: Propert
             <FormItem>
               <FormLabel>Tình trạng nội thất</FormLabel>
               <FormControl>
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger>
+                <Select onValueChange={editable ? field.onChange : () => {}} value={field.value || undefined}>
+                  <SelectTrigger disabled={!editable}>
                     <SelectValue placeholder="Nội thất" />
                   </SelectTrigger>
                   <SelectContent>
@@ -101,7 +190,21 @@ export function PropertyFormDetails({ form, hasError, editable = true }: Propert
             <FormItem>
               <FormLabel>Tiện ích</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Nhập tiện ích, cách nhau dấu phẩy" disabled={!editable} />
+                <Input
+                  placeholder="Nhập tiện ích, cách nhau dấu phẩy"
+                  disabled={!editable}
+                  value={Array.isArray(field.value) ? field.value.join(', ') : (field.value ?? '')}
+                  onChange={(e) => {
+                    if (!editable) return;
+                    const parts = e.target.value.split(',').map((s) => s.trim()).filter(Boolean);
+                    field.onChange(parts);
+                  }}
+                  onBlur={(e) => {
+                    if (!editable) return;
+                    const parts = e.target.value.split(',').map((s) => s.trim()).filter(Boolean);
+                    field.onChange(parts);
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

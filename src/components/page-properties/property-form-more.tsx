@@ -30,6 +30,14 @@ import { PropertyFormCard } from "./property-form-card";
                       type="date"
                       {...field}
                       value={field.value ? (typeof field.value === "string" ? field.value : field.value.toISOString().slice(0, 10)) : ""}
+                      onChange={(e) => {
+                        if (!editable) return;
+                        const v = e.target.value;
+                        if (!v) return field.onChange(undefined);
+                        // Convert YYYY-MM-DD to Date (at local midnight)
+                        const d = new Date(`${v}T00:00:00`);
+                        field.onChange(Number.isNaN(d.getTime()) ? undefined : d);
+                      }}
                       disabled={!editable}
                     />
                   </FormControl>
@@ -40,7 +48,7 @@ import { PropertyFormCard } from "./property-form-card";
                 <FormItem>
                   <FormLabel>Tình trạng hiện tại</FormLabel>
                   <FormControl>
-                    <Select onValueChange={field.onChange} value={field.value} disabled={!editable}>
+                    <Select onValueChange={editable ? field.onChange : () => {}} value={field.value || undefined} disabled={!editable}>
                       <SelectTrigger disabled={!editable}>
                         <SelectValue placeholder="Chọn tình trạng" />
                       </SelectTrigger>
@@ -60,10 +68,17 @@ import { PropertyFormCard } from "./property-form-card";
                   <FormControl>
                     <Input
                       type="number"
+                      inputMode="numeric"
                       step="any"
                       placeholder="Giá/m²"
                       value={field.value ?? ''}
-                      onChange={e => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
+                      onChange={e => {
+                        if (!editable) return;
+                        const v = e.target.value;
+                        if (v === '') return field.onChange(undefined);
+                        const num = Number(v);
+                        field.onChange(Number.isNaN(num) ? undefined : num);
+                      }}
                       disabled={!editable}
                     />
                   </FormControl>

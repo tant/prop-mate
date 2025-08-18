@@ -23,7 +23,17 @@ export function PropertyFormContact({ form, hasError, editable = true }: Propert
                 <div className="flex items-center gap-2">
                   <FormLabel className="mb-0 whitespace-nowrap">Tên</FormLabel>
                   <FormControl>
-                    <Input placeholder="Tên" {...field} disabled={!editable} />
+                    <Input
+                      placeholder="Tên"
+                      {...field}
+                      disabled={!editable}
+                      onBlur={(e) => {
+                        if (!editable) return;
+                        const v = e.target.value.trim();
+                        if (v !== field.value) field.onChange(v);
+                      }}
+                      autoComplete="name"
+                    />
                   </FormControl>
                 </div>
                 <FormMessage />
@@ -41,7 +51,19 @@ export function PropertyFormContact({ form, hasError, editable = true }: Propert
                   <div className="flex items-center gap-2">
                     <FormLabel className="mb-0 whitespace-nowrap">Điện thoại</FormLabel>
                     <FormControl>
-                      <Input placeholder="Số điện thoại" {...field} disabled={!editable} />
+                      <Input
+                        type="tel"
+                        inputMode="tel"
+                        autoComplete="tel"
+                        placeholder="Số điện thoại"
+                        {...field}
+                        disabled={!editable}
+                        onBlur={(e) => {
+                          if (!editable) return;
+                          const v = e.target.value.trim();
+                          if (v !== field.value) field.onChange(v);
+                        }}
+                      />
                     </FormControl>
                   </div>
                   <FormMessage />
@@ -58,7 +80,18 @@ export function PropertyFormContact({ form, hasError, editable = true }: Propert
                   <div className="flex items-center gap-2">
                     <FormLabel className="mb-0 whitespace-nowrap">Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="Email" {...field} disabled={!editable} />
+                      <Input
+                        type="email"
+                        autoComplete="email"
+                        placeholder="Email"
+                        {...field}
+                        disabled={!editable}
+                        onBlur={(e) => {
+                          if (!editable) return;
+                          const v = e.target.value.trim();
+                          if (v !== field.value) field.onChange(v);
+                        }}
+                      />
                     </FormControl>
                   </div>
                   <FormMessage />

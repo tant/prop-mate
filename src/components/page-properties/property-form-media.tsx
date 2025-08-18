@@ -45,7 +45,51 @@ async function removeFileFromFirebase(url?: string) {
   }
 }
 
-export function PropertyFormMedia({ form }: PropertyFormMediaProps) {
+export function PropertyFormMedia({ form, editable }: PropertyFormMediaProps) {
+  const CONCURRENCY = 3;
+  const getDocIcon = (name?: string) => {
+    const ext = (name?.split('.').pop() || '').toLowerCase();
+    return (
+      <span className="inline-flex items-center justify-center w-5 h-5 rounded bg-muted text-muted-foreground">
+        <FileText className="w-4 h-4" />
+        <span className="sr-only">{ext || 'file'}</span>
+      </span>
+    );
+  };
+
+  // Run promise tasks with limited concurrency (stable callback)
+  const runWithConcurrency = useCallback(async function runWithConcurrency<T>(tasks: Array<() => Promise<T>>, limit: number): Promise<T[]> {
+    const results: T[] = [];
+    let index = 0;
+    let active = 0;
+
+    return new Promise<T[]>((resolve) => {
+      const next = () => {
+        while (active < limit && index < tasks.length) {
+          const current = tasks[index++];
+          active++;
+          current()
+            .then((res) => {
+              results.push(res as T);
+            })
+            .catch(() => {
+              // swallow; errors are reflected in UI state per-item
+            })
+            .finally(() => {
+              active--;
+              if (results.length + active === tasks.length) {
+                resolve(results);
+              } else {
+                next();
+              }
+            });
+        }
+      };
+      next();
+      if (tasks.length === 0) resolve(results);
+    });
+  }, []);
+
   // Images gallery (imageUrls)
   const [images, setImages] = useState<ImageItem[]>(() =>
     (form.getValues("imageUrls") ?? []).map((url) => ({ id: randomId("img"), name: url.split("/").pop() || "image", src: url, downloadUrl: url, progress: 100, status: "success" as UploadStatus }))
@@ -69,20 +113,20 @@ export function PropertyFormMedia({ form }: PropertyFormMediaProps) {
   // Ensure form has only finalized URLs
   useEffect(() => {
     const urls = images.map((i) => i.downloadUrl).filter(Boolean) as string[];
-    form.setValue("imageUrls", urls);
+    form.setValue("imageUrls", urls, { shouldDirty: true, shouldTouch: true });
   }, [images, form]);
 
   useEffect(() => {
     const docs = documents.flatMap((d) => (d.url ? [{ name: d.name, url: d.url }] : []));
-    form.setValue("documents", docs);
+    form.setValue("documents", docs, { shouldDirty: true, shouldTouch: true });
   }, [documents, form]);
 
   useEffect(() => {
-    form.setValue("images360", image360Src);
+    form.setValue("images360", image360Src, { shouldDirty: true, shouldTouch: true });
   }, [image360Src, form]);
 
   useEffect(() => {
-    form.setValue("videoUrl", videoSrc);
+    form.setValue("videoUrl", videoSrc, { shouldDirty: true, shouldTouch: true });
   }, [videoSrc, form]);
 
   // Drop handlers
@@ -117,27 +161,29 @@ export function PropertyFormMedia({ form }: PropertyFormMediaProps) {
     (acceptedFiles: File[]) => {
       const newItems: ImageItem[] = acceptedFiles.map((file) => ({ id: randomId("img"), name: file.name, src: URL.createObjectURL(file), progress: 0, status: "uploading" }));
       setImages((prev) => [...prev, ...newItems]);
-      // Start uploads
-      newItems.forEach(async (item, idx) => {
+      // Start uploads with limited concurrency
+      const tasks = newItems.map((item, idx) => async () => {
         const file = acceptedFiles[idx];
         try {
           const url = await uploadWithProgress(file, "properties/images", (p) => {
             setImages((prev) => prev.map((it) => (it.id === item.id ? { ...it, progress: p, status: "uploading" } : it)));
           });
           setImages((prev) => prev.map((it) => (it.id === item.id ? { ...it, downloadUrl: url, src: url, progress: 100, status: "success" } : it)));
-  } catch {
+        } catch {
           setImages((prev) => prev.map((it) => (it.id === item.id ? { ...it, status: "error" } : it)));
         }
       });
+
+      void runWithConcurrency(tasks, CONCURRENCY);
     },
-    [uploadWithProgress]
+  [uploadWithProgress, runWithConcurrency]
   );
 
   const onDropDocuments = useCallback(
     (acceptedFiles: File[]) => {
       const newDocs: DocItem[] = acceptedFiles.map((file) => ({ id: randomId("doc"), name: file.name, progress: 0, status: "uploading" }));
       setDocuments((prev) => [...prev, ...newDocs]);
-      newDocs.forEach(async (item, idx) => {
+      const tasks = newDocs.map((item, idx) => async () => {
         const file = acceptedFiles[idx];
         try {
           const url = await uploadWithProgress(file, "properties/documents", (p) => {
@@ -149,8 +195,10 @@ export function PropertyFormMedia({ form }: PropertyFormMediaProps) {
           setDocuments((prev) => prev.map((d) => (d.id === item.id ? { ...d, status: "error", error: msg } : d)));
         }
       });
+
+      void runWithConcurrency(tasks, CONCURRENCY);
     },
-    [uploadWithProgress]
+  [uploadWithProgress, runWithConcurrency]
   );
 
   const onDropImage360 = useCallback(
@@ -168,7 +216,7 @@ export function PropertyFormMedia({ form }: PropertyFormMediaProps) {
         })
         .catch(() => setImage360Status("error"));
     },
-    [uploadWithProgress]
+  [uploadWithProgress]
   );
 
   const onDropVideo = useCallback(
@@ -186,7 +234,7 @@ export function PropertyFormMedia({ form }: PropertyFormMediaProps) {
         })
         .catch(() => setVideoStatus("error"));
     },
-    [uploadWithProgress]
+  [uploadWithProgress]
   );
 
   // Revoke object URLs on unmount
@@ -200,39 +248,58 @@ export function PropertyFormMedia({ form }: PropertyFormMediaProps) {
     };
   }, [images, image360Src, videoSrc]);
 
-  const imagesDropzone = useDropzone({ accept: { "image/*": [] }, onDrop: onDropImages, multiple: true });
-  const documentsDropzone = useDropzone({ onDrop: onDropDocuments, multiple: true });
-  const image360Dropzone = useDropzone({ accept: { "image/*": [] }, onDrop: onDropImage360, multiple: false });
-  const videoDropzone = useDropzone({ accept: { "video/*": [] }, onDrop: onDropVideo, multiple: false });
+  const imagesDropzone = useDropzone({ accept: { "image/*": [] }, onDrop: onDropImages, multiple: true, disabled: !editable });
+  const documentsDropzone = useDropzone({
+    onDrop: onDropDocuments,
+    multiple: true,
+    disabled: !editable,
+    accept: {
+      "application/pdf": [".pdf"],
+      "application/msword": [".doc"],
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
+      "image/*": [],
+    },
+  });
+  const image360Dropzone = useDropzone({ accept: { "image/*": [] }, onDrop: onDropImage360, multiple: false, disabled: !editable });
+  const videoDropzone = useDropzone({ accept: { "video/*": [] }, onDrop: onDropVideo, multiple: false, disabled: !editable });
 
   const dropZoneBase = "flex flex-col items-center justify-center gap-2 rounded-md border border-dashed p-6 text-center cursor-pointer transition hover:bg-muted/40";
   const thumbGrid = "mt-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3";
 
   const removeImage = (id: string) => {
+    if (!editable) return;
+    const ok = window.confirm("Bạn có chắc muốn xóa ảnh này?");
+    if (!ok) return;
     setImages((prev) => prev.filter((it) => it.id !== id));
-    const removed = images.find((i) => i.id === id);
-    if (removed?.downloadUrl) {
-      const next = images.filter((i) => i.id !== id).map((i) => i.downloadUrl).filter(Boolean) as string[];
-      form.setValue("imageUrls", next);
-    }
   };
   const removeDoc = async (id: string) => {
+    if (!editable) return;
+    const ok = window.confirm("Xóa tài liệu này?");
+    if (!ok) return;
     setDocuments((prev) => prev.filter((d) => d.id !== id));
     const removed = documents.find((d) => d.id === id);
     if (removed?.url) {
       await removeFileFromFirebase(removed.url);
     }
-    const next = documents.filter((d) => d.id !== id).flatMap((d) => (d.url ? [{ name: d.name, url: d.url }] : []));
-    form.setValue("documents", next);
   };
+
+  // (moved above)
 
   return (
     <PropertyFormCard title="Hình ảnh & Tài liệu">
-      <div className="px-6 space-y-6">
+      <div className="px-6 space-y-6 relative">
+        {!editable && (
+          <div className="absolute inset-0 z-10 bg-transparent" aria-hidden="true" />
+        )}
       {/* Thư viện ảnh */}
       <div>
         <FormLabel className="mb-2 block">Thư viện ảnh</FormLabel>
-        <div {...imagesDropzone.getRootProps({ className: dropZoneBase })}>
+        <div
+          {...imagesDropzone.getRootProps({
+            className: `${dropZoneBase} ${editable ? '' : 'pointer-events-none opacity-50'}`,
+          })}
+          aria-disabled={!editable}
+        >
           <input {...imagesDropzone.getInputProps()} />
           <ImageIcon className="h-6 w-6 text-muted-foreground" />
           <div className="text-sm text-muted-foreground">Kéo thả ảnh vào đây hoặc bấm để chọn</div>
@@ -252,7 +319,7 @@ export function PropertyFormMedia({ form }: PropertyFormMediaProps) {
                   onClick={() => removeImage(it.id)}
                   className="absolute top-1 right-1 hidden group-hover:flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white disabled:opacity-50"
                   aria-label="Remove image"
-                  disabled={it.status === "uploading"}
+                  disabled={!editable || it.status === "uploading"}
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -275,7 +342,12 @@ export function PropertyFormMedia({ form }: PropertyFormMediaProps) {
       {/* Tài liệu đính kèm */}
       <div>
         <FormLabel className="mb-2 block">Tài liệu đính kèm</FormLabel>
-        <div {...documentsDropzone.getRootProps({ className: dropZoneBase })}>
+        <div
+          {...documentsDropzone.getRootProps({
+            className: `${dropZoneBase} ${editable ? '' : 'pointer-events-none opacity-50'}`,
+          })}
+          aria-disabled={!editable}
+        >
           <input {...documentsDropzone.getInputProps()} />
           <FileText className="h-6 w-6 text-muted-foreground" />
           <div className="text-sm text-muted-foreground">Kéo thả tài liệu vào đây hoặc bấm để chọn</div>
@@ -286,12 +358,12 @@ export function PropertyFormMedia({ form }: PropertyFormMediaProps) {
               <li key={d.id} className="flex flex-col gap-2 rounded border p-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 truncate">
-                    <FileText className="h-4 w-4 text-muted-foreground" />
+                    {getDocIcon(d.name)}
                     <span className="truncate" title={d.name}>{d.name}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     {/* Ẩn input tên và input URL, chỉ hiện nút xóa */}
-                    <button type="button" onClick={() => removeDoc(d.id)} className="text-destructive hover:underline text-sm" disabled={d.status === "uploading"}>Xóa</button>
+                    <button type="button" onClick={() => removeDoc(d.id)} className="text-destructive hover:underline text-sm disabled:opacity-50" disabled={!editable || d.status === "uploading"}>Xóa</button>
                   </div>
                 </div>
                 {d.status === "uploading" && <ProgressBar value={d.progress} />}
@@ -314,7 +386,12 @@ export function PropertyFormMedia({ form }: PropertyFormMediaProps) {
       {/* Ảnh 360 */}
       <div>
         <FormLabel className="mb-2 block">Ảnh 360</FormLabel>
-        <div {...image360Dropzone.getRootProps({ className: dropZoneBase })}>
+        <div
+          {...image360Dropzone.getRootProps({
+            className: `${dropZoneBase} ${editable ? '' : 'pointer-events-none opacity-50'}`,
+          })}
+          aria-disabled={!editable}
+        >
           <input {...image360Dropzone.getInputProps()} />
           <ImageIcon className="h-6 w-6 text-muted-foreground" />
           <div className="text-sm text-muted-foreground">Kéo thả 1 ảnh 360 hoặc bấm để chọn</div>
@@ -332,6 +409,7 @@ export function PropertyFormMedia({ form }: PropertyFormMediaProps) {
               onClick={() => { setImage360Src(undefined); setImage360Progress(0); setImage360Status("pending"); }}
               className="absolute top-1 right-1 h-6 w-6 flex items-center justify-center rounded-full bg-black/60 text-white"
               aria-label="Remove 360"
+              disabled={!editable}
             >
               <X className="h-4 w-4" />
             </button>
@@ -339,7 +417,7 @@ export function PropertyFormMedia({ form }: PropertyFormMediaProps) {
         )}
         {/* Manual URL input */}
         <div className="mt-2">
-          <Input placeholder="Hoặc dán URL ảnh 360" value={image360Src ?? ""} onChange={(e) => { setImage360Src(e.target.value || undefined); setImage360Status(e.target.value ? "success" : "pending"); }} />
+          <Input placeholder="Hoặc dán URL ảnh 360" value={image360Src ?? ""} onChange={(e) => { setImage360Src(e.target.value || undefined); setImage360Status(e.target.value ? "success" : "pending"); }} disabled={!editable} />
         </div>
         <FormField
           control={form.control}
@@ -355,7 +433,12 @@ export function PropertyFormMedia({ form }: PropertyFormMediaProps) {
       {/* Video */}
       <div>
         <FormLabel className="mb-2 block">Video</FormLabel>
-        <div {...videoDropzone.getRootProps({ className: dropZoneBase })}>
+        <div
+          {...videoDropzone.getRootProps({
+            className: `${dropZoneBase} ${editable ? '' : 'pointer-events-none opacity-50'}`,
+          })}
+          aria-disabled={!editable}
+        >
           <input {...videoDropzone.getInputProps()} />
           <Upload className="h-6 w-6 text-muted-foreground" />
           <div className="text-sm text-muted-foreground">Kéo thả 1 video hoặc bấm để chọn</div>
@@ -371,12 +454,12 @@ export function PropertyFormMedia({ form }: PropertyFormMediaProps) {
               </div>
             )}
             <div className="mt-2 flex gap-2">
-              <button type="button" onClick={() => { setVideoSrc(undefined); setVideoProgress(0); setVideoStatus("pending"); }} className="text-destructive hover:underline text-sm">Xóa</button>
+              <button type="button" onClick={() => { setVideoSrc(undefined); setVideoProgress(0); setVideoStatus("pending"); }} className="text-destructive hover:underline text-sm disabled:opacity-50" disabled={!editable}>Xóa</button>
             </div>
           </div>
         )}
         <div className="mt-2">
-          <Input placeholder="Hoặc dán URL video" value={videoSrc ?? ""} onChange={(e) => { setVideoSrc(e.target.value || undefined); setVideoStatus(e.target.value ? "success" : "pending"); }} />
+          <Input placeholder="Hoặc dán URL video" value={videoSrc ?? ""} onChange={(e) => { setVideoSrc(e.target.value || undefined); setVideoStatus(e.target.value ? "success" : "pending"); }} disabled={!editable} />
         </div>
         <FormField
           control={form.control}

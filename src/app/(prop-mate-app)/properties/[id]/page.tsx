@@ -24,15 +24,17 @@ export default function PropertyDetailPage() {
   // ...existing code...
   const updateProperty = api.property.update.useMutation({
     onSuccess: () => {
+      // Thông báo thành công, đợi ~1s rồi thoát edit mode theo spec
       toast.success("Cập nhật thành công!");
-  // Chuyển về view mode bằng cách xóa query param editmode, giữ nguyên pathname
-  const sp = new URLSearchParams(Array.from(searchParams.entries()));
-  sp.delete('editmode');
-  const query = sp.toString();
-  const url = query ? `${window.location.pathname}?${query}` : window.location.pathname;
-  toast.success("Cập nhật thành công!");
-  router.replace(url, { scroll: false });
-  setTimeout(() => router.refresh(), 100);
+      // Chuyển về view mode bằng cách xóa query param editmode, giữ nguyên pathname
+      const sp = new URLSearchParams(Array.from(searchParams.entries()));
+      sp.delete('editmode');
+      const query = sp.toString();
+      const url = query ? `${window.location.pathname}?${query}` : window.location.pathname;
+      setTimeout(() => {
+        router.replace(url, { scroll: false });
+        router.refresh();
+      }, 1000);
     },
     onError: (err) => {
       toast.error(err.message || "Cập nhật thất bại");
@@ -84,11 +86,7 @@ export default function PropertyDetailPage() {
   };
 
   const handleSave = () => {
-    if (formRef.current) {
-      formRef.current.requestSubmit();
-    } else {
-      console.warn('formRef.current is null');
-    }
+    formRef.current?.requestSubmit();
   };
 
   const handleSubmit = (data: PropertyCreateInput) => {
@@ -205,6 +203,7 @@ export default function PropertyDetailPage() {
                 initialValues={property}
                 formRef={formRef}
                 loading={isLoading}
+                mode="edit"
                 disabled={!editMode}
                 onSubmit={handleSubmit}
               />

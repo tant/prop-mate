@@ -23,7 +23,17 @@ export function PropertyFormLocation({ form, hasError, editable = true }: Proper
             <FormItem>
               <FormLabel>Thành phố</FormLabel>
               <FormControl>
-                <Input placeholder="Thành phố" {...field} disabled={!editable} />
+                <Input
+                  placeholder="Thành phố"
+                  {...field}
+                  disabled={!editable}
+                  autoComplete="address-level1"
+                  onBlur={(e) => {
+                    if (!editable) return;
+                    const v = e.target.value.trim();
+                    if (v !== field.value) field.onChange(v);
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -32,7 +42,17 @@ export function PropertyFormLocation({ form, hasError, editable = true }: Proper
             <FormItem>
               <FormLabel>Quận/Huyện</FormLabel>
               <FormControl>
-                <Input placeholder="Quận/Huyện" {...field} disabled={!editable} />
+                <Input
+                  placeholder="Quận/Huyện"
+                  {...field}
+                  disabled={!editable}
+                  autoComplete="address-level2"
+                  onBlur={(e) => {
+                    if (!editable) return;
+                    const v = e.target.value.trim();
+                    if (v !== field.value) field.onChange(v);
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -41,7 +61,17 @@ export function PropertyFormLocation({ form, hasError, editable = true }: Proper
             <FormItem>
               <FormLabel>Phường/Xã</FormLabel>
               <FormControl>
-                <Input placeholder="Phường/Xã" {...field} disabled={!editable} />
+                <Input
+                  placeholder="Phường/Xã"
+                  {...field}
+                  disabled={!editable}
+                  autoComplete="address-level3"
+                  onBlur={(e) => {
+                    if (!editable) return;
+                    const v = e.target.value.trim();
+                    if (v !== field.value) field.onChange(v);
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -50,7 +80,17 @@ export function PropertyFormLocation({ form, hasError, editable = true }: Proper
             <FormItem>
               <FormLabel>Đường</FormLabel>
               <FormControl>
-                <Input placeholder="Đường" {...field} disabled={!editable} />
+                <Input
+                  placeholder="Đường"
+                  {...field}
+                  disabled={!editable}
+                  autoComplete="address-line1"
+                  onBlur={(e) => {
+                    if (!editable) return;
+                    const v = e.target.value.trim();
+                    if (v !== field.value) field.onChange(v);
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -65,8 +105,13 @@ export function PropertyFormLocation({ form, hasError, editable = true }: Proper
             onChange={
               editable
                 ? (lat: number, lng: number) => {
-                    form.setValue("location.gps.lat", lat);
-                    form.setValue("location.gps.lng", lng);
+                    const prev = form.getValues("location.gps");
+                    if (prev?.lat !== lat) {
+                      form.setValue("location.gps.lat", lat, { shouldDirty: true, shouldTouch: true });
+                    }
+                    if (prev?.lng !== lng) {
+                      form.setValue("location.gps.lng", lng, { shouldDirty: true, shouldTouch: true });
+                    }
                   }
                 : () => {}
             }
