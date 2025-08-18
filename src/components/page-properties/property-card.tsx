@@ -3,11 +3,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Property } from "@/types/property";
 import dynamic from "next/dynamic";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Swiper, SwiperSlide } from "swiper/react";
+// Note: don't import Swiper modules directly to avoid version/typing issues in this repo.
 import "swiper/css";
-import { IconShare } from "@tabler/icons-react";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import { IconShare, IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import Image from "next/image";
 
 const PropertyMiniMap = dynamic(() => import("./property-mini-map"), { ssr: false });
@@ -41,14 +44,16 @@ function highlight(text: string | undefined, term?: string) {
 
 export function PropertyCard({ property, onView, onEdit, onDelete, highlightTerm }: PropertyCardProps) {
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalImg, setModalImg] = useState<string | null>(null);
+  // modalImg removed; use currentIndex to track modal image
+  const [currentIndex, setCurrentIndex] = useState(0);
   // Filter out any falsy/invalid image URLs
   const images = (property.imageUrls?.filter((img) => typeof img === 'string' && !!img) ?? []);
   const safeImages = images.length > 0 ? images : ["/no-image.png"];
 
   const handleImgClick = (img: string) => {
-    setModalImg(img);
-    setModalOpen(true);
+  const idx = safeImages.findIndex((s) => s === img);
+  setCurrentIndex(idx >= 0 ? idx : 0);
+  setModalOpen(true);
   };
 
   // Fix: location may be undefined, so use optional chaining and fallback
@@ -72,6 +77,26 @@ export function PropertyCard({ property, onView, onEdit, onDelete, highlightTerm
     }
     return `${millions.toLocaleString('vi-VN', { maximumFractionDigits: 2 })} triệu`;
   }, [property.price?.value]);
+
+  // Modal navigation uses setCurrentIndex inline in handlers below
+
+  // Keyboard shortcuts when modal is open
+  useEffect(() => {
+    if (!modalOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        setCurrentIndex((i) => (i - 1 + safeImages.length) % safeImages.length);
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        setCurrentIndex((i) => (i + 1) % safeImages.length);
+      } else if (e.key === 'Escape') {
+        setModalOpen(false);
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [modalOpen, safeImages.length]);
 
   return (
     <Card className="p-4 flex flex-col gap-2 shadow hover:shadow-lg transition" data-testid="property-card">
@@ -161,14 +186,33 @@ export function PropertyCard({ property, onView, onEdit, onDelete, highlightTerm
       </CardFooter>
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent className="flex flex-col items-center justify-center">
-          <div className="sr-only">
-            <DialogTitle>Xem ảnh bất động sản</DialogTitle>
-            <DialogDescription>Ảnh phóng to của bất động sản này</DialogDescription>
-          </div>
-          {modalImg && (
-            <Image src={modalImg} alt="Xem ảnh" className="max-h-[80vh] max-w-full object-contain rounded" width={800} height={600} />
-          )}
-        </DialogContent>
+            <div className="sr-only">
+              <DialogTitle>Xem ảnh bất động sản</DialogTitle>
+              <DialogDescription>Ảnh phóng to của bất động sản này</DialogDescription>
+            </div>
+            {safeImages.length > 0 && (
+              <div className="w-full max-w-3xl">
+                <div className="relative">
+                  <button type="button" onClick={() => setCurrentIndex((i) => (i - 1 + safeImages.length) % safeImages.length)} className="absolute left-2 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/40 text-white">
+                    <IconChevronLeft />
+                  </button>
+                  <button type="button" onClick={() => setCurrentIndex((i) => (i + 1) % safeImages.length)} className="absolute right-2 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/40 text-white">
+                    <IconChevronRight />
+                  </button>
+                  <div className="flex items-center justify-center">
+                    <Image src={safeImages[currentIndex]} alt={property.memorableName} className="max-h-[80vh] max-w-full object-contain rounded" width={1000} height={800} />
+                  </div>
+                </div>
+                <div className="mt-3 flex items-center gap-2 overflow-x-auto">
+                  {safeImages.map((t, idx) => (
+                    <button key={t} type="button" onClick={() => setCurrentIndex(idx)} className={`flex-shrink-0 border rounded overflow-hidden ${idx === currentIndex ? 'ring-2 ring-primary' : ''}`}>
+                      <Image src={t} alt={`thumb-${idx}`} width={120} height={80} className="object-cover" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </DialogContent>
       </Dialog>
     </Card>
   );
