@@ -131,7 +131,7 @@ export function PropertyCard({ property, onView, onEdit, onDelete }: PropertyCar
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogPortal>
           <DialogOverlay className="bg-transparent" />
-          <DialogContent className="w-[85vw] h-[42vh] max-w-[1400px] p-0 gap-0 bg-transparent border-0 shadow-none overflow-visible [&>button]:hidden">
+          <DialogContent className="w-[85vw] h-auto max-h-[90vh] max-w-[1400px] p-0 gap-0 bg-transparent border-0 shadow-none overflow-visible [&>button]:hidden">
             <div className="sr-only">
               <DialogTitle>Xem ảnh bất động sản</DialogTitle>
               <DialogDescription>Ảnh phóng to của bất động sản này</DialogDescription>
@@ -143,14 +143,15 @@ export function PropertyCard({ property, onView, onEdit, onDelete }: PropertyCar
               navigation
               pagination={{ clickable: true }}
               initialSlide={modalImgIndex}
-              className="property-modal-swiper w-full h-full"
+              className="property-modal-swiper w-full"
+              style={{ height: 'auto', minHeight: '400px' }}
             >
               {images.map((img, idx) => (
-                <SwiperSlide key={`modal-${idx}`} className="flex items-center justify-center">
+                <SwiperSlide key={`modal-${idx}`} className="flex items-center justify-center h-auto">
                   <Image
                     src={img}
                     alt={`${property.memorableName} - ảnh ${idx + 1}`}
-                    className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+                    className="w-auto h-auto max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
                     width={1920}
                     height={1080}
                     unoptimized
