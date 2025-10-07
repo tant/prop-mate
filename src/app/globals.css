@@ -138,3 +138,98 @@
 .animate-fade-in {
   animation: fadeIn 1s;
 }
+
+/* Swiper custom styles for property card slider */
+.property-card-swiper .swiper-button-next,
+.property-card-swiper .swiper-button-prev {
+  color: white;
+  background: rgba(0, 0, 0, 0.5);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.property-card-swiper .swiper-button-next::after,
+.property-card-swiper .swiper-button-prev::after {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.property-card-swiper .swiper-button-next:hover,
+.property-card-swiper .swiper-button-prev:hover {
+  background: rgba(0, 0, 0, 0.7);
+  transform: scale(1.1);
+}
+
+.property-card-swiper .swiper-pagination-bullet {
+  background: white;
+  opacity: 0.6;
+  width: 6px;
+  height: 6px;
+}
+
+.property-card-swiper .swiper-pagination-bullet-active {
+  opacity: 1;
+  background: white;
+}
+
+/* Swiper custom styles for property modal slider */
+.property-modal-swiper {
+  background: transparent;
+}
+
+/* Hide controls by default, show on hover */
+.property-modal-swiper .swiper-button-next,
+.property-modal-swiper .swiper-button-prev {
+  color: white;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  opacity: 0;
+}
+
+.property-modal-swiper:hover .swiper-button-next,
+.property-modal-swiper:hover .swiper-button-prev {
+  opacity: 1;
+}
+
+.property-modal-swiper .swiper-button-next::after,
+.property-modal-swiper .swiper-button-prev::after {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.property-modal-swiper .swiper-button-next:hover,
+.property-modal-swiper .swiper-button-prev:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.05);
+}
+
+.property-modal-swiper .swiper-pagination {
+  bottom: 20px !important;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.property-modal-swiper:hover .swiper-pagination {
+  opacity: 1;
+}
+
+.property-modal-swiper .swiper-pagination-bullet {
+  background: rgba(255, 255, 255, 0.6);
+  opacity: 0.8;
+  width: 8px;
+  height: 8px;
+  transition: all 0.3s ease;
+}
+
+.property-modal-swiper .swiper-pagination-bullet-active {
+  opacity: 1;
+  background: rgba(255, 255, 255, 1);
+  width: 10px;
+  height: 10px;
+}
